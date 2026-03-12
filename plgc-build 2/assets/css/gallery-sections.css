@@ -363,6 +363,18 @@
     flex-wrap: wrap;
 }
 
+/* Badge link wrapper — invisible anchor around the circular logo.
+   The badge is decorative/redundant (CTA button is the real interactive element),
+   so tabindex=-1 and aria-hidden=true are applied in the PHP to prevent a
+   duplicate keyboard stop. The <a> tag just provides the pointer cursor. */
+.plgc-gs__badge-link {
+    display: inline-block;
+    flex-shrink: 0;
+    border-radius: 50%;
+    text-decoration: none;
+    outline-offset: 4px;
+}
+
 /* McChesney's badge */
 .plgc-gs__badge {
     display: block;
@@ -440,7 +452,12 @@
    RESPONSIVE — MOBILE  (≤ 767 px)
    ───────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
-    .plgc-gs__image-col {
+    /* Override BOTH selectors from the tablet rule — .plgc-gs--image-right
+       .plgc-gs__image-col has higher specificity than .plgc-gs__image-col and
+       was not being overridden, leaving the Weddings image column 100px taller
+       than the other two sections and creating the extra whitespace gap. */
+    .plgc-gs__image-col,
+    .plgc-gs--image-right .plgc-gs__image-col {
         height: 260px;
         min-height: 260px;
     }
@@ -459,11 +476,9 @@
         padding: 32px 20px;
     }
 
-    /* Remove any top margin inherited from the right-aligned weddings card.
-       Extra specificity needed because the image-right desktop rule sets a
-       large padding-top (86px) and the general reset may not always win. */
+    /* Weddings: belt-and-braces reset so no desktop padding-top bleeds through */
     .plgc-gs--image-right .plgc-gs__card {
-        margin-top: 0;
+        margin-top: 0 !important;
         padding-top: 32px !important;
     }
 

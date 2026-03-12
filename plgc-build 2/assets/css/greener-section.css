@@ -408,14 +408,16 @@
         padding: 40px 0 60px;
     }
 
-    /* Feather: keep within the visible section area — no negative top so
-       overflow:hidden doesn't clip it. Right stays slightly inset so it
-       doesn't create horizontal scroll on narrow screens. */
+    /* Feather: sits at the bottom-right corner (matching desktop intent) within
+       the section bounds. Must explicitly set top:auto to cancel the base rule's
+       bottom:0 — if both top and bottom are set on a height:auto element, the
+       browser stretches it and the image looks distorted/invisible. */
     .plgc-greener__feather {
-        width: 120px;
-        top: 0;
-        right: -8px;
-        opacity: 0.22;
+        width: 160px;
+        bottom: 0;
+        top: auto;
+        right: 0;
+        opacity: 0.40;
     }
 
     .plgc-greener__header {
