@@ -631,16 +631,21 @@
         margin-top: 8px;
     }
 
-    /* Fix: .plgc-btn--tee-time has width:max-content + white-space:nowrap globally.
-       The <a> carries both plgc-btn--tee-time AND plgc-footer__cta directly —
-       use no-space compound selector (same element), not descendant selector. */
-    a.plgc-footer__cta {
+    /* Fix: on mobile the footer CTA must stretch to full width while keeping
+       its text centred. We keep display:flex (not block) so justify-content
+       and align-items from .plgc-btn--tee-time still work.  The compound
+       selector (same element, no space) overrides the nav.css base rule
+       without breaking specificity. */
+    a.plgc-footer__cta,
+    .plgc-footer__cta.plgc-btn--tee-time {
         width: 100%;
         box-sizing: border-box;
-        white-space: normal;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        white-space: nowrap;
         text-align: center;
         flex-shrink: 1;
-        display: block;
     }
 
     .plgc-footer__sub-inner {

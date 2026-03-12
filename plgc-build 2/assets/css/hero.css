@@ -408,6 +408,13 @@
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
+    /* At tablet widths the Elementor widget injects --plgc-hero-height:698px as
+       an inline style, which makes the hero very tall relative to the viewport.
+       Override with a viewport-proportional height so the image doesn't crop
+       heavily on a landscape photo at portrait-ish screen sizes. */
+    .plgc-hero {
+        height: clamp(380px, 60vw, 680px);
+    }
     .plgc-hero__content { padding: 0 2rem 2.5rem; }
     .plgc-hero__heading { font-size: 2.25rem; }
     .plgc-hero__subheading { font-size: 1.25rem; }
@@ -417,9 +424,11 @@
 }
 
 @media (max-width: 640px) {
+    /* Mobile: use a 16:9-ish aspect ratio so the hero image fills the
+       container proportionally at any phone width without awkward cropping.
+       clamp keeps it from being too short on very narrow screens. */
     .plgc-hero {
-        height: var(--plgc-hero-height-mobile, 75vw);
-        min-height: 340px;
+        height: clamp(240px, 56.25vw, 420px);
     }
     .plgc-hero__content { padding: 0 1rem 1.5rem; gap: 0.75rem; }
     .plgc-hero__heading { font-size: 1.75rem; }

@@ -64,7 +64,7 @@
     right: 0;
     width: clamp(320px, 49%, 705px);
     height: auto;
-    opacity: 0.35;
+    opacity: 0.55;
     mix-blend-mode: soft-light;
     pointer-events: none;
     user-select: none;
@@ -356,9 +356,22 @@
         padding: 0 20px;
     }
 
+    /* 2×2 grid: each tile is exactly half width minus half the gap.
+       Use aspect-ratio (4:3) instead of a fixed pixel height so tiles scale
+       proportionally at every screen width — avoids the "awkward bottom" issue
+       where a 360px tile on a 500px-wide screen looks portrait-cropped. */
     .plgc-greener__tile {
         flex: 1 1 calc(50% - 15px);
-        height: 360px;
+        height: auto;
+        aspect-ratio: 4 / 3;
+    }
+
+    /* Tile image must fill the aspect-ratio container */
+    .plgc-greener__tile-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
     }
 
     /* Reset corner radii for wrapped layout */
@@ -383,7 +396,7 @@
 
     .plgc-greener__feather {
         width: 180px;
-        opacity: 0.12;
+        opacity: 0.35;
     }
 }
 
@@ -399,7 +412,7 @@
         width: 120px;
         top: -10px;
         right: -15px;
-        opacity: 0.10;
+        opacity: 0.22;
     }
 
     .plgc-greener__header {
@@ -417,6 +430,9 @@
         line-height: 1.75rem;
     }
 
+    /* Single column on mobile. Use 16:9 aspect-ratio for a proportional
+       landscape card — wider than the 4:3 tablet tiles so the image
+       reads well on a narrow screen without feeling too squat. */
     .plgc-greener__grid {
         flex-direction: column;
         gap: 16px;
@@ -427,7 +443,8 @@
     .plgc-greener__tile {
         flex: none;
         width: 100%;
-        height: 280px;
+        height: auto;
+        aspect-ratio: 16 / 9;
         border-radius: 5px !important;
     }
 
