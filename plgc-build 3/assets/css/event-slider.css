@@ -96,29 +96,15 @@
 }
 
 /* ── Dark gradient panel ─────────────────────────────────────────────────── */
-/* Figma node I42551:9332;18028:2213:
-     right: 0 (flush to right edge of slide)
-     bottom: 7.05% (not flush to bottom — floats above it)
-     width: 626/708 = 88.4% of container
-     top-left + bottom-left corners rounded (10px), right side straight
-   The panel "floats" above the bottom of the slide with left breathing room,
-   giving it the appearance of a floating card attached to the right wall.  */
+/* The panel provides the dark background for the content overlay.
+   We hide the empty panel div and instead apply the background + border-radius
+   directly on .plgc-es__content — this way the dark background always grows
+   to exactly match content height, regardless of how much text is inside.    */
 .plgc-es__panel {
-    position: absolute;
-    right: 0;
-    bottom: 7.05%;
-    width: 88.4%;
-    /* Height is driven by content; min-height ensures panel is never tiny */
-    min-height: 23%;
-    height: auto;
-    background: linear-gradient(180deg, #000000 12.255%, #454041 108.82%);
-    border-radius: 10px 0 0 10px;   /* left corners rounded, right flush */
-    pointer-events: none;
-    z-index: 1;
-    /* No border — Figma has no visible stroke on this element */
+    display: none;
 }
 
-/* ── Content layer (sits above panel, z-index 2) ────────────────────────── */
+/* ── Content layer — IS the panel (background applied here) ─────────────── */
 .plgc-es__content {
     position: absolute;
     right: 0;
@@ -131,10 +117,14 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 18px 36px 20px;
+    gap: 8px;
+    padding: 20px 36px 20px;
     text-align: center;
     pointer-events: auto;
+    /* Dark gradient background — now on the content element so it always
+       matches content height perfectly. Panel div is hidden.                 */
+    background: linear-gradient(180deg, #000000 12.255%, #454041 108.82%);
+    border-radius: 10px 0 0 10px;
 }
 
 /* Eyebrow — date + time, small caps, muted white */
@@ -179,28 +169,34 @@
 
 /* ── CTA states ──────────────────────────────────────────────────────────── */
 
-/* Base — "Learn More" / "View Details": white underlined link per WCAG 1.4.1 */
+/* Base — "Learn More" / "View Details": white outline pill button
+   More prominent than a bare underline link, clearly a CTA action.
+   White border on dark background = 21:1 contrast (WCAG AAA).            */
 .plgc-es__cta {
     font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    font-size: 1.5rem;        /* 24px — matches Figma */
-    line-height: 2.625rem;    /* 42px */
+    font-weight: 600;
+    font-size: 0.9375rem;      /* 15px — matches global .plgc-btn */
+    line-height: 1;
     color: #FFFFFF;
-    text-decoration: underline;           /* WCAG 1.4.1 — always visible */
-    text-underline-offset: 3px;
-    text-decoration-color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
-    display: inline-block;
-    padding: 2px 12px;
-    min-height: 44px;         /* WCAG 2.5.5 */
+    padding: 0.75rem 1.5rem;
+    min-height: 47px;          /* WCAG 2.5.5 — matches primary button height */
     min-width: 44px;
-    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    border-radius: 6.25rem;    /* pill — matches .plgc-btn */
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .plgc-es__cta:hover {
-    color: #FFAE40;
-    text-decoration-color: #FFAE40;
-    text-decoration: underline;   /* belt-and-suspenders */
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 1);
+    color: #FFFFFF;
+    text-decoration: none;
 }
 
 /* "Get Tickets" — yellow pill, visually distinct, signals a transaction */
@@ -227,7 +223,7 @@
 .plgc-es__cta:focus-visible {
     outline: 3px solid #FFAE40;
     outline-offset: 3px;
-    border-radius: 3px;
+    border-radius: 6.25rem;
 }
 
 .plgc-es__cta--tickets:focus-visible {
@@ -354,14 +350,9 @@
         line-height: 1.875rem;
     }
 
-    .plgc-es__cta {
-        font-size: 1.125rem;
-        line-height: 2.25rem;
-    }
-
     .plgc-es__content {
-        padding: 14px 24px 16px;
-        gap: 5px;
+        padding: 16px 24px 16px;
+        gap: 6px;
     }
 }
 
@@ -373,27 +364,26 @@
         min-height: 300px;
     }
 
-    /* Panel stays floating at right at same relative position;
-       left gap scales proportionally on narrower screens.                  */
-    .plgc-es__panel,
+    /* Panel/content stays at right, slightly wider on mobile — less left gap.
+       Bottom offset reduced so the panel doesn't sit too low.               */
     .plgc-es__content {
-        width: 92%;           /* slightly wider on mobile — less left gap */
+        width: 92%;
         bottom: 5%;
-    }
-
-    .plgc-es__content {
-        padding: 12px 16px 14px;
-        gap: 4px;
+        padding: 14px 16px 14px;
+        gap: 5px;
     }
 
     .plgc-es__title {
         font-size: 1.0625rem;
         line-height: 1.625rem;
+        /* Allow 3 lines on mobile — narrow viewport makes long names wrap    */
+        -webkit-line-clamp: 3;
     }
 
     .plgc-es__cta {
-        font-size: 0.9375rem;
-        line-height: 1.875rem;
+        font-size: 0.875rem;
+        padding: 0.625rem 1.25rem;
+        min-height: 44px;
     }
 
     .plgc-es__cta--tickets {

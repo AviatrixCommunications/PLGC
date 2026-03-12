@@ -81,15 +81,17 @@
             loop:           false,
             slidesPerView:  1,
             spaceBetween:   0,
-            grabCursor:     false,
+            grabCursor:     true,   // shows grab cursor; enables click-drag on desktop
 
-            // cssMode: uses native overflow-x scroll + scrollLeft instead of
-            // CSS translate3d transforms. This prevents the iOS Safari invisible-
-            // content bug where a GPU-composited (transform) child inside an
-            // overflow:hidden parent renders nothing on real iOS devices.
-            // Trade-off: no crossfade/cube effects (not used here), and touch
-            // swipe uses native momentum scrolling (actually better on iOS).
-            cssMode:        true,
+            // simulateTouch is true by default — allows mouse drag in addition to touch.
+            // cssMode was previously set here to work around an iOS Safari bug where
+            // GPU-composited (transform) children inside overflow:hidden could go
+            // invisible on real devices. That bug affects older iOS (pre-2022). Removing
+            // cssMode restores Swiper's native pointer-event handling, which is required
+            // for desktop mouse drag. Modern iOS handles this correctly; if the invisible-
+            // content bug resurfaces on a specific device, re-enable cssMode and add a
+            // custom pointer-drag shim for desktop.
+            cssMode:        false,
 
             // NO autoplay (WCAG 2.2.2)
             autoplay: false,

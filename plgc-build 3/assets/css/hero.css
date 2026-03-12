@@ -454,15 +454,18 @@
         );
     }
 
-    /* Content — span from where gradient gets visually dark (70%) to the
-       bottom, then flex-center the text inside that zone.  This guarantees
-       equal visual breathing room above and below the heading/subheading
-       regardless of exact text height or hero height value.              */
+    /* Content — span from where gradient becomes visually dark to the bottom,
+       then flex-center the text inside that zone so there is equal visual
+       breathing room above and below the heading/subheading pair.
+       62% aligns with the gradient start (≈ 0.2 opacity), meaning the
+       text actually renders in the 70–100% zone where the overlay is rich
+       and dark, while the container starts at 62% so justify-content:center
+       can distribute equal space above and below the text.                   */
     .plgc-hero__content {
-        top: 70%;
+        top: 62%;
         bottom: 0;
-        padding: 0.75rem 1.25rem;
-        gap: 0.4rem;
+        padding: 1rem 1.25rem;
+        gap: 0.5rem;
         justify-content: center;
     }
 

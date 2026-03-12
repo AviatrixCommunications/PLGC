@@ -342,7 +342,7 @@ function plgc_gs_shortcode( array $atts ): string {
 	?>
 
 <section
-	class="plgc-gs plgc-gs--image-<?php echo esc_attr( $image_side ); ?>"
+	class="plgc-gs plgc-gs--image-<?php echo esc_attr( $image_side ); ?> plgc-gs--<?php echo esc_attr( $section_key ); ?>"
 	aria-labelledby="<?php echo esc_attr( $heading_id ); ?>"
 >
 

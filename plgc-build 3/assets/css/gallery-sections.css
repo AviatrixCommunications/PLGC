@@ -377,6 +377,29 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   McCHESNEY'S SPECIFIC OVERRIDES
+   The badge (126px circular logo) is taken out of the normal flex flow by
+   making it position:absolute. This means all three cards share the same
+   natural height — heading + body + button — and the badge sits decoratively
+   in the corner of the card without pushing the card taller.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Badge-link pulled out of flex flow — lives in the bottom-right corner of card */
+.plgc-gs--mcchesneys .plgc-gs__badge-link {
+    position: absolute;
+    right: 44px;   /* inside 60px right padding, centred within it */
+    bottom: 44px;  /* inside 57px bottom padding, comfortable visual margin */
+}
+
+/* On tablet/mobile, badge re-flows into the btn-row row (no overlap issues
+   since the card goes full-width and is taller).                            */
+@media (max-width: 1024px) {
+    .plgc-gs--mcchesneys .plgc-gs__badge-link {
+        position: static;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    RESPONSIVE — TABLET  (≤ 1024 px)
    At tablet, stack vertically. Card drops below image, full width, no overlap,
    no negative margin. Border-radius resets to simple top/bottom pairs.

@@ -34,7 +34,7 @@
                 loop:          false,
                 slidesPerView: 1,
                 spaceBetween:  0,
-                grabCursor:    false,
+                grabCursor:    true,   // enables click-drag on desktop + grab cursor
                 autoplay:      false,   // No autoplay — WCAG 2.2.2
 
                 keyboard: {

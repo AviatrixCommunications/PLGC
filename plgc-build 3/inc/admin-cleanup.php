@@ -996,21 +996,221 @@ remove_action('welcome_panel', 'wp_welcome_panel');
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL ADMIN — BACKBONE NULL-SAFETY PATCH  (early — attached to backbone handle)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Patch Backbone.View.prototype.$ globally, as early as possible.
+ *
+ * ── Why the previous admin_footer approach failed ───────────────────────────
+ * The WooCommerce email settings crash (backbone.min.js: "Cannot read
+ * properties of undefined (reading 'find')") originates from an inline
+ * <script> in the page <body> — visible as "admin.php?page=wc-settings&
+ * tab=email:1075" in the stack trace. WordPress outputs that inline script
+ * during the page render, long before admin_footer fires. By the time our
+ * admin_footer patch ran, the Backbone crash had already happened and
+ * wp.Backbone.Subviews had already aborted its init chain.
+ *
+ * ── Correct timing: wp_add_inline_script on 'backbone' ─────────────────────
+ * wp_add_inline_script('backbone', $code, 'after') outputs the patch as an
+ * inline <script> immediately after backbone.min.js in the <head> — before
+ * any plugin's body inline scripts execute. On WooCommerce email settings,
+ * backbone is loaded as a dependency of media-views → wp-backbone → backbone,
+ * all of which arrive in the <head>. Our patch therefore runs after backbone
+ * but before WooCommerce's body script that triggers the crash.
+ *
+ * wp_enqueue_script('backbone') is called first to guarantee the handle is
+ * in the queue even on pages that wouldn't otherwise load it.
+ *
+ * ── What the patch does ─────────────────────────────────────────────────────
+ * WordPress 6.9 changed when wp.Backbone.Subviews.ready() fires — it now
+ * calls each subview's ready() before the subview's `el` is attached to the
+ * live DOM. Any code inside ready() that calls this.$('selector') resolves
+ * to this.$el.find(selector). When this.el is undefined, this.$el is also
+ * undefined and .find() throws TypeError, killing the entire init chain.
+ *
+ * Fix: wrap Backbone.View.prototype.$ so that if this.el is falsy it returns
+ * an inert empty jQuery object rather than throwing. All downstream code
+ * (.find, .on, .off, .filter, .length) then no-ops gracefully.
+ */
+add_action( 'admin_enqueue_scripts', 'plgc_backbone_null_safety_patch', 1 );
+
+function plgc_backbone_null_safety_patch(): void {
+    if ( wp_doing_ajax() ) return;
+
+    // Guarantee backbone is in the script queue so wp_add_inline_script has
+    // a valid handle to attach to, even on pages that don't load it otherwise.
+    wp_enqueue_script( 'backbone' );
+
+    $patch = <<<'PATCH'
+(function () {
+    'use strict';
+    if ( typeof Backbone === 'undefined'
+         || ! Backbone.View
+         || ! Backbone.View.prototype
+         || Backbone.View.prototype._plgcPatched ) {
+        return;
+    }
+    Backbone.View.prototype._plgcPatched = true;
+
+    var _orig = Backbone.View.prototype.$;
+    Backbone.View.prototype.$ = function ( selector ) {
+        /*
+         * Guard: this.el is undefined when the view has been created but its
+         * element hasn't been inserted into the live DOM yet. wp.Backbone.
+         * Subviews.ready() (WP 6.9+) calls ready() on child views at this
+         * stage. Any this.$('.x') call inside ready() would throw without this
+         * guard. Return an inert jQuery-compatible object so callers no-op.
+         */
+        if ( ! this.el ) {
+            if ( typeof jQuery !== 'undefined' ) {
+                return jQuery();   /* empty jQuery set — all methods safe */
+            }
+            /* Fallback if jQuery isn't available yet (shouldn't happen in WP) */
+            var noop = function () { return noop; };
+            return { length: 0, on: noop, off: noop, find: noop, filter: noop,
+                     prop: noop, addClass: noop, removeClass: noop, is: noop };
+        }
+        return _orig.call( this, selector );
+    };
+}());
+PATCH;
+
+    // 'after' = output inline script immediately after backbone.min.js.
+    // This fires in <head>, before any plugin body inline scripts.
+    wp_add_inline_script( 'backbone', $patch, 'after' );
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL ADMIN — MEDIA SELECT BUTTON FIX  (admin_footer — interaction-time)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Re-enable the Select button in wp.media frames after an image is clicked.
+ *
+ * This is interaction-time (user clicks an image), not page-load, so
+ * admin_footer timing is fine — the modal isn't open yet when the page loads.
+ *
+ * The Select button stays disabled when ACF's selection-change listener
+ * failed to bind (e.g. because the field was inside a hidden tab panel when
+ * wp.media initialised). Re-enabling on any attachment click is safe: WP
+ * core still validates the actual selection state before inserting media.
+ */
+add_action( 'admin_footer', 'plgc_media_select_button_fix', 5 );
+
+function plgc_media_select_button_fix(): void {
+    if ( wp_doing_ajax() ) return;
+    ?>
+<script id="plgc-media-select-fix">
+(function () {
+    'use strict';
+
+    function init() {
+        if ( typeof wp === 'undefined' || ! wp.media ) return;
+        if ( wp.media._plgcSelectFixed ) return;
+        wp.media._plgcSelectFixed = true;
+
+        function enableSelectBtn( frame ) {
+            if ( ! frame ) return;
+            var btn;
+            try {
+                /*
+                 * frame.$() uses Backbone's jQuery scope. Now that the Backbone
+                 * patch (above) guards against undefined el, this is safe.
+                 */
+                btn = ( typeof frame.$ === 'function' )
+                    ? frame.$( '.media-button-select' )
+                    : ( frame.$el ? frame.$el.find( '.media-button-select' ) : jQuery() );
+            } catch ( e ) { return; }
+            if ( btn && btn.length ) btn.prop( 'disabled', false ).removeClass( 'disabled' );
+        }
+
+        function patchFrame( frame ) {
+            if ( ! frame || frame._plgcSelectPatched ) return;
+            frame._plgcSelectPatched = true;
+            frame.on( 'open', function () {
+                var state     = frame.state ? frame.state() : null;
+                var selection = state ? state.get( 'selection' ) : null;
+                if ( ! selection ) return;
+                selection.on(
+                    'selection:single selection:multiple add remove reset',
+                    function () { enableSelectBtn( frame ); }
+                );
+                try {
+                    frame.$el.on( 'click.plgcselect', '.attachment', function () {
+                        setTimeout( function () { enableSelectBtn( frame ); }, 60 );
+                    } );
+                } catch ( e ) {}
+            } );
+        }
+
+        if ( wp.media.frame ) patchFrame( wp.media.frame );
+
+        if ( ! wp.media._plgcWrapped ) {
+            wp.media._plgcWrapped = true;
+            var _orig = wp.media;
+            wp.media = function () {
+                var frame = _orig.apply( this, arguments );
+                patchFrame( frame );
+                return frame;
+            };
+            for ( var k in _orig ) {
+                if ( Object.prototype.hasOwnProperty.call( _orig, k ) ) {
+                    wp.media[ k ] = _orig[ k ];
+                }
+            }
+        }
+
+        /*
+         * Catch-all delegate for the WooCommerce email logo picker and any
+         * other media frame that bypasses the wp.media() wrapper.
+         */
+        jQuery( document )
+            .off( 'click.plgcselect' )
+            .on( 'click.plgcselect', '.media-modal .attachment', function () {
+                setTimeout( function () {
+                    var btn = jQuery( '.media-modal-content .media-button-select' );
+                    if ( btn.length && btn.is( ':disabled' ) ) {
+                        btn.prop( 'disabled', false ).removeClass( 'disabled' );
+                    }
+                }, 80 );
+            } );
+    }
+
+    if ( document.readyState === 'loading' ) {
+        document.addEventListener( 'DOMContentLoaded', init );
+    } else {
+        init();
+    }
+}());
+</script>
+    <?php
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // PL SETTINGS PAGE — ADMIN ENHANCEMENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Enqueue admin JS + CSS specifically on the PL Settings options page.
  * Handles:
- *   1. Backbone.View safety patch — prevents "Cannot read properties of
- *      undefined (reading 'find')" crash on WordPress 6.9+ when ACF
- *      gallery/image fields are inside hidden tab panels on options pages.
+ *   1. wp_enqueue_media() — pre-initialises the WP media stack so ACF's
+ *      gallery/image fields work correctly on an ACF options page (which
+ *      doesn't call wp_enqueue_media() by default the way a post edit
+ *      screen does).
  *   2. ACF field re-init on tab click — fields hidden during page load
  *      never had their Backbone views properly attached; re-trigger ready
  *      when their tab becomes visible.
  *   3. Hide "Homepage Gallery Sections" and "Grass Is Greener" meta boxes
  *      when any tab other than "Homepage" is active.
  *   4. General settings page polish.
+ *
+ * Note: The Backbone null-safety patch and media Select-button fix that
+ * previously lived here have been promoted to plgc_global_admin_media_patch()
+ * (above) so they also cover WooCommerce settings, post edit screens, and any
+ * other admin page that opens a wp.media frame.
  */
 add_action( 'admin_enqueue_scripts', 'plgc_settings_page_admin_assets' );
 
@@ -1022,54 +1222,10 @@ function plgc_settings_page_admin_assets( string $hook ): void {
 
     // Pre-initialize WordPress's media stack so it's ready before ACF's
     // inline scripts run. This enqueues wp-backbone, backbone, media-views, etc.
+    // ACF options pages don't call this automatically (unlike post edit screens).
     wp_enqueue_media();
 
-    // ── 1. Backbone null-safety patch ────────────────────────────────────────
-    //
-    // Root cause of the "Cannot read properties of undefined (reading 'find')"
-    // error: ACF registers Backbone views for its gallery and image fields.
-    // WordPress 6.9 changed when wp.Backbone.Subviews.ready() fires — it now
-    // calls each view's ready() callback before the view's `el` has been
-    // attached to the live DOM. This happens because the field is inside a
-    // hidden ACF tab panel at page load.
-    //
-    // When ready() runs, ACF's code calls `this.$('.selector')`, which in
-    // Backbone resolves to `this.$el.find(selector)`. If `this.el` is
-    // undefined, `this.$el` is also undefined and the `.find()` call throws,
-    // aborting the entire initialization chain. The media modal never opens.
-    //
-    // Fix: patch Backbone.View.prototype.$ to return an empty jQuery object
-    // instead of throwing when `this.el` is undefined. This lets ACF's ready()
-    // complete gracefully. Field re-initialization on tab click (below) then
-    // finishes the job for fields that were hidden on load.
-    //
-    // Attached to 'wp-backbone' so it runs BEFORE ACF's inline <script> on
-    // the page (which is where the crash originates at line ~1495).
-    $backbone_patch_js = <<<'BPATCH'
-(function () {
-    'use strict';
-    if ( typeof Backbone === 'undefined' ) return;
-
-    var _origDollar = Backbone.View.prototype.$;
-
-    Backbone.View.prototype.$ = function ( selector ) {
-        // Guard: if el is not yet attached, return an inert empty jQuery set
-        // rather than letting this.$el.find() throw. ACF's ready() callbacks
-        // call this while the field is inside a hidden tab panel (el exists in
-        // memory but has no live DOM context), causing the WP 6.9 crash.
-        if ( ! this.el ) {
-            return ( typeof jQuery !== 'undefined' ) ? jQuery() : { length: 0, on: function(){}, off: function(){}, find: function(){ return this; } };
-        }
-        return _origDollar.call( this, selector );
-    };
-}());
-BPATCH;
-
-    // Must run after wp-backbone loads but BEFORE ACF's inline page script.
-    // wp_enqueue_media() above ensures 'wp-backbone' is in the queue.
-    wp_add_inline_script( 'wp-backbone', $backbone_patch_js, 'after' );
-
-    // ── 2. ACF tab click → re-initialize hidden fields + tab toggle ──────────
+    // ── ACF tab click → re-initialize hidden fields + tab toggle ─────────────
     $js = <<<'JS'
 (function () {
     'use strict';
@@ -1152,72 +1308,6 @@ BPATCH;
 JS;
 
     wp_add_inline_script( 'acf-input', $js );
-
-    // ── 3. Media modal Select-button fix ─────────────────────────────────────
-    //
-    // Belt-and-suspenders fix for the Select button remaining disabled after
-    // clicking an image in the media modal. Even after the Backbone patch
-    // above, ACF's selection-change listener may not bind correctly for fields
-    // that were hidden on load. This patch re-enables the button on any
-    // attachment click regardless of which field triggered the modal.
-    $media_fix_js = <<<'MEDIAJS'
-(function ( $ ) {
-    'use strict';
-
-    if ( typeof wp === 'undefined' || ! wp.media ) return;
-
-    function enableSelectBtn( frame ) {
-        if ( ! frame || ! frame.$el ) return;
-        var btn = frame.$el.find( '.media-button-select' );
-        if ( btn.length ) btn.prop( 'disabled', false ).removeClass( 'disabled' );
-    }
-
-    function patchFrame( frame ) {
-        if ( ! frame || frame._plgcPatched ) return;
-        frame._plgcPatched = true;
-
-        frame.on( 'open', function () {
-            var state     = frame.state();
-            var selection = state ? state.get( 'selection' ) : null;
-            if ( ! selection ) return;
-
-            selection.on(
-                'selection:single selection:multiple add remove reset',
-                function () { enableSelectBtn( frame ); }
-            );
-
-            frame.$el.on( 'click.plgcmedia', '.attachment', function () {
-                setTimeout( function () { enableSelectBtn( frame ); }, 60 );
-            } );
-        } );
-    }
-
-    // Patch any frame already created
-    if ( wp.media.frame ) patchFrame( wp.media.frame );
-
-    // Patch every frame created going forward
-    var origMedia = wp.media;
-    wp.media = function () {
-        var frame = origMedia.apply( this, arguments );
-        patchFrame( frame );
-        return frame;
-    };
-    $.extend( wp.media, origMedia );
-
-    // Also catch direct thumbnail clicks in the modal as a fallback
-    $( document ).on( 'click.plgcmedia', '.media-modal .attachment', function () {
-        setTimeout( function () {
-            var btn = $( '.media-modal-content .media-button-select' );
-            if ( btn.length && btn.is( ':disabled' ) ) {
-                btn.prop( 'disabled', false ).removeClass( 'disabled' );
-            }
-        }, 80 );
-    } );
-
-}( jQuery ));
-MEDIAJS;
-
-    wp_add_inline_script( 'media-editor', $media_fix_js );
 
     // Inline CSS — settings page cosmetic improvements
     $css = '
