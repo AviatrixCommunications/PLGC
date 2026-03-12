@@ -1,0 +1,55 @@
+{
+  "version": "0.4",
+  "title": "PLGC \u2014 Photo Gallery Grid",
+  "type": "section",
+  "page_settings": [],
+  "content": [
+    {
+      "id": "plgcgg01",
+      "elType": "section",
+      "isInner": false,
+      "settings": {
+        "layout": "full_width",
+        "content_width": { "unit": "px", "size": 1200, "sizes": [] },
+        "padding": { "unit": "rem", "top": "4", "right": "2.5", "bottom": "4", "left": "2.5", "isLinked": false },
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "plgcgg02",
+          "elType": "column",
+          "isInner": false,
+          "settings": { "_column_size": 100 },
+          "elements": [
+            {
+              "id": "plgcgg03",
+              "elType": "widget",
+              "widgetType": "plgc_gallery_grid",
+              "isInner": false,
+              "settings": {
+                "heading": "Wedding Gallery",
+                "heading_tag": "h2",
+                "intro_text": "A glimpse of the beautiful weddings and events hosted at Prairie Landing Golf Club.",
+                "columns": "3",
+                "aspect_ratio": "landscape",
+                "enable_lightbox": "yes",
+                "cta_label": "",
+                "cta_url": { "url": "" },
+                "images": [
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" }
+                ]
+              },
+              "elements": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
