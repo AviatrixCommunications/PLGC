@@ -85,7 +85,9 @@
 
 .plgc-filmstrip__img {
     transition: transform 250ms ease-in-out;
-    will-change: transform;
+    /* will-change:transform removed — causes iOS Safari to composit the image
+       onto a GPU layer that escapes the overflow:hidden clip on the parent button,
+       making it invisible on real iOS devices. The hover scale still works fine. */
 }
 .plgc-filmstrip__trigger:hover .plgc-filmstrip__img,
 .plgc-filmstrip__trigger:focus-visible .plgc-filmstrip__img {

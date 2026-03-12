@@ -29,10 +29,9 @@
     width: 100%;
     overflow: hidden;
     position: relative;
-    /* iOS Safari fix: forces GPU compositing on the parent so children
-       with will-change/transform don't go invisible inside overflow:hidden */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* No transform — transform + overflow:hidden on the same element
+       causes child images to go invisible on real iOS Safari (WebKit bug).
+       position:relative provides the stacking context we need. */
 }
 
 /* Optional background image layer — blended over the gradient */
@@ -127,9 +126,8 @@
     overflow: hidden;
     border-radius: 5px;
     background: #233C26;
-    /* iOS Safari: compositing layer on each tile so img transforms render correctly */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* No transform on overflow:hidden tiles — iOS Safari invisible-content bug.
+       Hover scale on the img child still works; browser composites as needed. */
 }
 
 /* Outer corner radius matching Figma */
@@ -454,21 +452,11 @@
         height: auto;
         aspect-ratio: 3 / 4;
         border-radius: 5px !important;
-        /* iOS Safari: explicit stacking context prevents absolutely-positioned
-           children (the tile image) from going invisible inside overflow:hidden
-           when the parent height is defined by aspect-ratio rather than px. */
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        /* Ensure the overlay gradient is always composited above the image */
-        isolation: isolate;
+        /* No transform or isolation — these trigger the iOS Safari
+           invisible-content bug when combined with overflow:hidden. */
     }
 
-    /* iOS Safari fix: tile image inside aspect-ratio container needs its own
-       compositing layer to render reliably. */
-    .plgc-greener__tile .plgc-greener__tile-img {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-    }
+    /* No transform on images inside overflow:hidden — resolved iOS Safari issue */
 
     /* Strengthen the bottom gradient at mobile so white link text always
        passes WCAG AA 4.5:1 regardless of image brightness. */

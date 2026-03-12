@@ -31,13 +31,9 @@
     overflow: hidden;           /* prevents the negative-margin card bleeding out */
     position: relative;
     width: 100%;
-    /* iOS Safari fix: GPU compositing layer so Swiper slide images don't
-       go invisible inside overflow:hidden — same fix as .plgc-greener */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    /* iOS Safari: create a new stacking context so overflow:hidden is
-       respected even when children have their own compositing layers */
-    isolation: isolate;
+    /* No transform here — transform + overflow:hidden on the same element
+       causes absolutely-positioned children to go invisible on real iOS Safari.
+       position:relative alone is sufficient for stacking context. */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -51,10 +47,7 @@
     align-self: stretch;        /* image column fills full section height */
     position: relative;
     overflow: hidden;
-    /* iOS Safari fix: GPU layer on image column */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    isolation: isolate;
+    /* No transform — see .plgc-gs comment above; same iOS Safari rationale */
 }
 
 /* Image-left:  right-side corners rounded (tr + br) */
@@ -94,10 +87,8 @@
     height: 100%;
     object-fit: cover;
     object-position: center 35%;  /* favour upper-middle — better for outdoor/course shots */
-    /* iOS Safari: explicit compositing layer prevents images from going
-       invisible inside overflow:hidden containers on initial load */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* No transform on images inside overflow:hidden — causes iOS Safari
+       invisible-content bug. Browser handles compositing automatically. */
 }
 
 /* Placeholder when no images uploaded */
@@ -404,10 +395,7 @@
         min-height: 360px;
         border-radius: 0;
         order: 1;               /* image always on top */
-        /* iOS Safari: maintain compositing layer after reset */
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        isolation: isolate;
+        /* No transform — same iOS Safari reason as base rule */
     }
 
     .plgc-gs__slider,

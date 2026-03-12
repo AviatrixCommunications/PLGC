@@ -22,12 +22,12 @@
     width: 100%;
     height: var(--plgc-hero-height, 698px);
     overflow: hidden;
-    /* Create stacking context via transform instead of isolation:isolate.
-       translateZ(0) achieves the same z-index containment AND forces a GPU
-       compositing layer — fixing the iOS Safari bug where position:absolute
-       children inside overflow:hidden+isolation:isolate don't render. */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* Dark green base: without this, Elementors default grey background bleeds
+       through the semi-transparent mid-gradient, creating a visible grey band. */
+    background-color: #233C26;
+    /* No transform — transform + overflow:hidden on same element causes absolutely-
+       positioned children (the background image) to go invisible on real iOS Safari.
+       position:relative provides the stacking context; overflow:hidden clips the edges. */
 }
 
 
@@ -56,8 +56,9 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* object-position is set via inline style from the widget's Image Position control.
-       Browser default (50% 50% = center center) is the fallback when no style is applied. */
+    /* Always centered — position control removed; crop focus is handled at upload time.
+       Use the recommended 2880×1116px image size for best results across all breakpoints. */
+    object-position: center center;
     -webkit-user-drag: none;
     user-drag: none;
     pointer-events: none;
@@ -99,6 +100,9 @@
     inset: 0;
     z-index: 1;
     overflow: hidden;
+    /* Dark green base: without this, Elementors default grey background bleeds
+       through the semi-transparent mid-gradient, creating a visible grey band. */
+    background-color: #233C26;
     pointer-events: none;
 }
 
