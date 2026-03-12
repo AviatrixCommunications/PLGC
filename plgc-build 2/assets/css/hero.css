@@ -429,22 +429,51 @@
 }
 
 @media (max-width: 767px) {
-    /* Mobile: generous viewport-relative height so the background image and
-       overlaid text both have comfortable room.
-       At 390px wide: 130vw ≈ 507px — text fits without crowding the image.
-       At 375px wide: 130vw ≈ 488px — same.
-       clamp floor (480px) prevents very small phones from going too short. */
+    /* Mobile hero height — large enough for the image to breathe while
+       keeping the gradient zone proportional to the text block inside it.
+       clamp(440px, 113vw, 530px):
+         390 px wide → 113vw = 440 px → gradient dark zone ≈ 141 px ✓
+         320 px wide → 113vw < 440 px → clamped to 440 px floor           */
     .plgc-hero {
-        height: clamp(480px, 130vw, 640px);
-        min-height: 480px;
+        height: clamp(440px, 113vw, 530px);
+        min-height: 440px;
     }
-    .plgc-hero__content { padding: 0 1.25rem 1.5rem; gap: 0.5rem; }
-    /* 1.625rem (26px) keeps heading at accessible large-text threshold (≥24px)
+
+    /* Mobile gradient — start clear stay clear through 35%, then ramp
+       smoothly so the image remains clearly visible in the top half while
+       the bottom third transitions into a rich dark green that reads like
+       the desktop gradient rather than a flat solid block.               */
+    .plgc-hero__overlay {
+        background: linear-gradient(
+            to bottom,
+            rgba(35,60,38,0)    0%,
+            rgba(35,60,38,0)    35%,
+            rgba(35,60,38,0.12) 52%,
+            rgba(35,60,38,0.65) 70%,
+            rgba(35,60,38,var(--plgc-hero-overlay, 0.92)) 100%
+        );
+    }
+
+    /* Content — span from where gradient gets visually dark (70%) to the
+       bottom, then flex-center the text inside that zone.  This guarantees
+       equal visual breathing room above and below the heading/subheading
+       regardless of exact text height or hero height value.              */
+    .plgc-hero__content {
+        top: 70%;
+        bottom: 0;
+        padding: 0.75rem 1.25rem;
+        gap: 0.4rem;
+        justify-content: center;
+    }
+
+    /* 1.625rem (26px) — keeps heading at accessible large-text threshold (≥24px)
        while fitting "Welcome to Prairie Landing Golf Club" in 2 lines at 390px */
     .plgc-hero__heading { font-size: 1.625rem; line-height: 1.28; }
-    /* 0.9375rem (15px) — just enough to keep subheading to 2 lines at 390px.
-       Still passes WCAG body-text 4.5:1 at this size on the dark overlay. */
+
+    /* 0.9375rem (15px) — keeps subheading to 2 lines at 390px and still
+       passes WCAG 4.5:1 contrast on the dark overlay.                   */
     .plgc-hero__subheading { font-size: 0.9375rem; line-height: 1.55; }
+
     .plgc-hero__announcement {
         position: relative;
         bottom: auto; right: auto;
@@ -457,8 +486,8 @@
     .plgc-hero__ann-link { font-size: 1rem; }
     .plgc-hero__dots { top: 10px; right: 10px; }
 
-    /* Move pause button to top-left on mobile so it never overlaps the
-       heading/subheading text that anchors to the bottom of the hero. */
+    /* Pause button moves top-left on mobile so it never overlaps
+       the text that is now centered in the bottom gradient zone.  */
     .plgc-hero__pause {
         top: 0.625rem;
         bottom: auto;

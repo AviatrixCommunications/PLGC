@@ -25,7 +25,9 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .plgc-greener {
     background: linear-gradient(180deg, #567915 41.83%, #2D5032 100%);
-    padding: 48px 0 79px;
+    /* Vertical rhythm: 73px top matches the 73px grid-to-testimonial gap,
+       giving the whole section a consistent internal cadence.            */
+    padding: 73px 0 79px;
     width: 100%;
     overflow: hidden;
     position: relative;
@@ -75,7 +77,9 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .plgc-greener__header {
     max-width: 1202px;
-    margin: 0 auto 111px;
+    /* 73px below matches the 73px grid-to-testimonial gap — creates a
+       uniform internal spacing rhythm throughout the section.           */
+    margin: 0 auto 73px;
     padding: 0 40px;
     text-align: center;
     position: relative;

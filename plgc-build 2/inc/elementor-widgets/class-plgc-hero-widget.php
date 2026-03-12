@@ -71,43 +71,6 @@ class PLGC_Hero_Widget extends Widget_Base {
 			'condition' => [ 'media_mode' => 'static' ],
 		] );
 
-		$this->add_control( 'static_position', [
-			'label'   => 'Image Position',
-			'type'    => Controls_Manager::SELECT,
-			'default' => 'center center',
-			'options' => [
-				'top left'      => 'Top Left',
-				'top center'    => 'Top Center',
-				'top right'     => 'Top Right',
-				'center left'   => 'Center Left',
-				'center center' => 'Center Center',
-				'center right'  => 'Center Right',
-				'bottom left'   => 'Bottom Left',
-				'bottom center' => 'Bottom Center',
-				'bottom right'  => 'Bottom Right',
-				'custom'        => 'Custom…',
-			],
-			'condition' => [ 'media_mode' => 'static' ],
-		] );
-
-		$this->add_control( 'static_focal_x', [
-			'label'      => 'Custom — Horizontal',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'media_mode' => 'static', 'static_position' => 'custom' ],
-		] );
-
-		$this->add_control( 'static_focal_y', [
-			'label'      => 'Custom — Vertical',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'media_mode' => 'static', 'static_position' => 'custom' ],
-		] );
-
 		// ── Slideshow images ──────────────────────────────────────────────
 		$repeater = new Repeater();
 		$repeater->add_control( 'slide_image', [
@@ -121,42 +84,6 @@ class PLGC_Hero_Widget extends Widget_Base {
 			'default'     => '',
 			'label_block' => true,
 			'description' => 'Required for accessibility.',
-		] );
-
-		$repeater->add_control( 'slide_position', [
-			'label'   => 'Image Position',
-			'type'    => Controls_Manager::SELECT,
-			'default' => 'center center',
-			'options' => [
-				'top left'      => 'Top Left',
-				'top center'    => 'Top Center',
-				'top right'     => 'Top Right',
-				'center left'   => 'Center Left',
-				'center center' => 'Center Center',
-				'center right'  => 'Center Right',
-				'bottom left'   => 'Bottom Left',
-				'bottom center' => 'Bottom Center',
-				'bottom right'  => 'Bottom Right',
-				'custom'        => 'Custom…',
-			],
-		] );
-
-		$repeater->add_control( 'slide_focal_x', [
-			'label'      => 'Custom — Horizontal',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'slide_position' => 'custom' ],
-		] );
-
-		$repeater->add_control( 'slide_focal_y', [
-			'label'      => 'Custom — Vertical',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'slide_position' => 'custom' ],
 		] );
 
 		$this->add_control( 'slides', [
@@ -224,43 +151,6 @@ class PLGC_Hero_Widget extends Widget_Base {
 			'default'      => 'yes',
 			'description'  => 'WCAG 2.2.2: A pause button will always appear for auto-playing video.',
 			'condition'    => [ 'media_mode' => 'video' ],
-		] );
-
-		$this->add_control( 'video_position', [
-			'label'     => 'Video Position',
-			'type'      => Controls_Manager::SELECT,
-			'default'   => 'center center',
-			'options'   => [
-				'top left'      => 'Top Left',
-				'top center'    => 'Top Center',
-				'top right'     => 'Top Right',
-				'center left'   => 'Center Left',
-				'center center' => 'Center Center',
-				'center right'  => 'Center Right',
-				'bottom left'   => 'Bottom Left',
-				'bottom center' => 'Bottom Center',
-				'bottom right'  => 'Bottom Right',
-				'custom'        => 'Custom…',
-			],
-			'condition' => [ 'media_mode' => 'video' ],
-		] );
-
-		$this->add_control( 'video_focal_x', [
-			'label'      => 'Custom — Horizontal',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'media_mode' => 'video', 'video_position' => 'custom' ],
-		] );
-
-		$this->add_control( 'video_focal_y', [
-			'label'      => 'Custom — Vertical',
-			'type'       => Controls_Manager::SLIDER,
-			'size_units' => [ '%' ],
-			'range'      => [ '%' => [ 'min' => 0, 'max' => 100, 'step' => 1 ] ],
-			'default'    => [ 'unit' => '%', 'size' => 50 ],
-			'condition'  => [ 'media_mode' => 'video', 'video_position' => 'custom' ],
 		] );
 
 		$this->add_control( 'video_native_ratio', [
@@ -435,26 +325,7 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 		return '';
 	}
 
-	/**
-	 * Resolve an object-position CSS value from a SELECT + optional custom sliders.
-	 *
-	 * @param string $position  Value from the position SELECT ('top left', 'custom', etc.)
-	 * @param float  $custom_x  Horizontal % (used only when $position === 'custom')
-	 * @param float  $custom_y  Vertical %   (used only when $position === 'custom')
-	 * @return string  Ready-to-use CSS value, e.g. "top center" or "35% 22%"
-	 */
-	private function resolve_position( string $position, float $custom_x = 50, float $custom_y = 50 ): string {
-		if ( $position === 'custom' ) {
-			return "{$custom_x}% {$custom_y}%";
-		}
-		// All 9 named positions are valid CSS — return as-is
-		$allowed = [
-			'top left', 'top center', 'top right',
-			'center left', 'center center', 'center right',
-			'bottom left', 'bottom center', 'bottom right',
-		];
-		return in_array( $position, $allowed, true ) ? $position : 'center center';
-	}
+
 
 	/**
 	 * Resolve a YouTube vertical translate offset from the yt_position SELECT.
@@ -487,17 +358,7 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 		$overlay_op  = ( $s['overlay_opacity']['size'] ?? 88 ) / 100;
 		$hero_id     = 'plgc-hero-' . esc_attr( $widget_id );
 
-		// Image positions — resolve SELECT to CSS value (or custom sliders if 'custom')
-		$static_pos  = $this->resolve_position(
-			$s['static_position']  ?? 'center center',
-			(float) ( $s['static_focal_x']['size']  ?? 50 ),
-			(float) ( $s['static_focal_y']['size']  ?? 50 )
-		);
-		$video_pos   = $this->resolve_position(
-			$s['video_position']   ?? 'center center',
-			(float) ( $s['video_focal_x']['size']   ?? 50 ),
-			(float) ( $s['video_focal_y']['size']   ?? 50 )
-		);
+		// Image/video always centered — no position control (object-position: center in CSS)
 
 		// YouTube vertical position (cover mode only)
 		$yt_fit      = $s['yt_fit']      ?? 'cover';
@@ -534,7 +395,6 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 					decoding="async"
 					fetchpriority="high"
 					draggable="false"
-					style="object-position:<?php echo esc_attr( $static_pos ); ?>;"
 				>
 
 				<?php elseif ( $mode === 'slideshow' ) :
@@ -556,11 +416,7 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 						$img_url   = $img_id ? wp_get_attachment_image_url( $img_id, 'full' ) : ( $slide['slide_image']['url'] ?? '' );
 						$alt       = trim( $slide['slide_alt'] ?? '' );
 						if ( ! $alt ) $alt = $img_id ? get_post_meta( $img_id, '_wp_attachment_image_alt', true ) : '';
-						$slide_pos = $this->resolve_position(
-							$slide['slide_position'] ?? 'center center',
-							(float) ( $slide['slide_focal_x']['size'] ?? 50 ),
-							(float) ( $slide['slide_focal_y']['size'] ?? 50 )
-						);
+						// position always center center (CSS controlled)
 					?>
 					<div
 						class="plgc-hero__slide<?php echo $idx === 0 ? ' is-active' : ''; ?>"
@@ -574,10 +430,10 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 								'fetchpriority' => $idx === 0 ? 'high' : 'auto',
 								'decoding'      => 'async',
 								'draggable'     => 'false',
-								'style'         => 'object-position:' . esc_attr( $slide_pos ) . ';',
+								// object-position: center center (set in CSS, not inline style)
 							] );
 						else : ?>
-						<img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" class="plgc-hero__bg-img" loading="<?php echo $idx === 0 ? 'eager' : 'lazy'; ?>" draggable="false" style="object-position:<?php echo esc_attr( $slide_pos ); ?>;">
+						<img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" class="plgc-hero__bg-img" loading="<?php echo $idx === 0 ? 'eager' : 'lazy'; ?>" draggable="false">
 						<?php endif; ?>
 					</div>
 					<?php endforeach; ?>
@@ -641,7 +497,6 @@ The video plays muted, looped, and cropped to fill the hero.<br>
 					preload="metadata"
 					poster="<?php echo esc_url( $fallback_url ); ?>"
 					aria-hidden="true"
-					style="object-position:<?php echo esc_attr( $video_pos ); ?>;"
 				>
 					<?php if ( $video_webm ) : ?>
 					<source src="<?php echo esc_url( $video_webm ); ?>" type="video/webm">

@@ -461,7 +461,9 @@
     .plgc-gs__card,
     .plgc-gs--image-left .plgc-gs__card,
     .plgc-gs--image-right .plgc-gs__card {
-        padding: 32px 20px;
+        /* Tighter top padding pulls the heading up close to the image.
+           Keep generous bottom so button/badge have breathing room.     */
+        padding: 16px 20px 28px;
     }
 
     /* Weddings: belt-and-braces reset so no desktop padding-top bleeds through */

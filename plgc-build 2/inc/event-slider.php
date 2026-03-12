@@ -457,6 +457,8 @@ function plgc_es_shortcode( array $atts = [] ): string {
 					<p class="plgc-es__price"><?php echo esc_html( $price ); ?></p>
 					<?php endif; ?>
 
+					<div class="plgc-es__divider" aria-hidden="true"></div>
+
 					<a
 						href="<?php echo $cta_url; ?>"
 						class="plgc-es__cta plgc-es__cta--<?php echo esc_attr( $cta_mod ); ?>"
