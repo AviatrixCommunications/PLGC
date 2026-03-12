@@ -73,7 +73,9 @@
     });
 
 
+    /**
      * Adds .using-keyboard class for styling focus rings.
+     * Keyboard users get full-resolution focus rings; mouse users don't.
      */
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Tab') {
