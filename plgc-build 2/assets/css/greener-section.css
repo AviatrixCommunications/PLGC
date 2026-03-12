@@ -160,10 +160,11 @@
     object-position: center center;
     position: absolute;
     inset: 0;
-    transform: scale(1);
+    /* No base transform — transform: scale(1) forced a GPU compositing layer
+       on this element, which made it invisible on iOS Safari when the parent
+       overflow:hidden container was NOT also GPU composited.
+       The hover scale still works because transform only applies on :hover. */
     transform-origin: center center;
-    /* will-change removed: caused iOS Safari invisible-content bug when nested
-       inside overflow:hidden parents. Hover animation still works via transition. */
     transition: transform 0.5s ease;
 }
 
