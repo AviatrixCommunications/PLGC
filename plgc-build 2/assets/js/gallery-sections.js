@@ -83,6 +83,14 @@
             spaceBetween:   0,
             grabCursor:     false,
 
+            // cssMode: uses native overflow-x scroll + scrollLeft instead of
+            // CSS translate3d transforms. This prevents the iOS Safari invisible-
+            // content bug where a GPU-composited (transform) child inside an
+            // overflow:hidden parent renders nothing on real iOS devices.
+            // Trade-off: no crossfade/cube effects (not used here), and touch
+            // swipe uses native momentum scrolling (actually better on iOS).
+            cssMode:        true,
+
             // NO autoplay (WCAG 2.2.2)
             autoplay: false,
 
