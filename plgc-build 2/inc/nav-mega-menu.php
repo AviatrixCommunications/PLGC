@@ -308,6 +308,18 @@ function plgc_render_mega_panel($parent, $panel_id) {
  */
 class PLGC_Mobile_Walker extends Walker_Nav_Menu {
 
+    /**
+     * Stores the panel ID for the current depth-0 item so start_lvl()
+     * can pick it up and stamp it onto the <ul> id attribute.
+     *
+     * Declared explicitly to avoid the PHP 8.2+ dynamic property deprecation
+     * (and fatal error in 8.3) that would cause wp_nav_menu() to produce no
+     * output when the fallback_cb is false.
+     *
+     * @var string
+     */
+    protected $_current_panel_id = '';
+
     public function start_lvl(&$output, $depth = 0, $args = null) {
         if ($depth === 0) {
             // id matches aria-controls on the toggle button above
