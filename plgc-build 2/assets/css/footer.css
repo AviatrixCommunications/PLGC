@@ -1,0 +1,679 @@
+/*
+ * Prairie Landing Golf Club — Footer Styles
+ *
+ * Covers: main footer body, 3-column layout, logo circle, contact,
+ * social icons, static map, weather widget + animations, quick links,
+ * CTA button, sub-footer legal bar. Fully responsive.
+ *
+ * @package PLGC
+ */
+
+/* ============================================================
+   DESIGN TOKENS (footer-specific)
+   ============================================================ */
+
+:root {
+    --plgc-footer-bg-from:    #000000;
+    --plgc-footer-bg-to:      #454041;
+    --plgc-footer-border:     #FFAE40;
+    --plgc-footer-text:       #FFFFFF;
+    --plgc-footer-muted:      rgba(255,255,255,0.70);
+    --plgc-footer-link:       #FFFFFF;
+    --plgc-footer-link-hover: #FFAE40;
+    --plgc-footer-sub-bg:     rgba(0,0,0,0.35);
+    --plgc-footer-social-bg:  #8C9B5A;        /* brand light green — matches Figma */
+    --plgc-footer-social-hover: #7a8a4b;      /* slightly darker on hover */
+}
+
+/* ============================================================
+   FOOTER SHELL
+   ============================================================ */
+
+.plgc-footer {
+    background: linear-gradient(180deg, var(--plgc-footer-bg-from) 0%, var(--plgc-footer-bg-to) 108%);
+    border-top: 12px solid var(--plgc-footer-border);
+    color: var(--plgc-footer-text);
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    width: 100%;
+}
+
+/* ============================================================
+   MAIN BODY
+   ============================================================ */
+
+.plgc-footer__body {
+    padding: 48px 0 40px;
+}
+
+.plgc-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: 40px 48px;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+    align-items: start;
+}
+
+/* ============================================================
+   COLUMNS
+   ============================================================ */
+
+.plgc-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── LEFT: Logo / Contact / Social ──────────────────────────────────────── */
+
+.plgc-footer__logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 130px;
+    height: 130px;
+    background: #fff;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin: 0 auto 4px;
+    overflow: hidden;
+    padding: 8px;
+    text-decoration: none;  /* suppress underline when it's an <a> */
+    transition: opacity 150ms ease;
+}
+
+.plgc-footer__logo-wrap:hover {
+    opacity: 0.88;
+}
+
+.plgc-footer__logo-wrap:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.plgc-footer__logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Contact / address block */
+.plgc-footer__contact {
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;           /* 8px */
+    text-align: center;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+}
+
+.plgc-footer__phone {
+    font-size: 0.9375rem;  /* 15px */
+    font-weight: 400;      /* Regular */
+    line-height: 1.5;
+    margin: 0;
+    color: var(--plgc-footer-text);
+}
+
+.plgc-footer__phone--events {
+    font-size: 0.875rem;   /* 14px */
+}
+
+.plgc-footer__phone-label {
+    font-weight: 600;      /* SemiBold */
+}
+
+.plgc-footer__phone-link {
+    color: var(--plgc-footer-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 150ms ease;
+}
+
+.plgc-footer__phone-link:hover {
+    color: var(--plgc-footer-link-hover);
+}
+
+.plgc-footer__phone-link:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Social icons */
+.plgc-footer__social {
+    margin-top: 4px;
+}
+
+.plgc-footer__social-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-footer__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--plgc-footer-social-bg);
+    border-radius: 50%;
+    text-decoration: none;
+    transition: background 150ms ease, transform 150ms ease;
+    flex-shrink: 0;
+}
+
+.plgc-footer__social-link svg,
+.plgc-footer__social-link img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    flex-shrink: 0;
+}
+
+.plgc-footer__social-link:hover {
+    background: var(--plgc-footer-social-hover);
+    transform: translateY(-2px);
+}
+
+.plgc-footer__social-link:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 50%;   /* circle default; The Knot overrides below */
+}
+
+/* The Knot — wide rectangle per Figma, no border-radius */
+.plgc-footer__social-link--theknot {
+    border-radius: 0;
+    width: 72px;
+    height: 36px;
+}
+
+.plgc-footer__social-link--theknot svg,
+.plgc-footer__social-link--theknot img {
+    width: 58px;
+    height: auto;
+    max-height: 24px;
+}
+
+.plgc-footer__social-link--theknot:focus-visible {
+    border-radius: 2px;
+}
+
+/* ── CENTER: Address / Map / Weather ───────────────────────────────────── */
+
+.plgc-footer__address {
+    font-size: 1rem;       /* 16px */
+    font-weight: 400;      /* Regular */
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.plgc-footer__address-label {
+    font-weight: 600;      /* SemiBold */
+}
+
+.plgc-footer__address-link {
+    color: var(--plgc-footer-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 150ms ease;
+}
+
+.plgc-footer__address-link:hover {
+    color: var(--plgc-footer-link-hover);
+}
+
+.plgc-footer__address-link:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Static Map image */
+.plgc-footer__map-link {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    line-height: 0;
+    transition: opacity 150ms ease;
+}
+
+.plgc-footer__map-link:hover { opacity: 0.88; }
+
+.plgc-footer__map-link:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+.plgc-footer__map {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+}
+
+.plgc-footer__map-placeholder {
+    color: var(--plgc-footer-link-hover);
+    text-decoration: underline;
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+/* ── WEATHER WIDGET ────────────────────────────────────────────────────── */
+
+.plgc-footer__weather {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;         /* 10px */
+    flex-wrap: wrap;
+    font-size: 1rem;       /* 16px */
+    font-weight: 400;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    margin-top: 0.25rem;
+}
+
+.plgc-footer__weather-label {
+    font-weight: 600;      /* SemiBold */
+    white-space: nowrap;
+}
+
+.plgc-footer__weather-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.plgc-footer__weather-reading {
+    white-space: nowrap;
+    font-weight: 400;  /* Regular — label is SemiBold, reading text is not */
+}
+
+/* ── Weather SVG base ───────────────────────────────────────────────── */
+
+/*
+ * WP Engine's security layer strips inline style= attributes from SVG elements.
+ * We use a wrapper <span> with fixed dimensions instead, and target the SVG
+ * inside it with aggressive CSS. The SVG width/height HTML attributes are
+ * also set as a third layer of defense.
+ */
+.plgc-footer__weather-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.5rem;      /* 40px — constrains even if SVG collapses */
+    height: 2.5rem;
+}
+
+.plgc-footer__weather-icon svg,
+.plgc-footer__weather-icon .plgc-weather-svg {
+    display: block !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    min-width: 2.5rem !important;
+    min-height: 2.5rem !important;
+    max-width: none !important;  /* override hello-elementor's max-width:100% */
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+/* ── Sun: rotating rays ─────────────────────────────────────────────── */
+
+@keyframes plgc-sun-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.plgc-wi-rays,
+.plgc-wi-rays-sm {
+    animation: plgc-sun-spin 12s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* ── Cloud: gentle float ────────────────────────────────────────────── */
+
+@keyframes plgc-cloud-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-2px); }
+}
+
+.plgc-wi-cloud-float {
+    animation: plgc-cloud-float 4s ease-in-out infinite;
+}
+
+/* ── Rain drops: staggered fall ─────────────────────────────────────── */
+
+@keyframes plgc-rain-drop {
+    0%   { opacity: 0;   transform: translateY(-4px); }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0;   transform: translateY(6px); }
+}
+
+.plgc-wi-drop       { animation: plgc-rain-drop 1.2s ease-in-out infinite; }
+.plgc-wi-drop--1    { animation-delay: 0s;    }
+.plgc-wi-drop--2    { animation-delay: 0.2s;  }
+.plgc-wi-drop--3    { animation-delay: 0.4s;  }
+.plgc-wi-drop--4    { animation-delay: 0.15s; }
+.plgc-wi-drop--5    { animation-delay: 0.35s; }
+.plgc-wi-drop--6    { animation-delay: 0.55s; }
+
+/* ── Snowflakes: drift and spin ─────────────────────────────────────── */
+
+@keyframes plgc-snow-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes plgc-snow-drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33%       { transform: translateY(3px) rotate(45deg); }
+    66%       { transform: translateY(-1px) rotate(90deg); }
+}
+
+.plgc-wi-flake {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: plgc-snow-drift 2.5s ease-in-out infinite;
+}
+
+.plgc-wi-flake--1 { animation-delay: 0s;    }
+.plgc-wi-flake--2 { animation-delay: 0.5s;  }
+.plgc-wi-flake--3 { animation-delay: 1.0s;  }
+.plgc-wi-flake--4 { animation-delay: 0.3s;  }
+.plgc-wi-flake--5 { animation-delay: 0.8s;  }
+
+/* ── Lightning: flash ───────────────────────────────────────────────── */
+
+@keyframes plgc-lightning-flash {
+    0%, 85%, 100% { opacity: 1; filter: drop-shadow(0 0 0px #FFAE40); }
+    90%            { opacity: 0.3; }
+    92%            { opacity: 1;   filter: drop-shadow(0 0 6px #FFAE40); }
+    94%            { opacity: 0.2; }
+    96%            { opacity: 1;   filter: drop-shadow(0 0 4px #FFAE40); }
+}
+
+.plgc-wi-lightning {
+    animation: plgc-lightning-flash 3.5s ease-in-out infinite;
+}
+
+/* ── Stars: twinkle ─────────────────────────────────────────────────── */
+
+@keyframes plgc-twinkle {
+    0%, 100% { opacity: 1; r: 1;   }
+    50%       { opacity: 0.3; r: 0.5; }
+}
+
+.plgc-wi-star          { animation: plgc-twinkle 2s ease-in-out infinite; }
+.plgc-wi-star--2       { animation-delay: 0.7s; }
+.plgc-wi-star--3       { animation-delay: 1.3s; }
+
+/* ── Fog: slow pulse ────────────────────────────────────────────────── */
+
+@keyframes plgc-fog-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+.plgc-wi-fog {
+    animation: plgc-fog-pulse 3s ease-in-out infinite;
+}
+
+/* ── RIGHT: Quick Links / CTA ───────────────────────────────────────── */
+
+.plgc-footer__nav-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #FFAE40;
+    color: var(--plgc-footer-text);
+}
+
+.plgc-footer__nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.plgc-footer__nav-list li {
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-footer__nav-list a {
+    display: inline-block;
+    padding: 0.3125rem 0;
+    color: var(--plgc-footer-text);                 /* white — Figma spec */
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    text-decoration: underline;
+    text-decoration-color: var(--plgc-footer-text); /* white underline */
+    text-underline-offset: 0.2em;
+    line-height: 1.5;
+    transition: color 150ms ease, opacity 150ms ease;
+}
+
+.plgc-footer__nav-list a:hover {
+    color: var(--plgc-footer-link-hover);            /* orange on hover */
+    text-decoration-color: var(--plgc-footer-link-hover);
+    opacity: 1;
+}
+
+.plgc-footer__nav-list a:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Footer CTA button — same classes as header (.plgc-btn--tee-time),
+   just needs margin-top to push below the links */
+.plgc-footer__cta {
+    margin-top: 20px;
+    width: max-content;
+}
+
+/* ============================================================
+   SUB-FOOTER
+   ============================================================ */
+
+.plgc-footer__sub {
+    background: var(--plgc-footer-sub-bg);
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding: 16px 0;
+}
+
+.plgc-footer__sub-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.plgc-footer__copyright {
+    font-size: 0.875rem;
+    color: var(--plgc-footer-muted);
+    margin: 0;
+}
+
+.plgc-footer__legal-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-footer__legal-list li {
+    display: flex;
+    align-items: center;
+}
+
+/* Bullet separator between legal links */
+.plgc-footer__legal-list li + li::before {
+    content: '·';
+    color: var(--plgc-footer-muted);
+    padding: 0 10px;
+    pointer-events: none;
+    aria-hidden: true;
+}
+
+.plgc-footer__legal-link {
+    font-size: 0.875rem;
+    color: var(--plgc-footer-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 150ms ease;
+}
+
+.plgc-footer__legal-link:hover {
+    color: var(--plgc-footer-text);
+}
+
+.plgc-footer__legal-link:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 2px;
+    color: var(--plgc-footer-text);
+}
+
+/* Cookie button — same appearance as the link items */
+.plgc-footer__cookie-btn {
+    line-height: inherit;
+}
+
+/* ============================================================
+   RESPONSIVE — TABLET (≤ 1100px)
+   ============================================================ */
+
+@media (max-width: 1100px) {
+    .plgc-footer__inner {
+        grid-template-columns: 1fr 1.3fr;
+        grid-template-rows: auto auto;
+        padding: 0 24px;
+    }
+
+    /* Left stays top-left, center fills top-right, right goes full-width bottom */
+    .plgc-footer__col--left   { grid-column: 1; grid-row: 1; }
+    .plgc-footer__col--center { grid-column: 2; grid-row: 1; }
+    .plgc-footer__col--right  {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 24px 48px;
+    }
+
+    .plgc-footer__cta {
+        margin-top: 0;
+        align-self: flex-start;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .plgc-footer__body { padding: 36px 0 32px; }
+
+    .plgc-footer__inner {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        padding: 0 20px;
+        gap: 32px;
+    }
+
+    .plgc-footer__col--left,
+    .plgc-footer__col--center,
+    .plgc-footer__col--right { grid-column: 1; grid-row: auto; }
+
+    .plgc-footer__col--right {
+        flex-direction: column;
+    }
+
+    .plgc-footer__logo-wrap {
+        width: 110px;
+        height: 110px;
+    }
+
+    .plgc-footer__cta {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+
+    /* Fix: .plgc-btn--tee-time has width:max-content + white-space:nowrap globally.
+       The <a> carries both plgc-btn--tee-time AND plgc-footer__cta directly —
+       use no-space compound selector (same element), not descendant selector. */
+    a.plgc-footer__cta {
+        width: 100%;
+        box-sizing: border-box;
+        white-space: normal;
+        text-align: center;
+        flex-shrink: 1;
+        display: block;
+    }
+
+    .plgc-footer__sub-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 20px;
+        gap: 8px;
+    }
+
+    .plgc-footer__legal-list {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .plgc-footer__legal-list li + li::before {
+        display: none;
+    }
+}
+
+/* ============================================================
+   PREFERS REDUCED MOTION — disable all weather animations
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .plgc-wi-rays,
+    .plgc-wi-rays-sm,
+    .plgc-wi-cloud-float,
+    .plgc-wi-drop,
+    .plgc-wi-flake,
+    .plgc-wi-lightning,
+    .plgc-wi-star,
+    .plgc-wi-fog {
+        animation: none !important;
+    }
+}
