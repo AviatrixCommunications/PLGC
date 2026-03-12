@@ -411,13 +411,15 @@
     /* Feather: sits at the bottom-right corner (matching desktop intent) within
        the section bounds. Must explicitly set top:auto to cancel the base rule's
        bottom:0 — if both top and bottom are set on a height:auto element, the
-       browser stretches it and the image looks distorted/invisible. */
+       browser stretches it and the image looks distorted/invisible.
+       Width increased to clamp(260px, 70vw, 380px) so the feather is clearly
+       visible at phone sizes — the previous 160px was too subtle. */
     .plgc-greener__feather {
-        width: 160px;
+        width: clamp(260px, 70vw, 380px);
         bottom: 0;
         top: auto;
         right: 0;
-        opacity: 0.40;
+        opacity: 0.50;
     }
 
     .plgc-greener__header {
