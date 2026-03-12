@@ -35,6 +35,9 @@
        go invisible inside overflow:hidden — same fix as .plgc-greener */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+    /* iOS Safari: create a new stacking context so overflow:hidden is
+       respected even when children have their own compositing layers */
+    isolation: isolate;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -51,6 +54,7 @@
     /* iOS Safari fix: GPU layer on image column */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+    isolation: isolate;
 }
 
 /* Image-left:  right-side corners rounded (tr + br) */
@@ -90,6 +94,10 @@
     height: 100%;
     object-fit: cover;
     object-position: center 35%;  /* favour upper-middle — better for outdoor/course shots */
+    /* iOS Safari: explicit compositing layer prevents images from going
+       invisible inside overflow:hidden containers on initial load */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 /* Placeholder when no images uploaded */
@@ -384,6 +392,10 @@
         min-height: 360px;
         border-radius: 0;
         order: 1;               /* image always on top */
+        /* iOS Safari: maintain compositing layer after reset */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        isolation: isolate;
     }
 
     .plgc-gs__slider,
@@ -447,10 +459,12 @@
         padding: 32px 20px;
     }
 
-    /* Remove any top margin inherited from the right-aligned weddings card */
+    /* Remove any top margin inherited from the right-aligned weddings card.
+       Extra specificity needed because the image-right desktop rule sets a
+       large padding-top (86px) and the general reset may not always win. */
     .plgc-gs--image-right .plgc-gs__card {
         margin-top: 0;
-        padding-top: 32px;
+        padding-top: 32px !important;
     }
 
     .plgc-gs__heading {
@@ -469,9 +483,11 @@
         right: auto !important;
     }
 
+    /* McChesney's badge: slightly larger on mobile so it's not lost
+       next to the CTA button */
     .plgc-gs__badge {
-        width: 80px;
-        height: 80px;
+        width: 96px;
+        height: 96px;
     }
 }
 

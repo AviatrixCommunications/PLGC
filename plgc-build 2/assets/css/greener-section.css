@@ -408,10 +408,13 @@
         padding: 40px 0 60px;
     }
 
+    /* Feather: keep within the visible section area — no negative top so
+       overflow:hidden doesn't clip it. Right stays slightly inset so it
+       doesn't create horizontal scroll on narrow screens. */
     .plgc-greener__feather {
         width: 120px;
-        top: -10px;
-        right: -15px;
+        top: 0;
+        right: -8px;
         opacity: 0.22;
     }
 
@@ -430,9 +433,10 @@
         line-height: 1.75rem;
     }
 
-    /* Single column on mobile. Use 16:9 aspect-ratio for a proportional
-       landscape card — wider than the 4:3 tablet tiles so the image
-       reads well on a narrow screen without feeling too squat. */
+    /* Single column on mobile. Use the same portrait ratio as the desktop
+       tiles (338 × 453 px ≈ 3:4) so images don't crop awkwardly and the
+       dark gradient at the bottom covers enough of the tile for WCAG-compliant
+       text contrast. 16:9 landscape was too wide/squat on a narrow screen. */
     .plgc-greener__grid {
         flex-direction: column;
         gap: 16px;
@@ -444,8 +448,32 @@
         flex: none;
         width: 100%;
         height: auto;
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 3 / 4;
         border-radius: 5px !important;
+        /* iOS Safari: explicit stacking context prevents absolutely-positioned
+           children (the tile image) from going invisible inside overflow:hidden
+           when the parent height is defined by aspect-ratio rather than px. */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        /* Ensure the overlay gradient is always composited above the image */
+        isolation: isolate;
+    }
+
+    /* iOS Safari fix: tile image inside aspect-ratio container needs its own
+       compositing layer to render reliably. */
+    .plgc-greener__tile .plgc-greener__tile-img {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+
+    /* Strengthen the bottom gradient at mobile so white link text always
+       passes WCAG AA 4.5:1 regardless of image brightness. */
+    .plgc-greener__tile .plgc-greener__tile-overlay {
+        background: linear-gradient(
+            to bottom,
+            transparent 40%,
+            rgba(0, 0, 0, 0.92) 100%
+        );
     }
 
     .plgc-greener__testimonial-wrap {
