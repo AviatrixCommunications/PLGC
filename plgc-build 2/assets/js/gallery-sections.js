@@ -18,17 +18,45 @@
 ( function () {
     'use strict';
 
-    // Wait until Swiper is available and DOM is ready
-    document.addEventListener( 'DOMContentLoaded', function () {
+    // WordPress footer scripts execute AFTER DOMContentLoaded has already fired,
+    // so a plain addEventListener( 'DOMContentLoaded' ) listener is never called.
+    // We mirror the same three-layer init pattern used in gallery-widgets.js:
+    //   Layer 1 — immediate if DOM is ready, otherwise wait for DOMContentLoaded
+    //   Layer 2 — window.load (Elementor may render widgets after DOMContentLoaded)
+    //   Layer 3 — Elementor frontend hooks (widget injected post-load)
+
+    /**
+     * Top-level init: queries all sliders on the page.
+     * Has-init guard on each element prevents double-initialisation.
+     */
+    function init() {
         if ( typeof Swiper === 'undefined' ) {
-            console.warn( 'PLGC Gallery: Swiper not loaded.' );
+            // Swiper CDN script hasn't executed yet — retry once after load
+            window.addEventListener( 'load', initOnce );
             return;
         }
-
-        document.querySelectorAll( '.plgc-gs__slider' ).forEach( function ( el ) {
+        document.querySelectorAll( '.plgc-gs__slider:not([data-plgc-gs-init])' ).forEach( function ( el ) {
+            el.dataset.plgcGsInit = '1';
             initGallerySlider( el );
         } );
-    } );
+    }
+
+    var _loadFired = false;
+    function initOnce() {
+        if ( _loadFired ) return;
+        _loadFired = true;
+        init();
+    }
+
+    // Layer 1: immediate / DOMContentLoaded
+    if ( document.readyState === 'loading' ) {
+        document.addEventListener( 'DOMContentLoaded', init );
+    } else {
+        init();
+    }
+
+    // Layer 2: window load
+    window.addEventListener( 'load', initOnce );
 
 
     /**

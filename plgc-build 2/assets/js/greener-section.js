@@ -15,9 +15,19 @@
 ( function () {
 	'use strict';
 
-	document.addEventListener( 'DOMContentLoaded', function () {
+	// Layer 1: immediate if DOM is already ready (WP footer scripts run after DOMContentLoaded)
+	function initAll() {
 		document.querySelectorAll( '[data-greener-slider]' ).forEach( initSlider );
-	} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', initAll );
+	} else {
+		initAll();
+	}
+
+	// Layer 2: window.load for safety
+	window.addEventListener( 'load', initAll );
 
 	function initSlider( slider ) {
 		const slides     = Array.from( slider.querySelectorAll( '.plgc-greener__slide' ) );
