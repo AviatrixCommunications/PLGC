@@ -447,32 +447,26 @@ function plgc_gs_shortcode( array $atts ): string {
 			class="plgc-gs__btn plgc-btn"
 		><?php echo esc_html( $btn_label ); ?></a>
 
-		<?php /* Badge image (McChesney's only) */ ?>
+		<?php /* Badge — linked to same URL as CTA (tabindex=-1/aria-hidden so the
+		   link isn't a duplicate keyboard stop; the CTA button is the real stop) */ ?>
 		<?php if ( ! empty( $badge ) ) : ?>
-		<img
-			src="<?php echo esc_url( $badge['url'] ); ?>"
-			alt="<?php echo esc_attr( $badge['alt'] ?: "McChesney's Pub &amp; Grill award badge" ); ?>"
-			width="126"
-			height="126"
-			class="plgc-gs__badge"
-			loading="lazy"
-			decoding="async"
+		<a
+			href="<?php echo esc_url( $btn_url ); ?>"
+			class="plgc-gs__badge-link"
+			aria-label="<?php echo esc_attr( "McChesney&#8217;s Pub &amp; Grill &#8212; View Our Specials" ); ?>"
+			tabindex="-1"
+			aria-hidden="true"
 		>
-		<?php endif; ?>
-		</div>
-		<?php else : ?>
-
-		<?php /* Badge without button (edge case) */ ?>
-		<?php if ( ! empty( $badge ) ) : ?>
-		<img
-			src="<?php echo esc_url( $badge['url'] ); ?>"
-			alt="<?php echo esc_attr( $badge['alt'] ?: "McChesney's Pub &amp; Grill award badge" ); ?>"
-			width="126"
-			height="126"
-			class="plgc-gs__badge"
-			loading="lazy"
-			decoding="async"
-		>
+			<img
+				src="<?php echo esc_url( $badge['url'] ); ?>"
+				alt=""
+				width="126"
+				height="126"
+				class="plgc-gs__badge"
+				loading="lazy"
+				decoding="async"
+			>
+		</a>
 		<?php endif; ?>
 		<?php endif; ?>
 
