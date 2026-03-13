@@ -22,6 +22,14 @@ defined( 'ABSPATH' ) || exit;
 if ( class_exists( 'WooCommerce' ) ) {
 
     /**
+     * Redirect "Return to shop" button to the custom gift cards page
+     * instead of the default /shop/ WooCommerce archive.
+     */
+    add_filter( 'woocommerce_return_to_shop_redirect', function() {
+        return home_url( '/online-merchandise/' );
+    } );
+
+    /**
      * Declare WooCommerce theme support with accessible defaults.
      */
     function plgc_woocommerce_support() {
@@ -56,13 +64,18 @@ if ( class_exists( 'WooCommerce' ) ) {
     add_filter( 'woocommerce_loop_add_to_cart_link', 'plgc_woo_cart_button_aria', 10, 2 );
 
     /**
-     * Add accessible labels to WooCommerce quantity inputs.
-     * (WCAG 1.3.1 - Info and Relationships)
+     * Remove the product link on cart line items — show plain text name only.
+     * CSS pointer-events:none is cosmetic only; this removes the <a> from the DOM.
+     * (No WCAG issue — product name in cart doesn't need to be a link.)
      */
-    add_filter( 'woocommerce_quantity_input_args', function ( $args, $product ) {
-        $args['input_name'] = 'quantity';
-        return $args;
-    }, 10, 2 );
+    add_filter( 'woocommerce_cart_item_name', function( $name, $cart_item, $cart_item_key ) {
+        $product = $cart_item['data'];
+        if ( $product instanceof WC_Product ) {
+            return esc_html( $product->get_name() );
+        }
+        // Fallback: strip any <a> tags WooCommerce may have already built
+        return wp_strip_all_tags( $name );
+    }, 10, 3 );
 
     /**
      * Add accessible notices for cart updates.

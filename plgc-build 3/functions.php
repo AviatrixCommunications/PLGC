@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.6.24');
+define('PLGC_VERSION', '1.6.28');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -85,6 +85,16 @@ function plgc_enqueue_assets() {
         PLGC_VERSION
     );
 
+    // WooCommerce styles — loads globally so notices + cart + checkout work everywhere
+    if ( class_exists( 'WooCommerce' ) ) {
+        wp_enqueue_style(
+            'plgc-woocommerce',
+            PLGC_URI . '/assets/css/woocommerce.css',
+            ['plgc-theme'],
+            PLGC_VERSION
+        );
+    }
+
     // Accessibility enhancements
     wp_enqueue_script(
         'plgc-a11y',
@@ -153,6 +163,14 @@ function plgc_a11y_meta() {
     echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . "\n";
 }
 add_action('wp_head', 'plgc_a11y_meta', 1);
+
+/**
+ * ============================================================
+ * WOOCOMMERCE
+ * ============================================================
+ */
+
+// Note: woocommerce_return_to_shop_redirect is registered in inc/plugin-accessibility.php
 
 /**
  * ============================================================
@@ -250,7 +268,7 @@ add_action( 'elementor/elements/categories_registered', function ( $elements_man
 add_action( 'elementor/widgets/register', function ( $widgets_manager ) {
     require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-gallery-filmstrip-widget.php';
     require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-content-slideshow-widget.php';
-require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-hero-widget.php';
+    require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-hero-widget.php';
 
     $widgets_manager->register( new PLGC_Gallery_Filmstrip_Widget() );
     $widgets_manager->register( new PLGC_Content_Slideshow_Widget() );

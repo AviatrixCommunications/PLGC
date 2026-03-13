@@ -429,72 +429,118 @@
 }
 
 @media (max-width: 767px) {
-    /* Mobile hero height — large enough for the image to breathe while
-       keeping the gradient zone proportional to the text block inside it.
-       clamp(440px, 113vw, 530px):
-         390 px wide → 113vw = 440 px → gradient dark zone ≈ 141 px ✓
-         320 px wide → 113vw < 440 px → clamped to 440 px floor           */
+    /* ── Stacked mobile layout ────────────────────────────────────────────────
+       The hero becomes a flex column — image on top, solid green content block
+       below. Equal padding on all sides = equal spacing, every time.
+
+       !important is required on padding and margin because Elementor writes
+       per-page CSS into /wp-content/uploads/elementor/css/post-N.css from
+       the editor's spacing controls, and that file loads after theme CSS.
+       Any section padding or widget container padding set in the editor will
+       silently win over un-important rules, causing the unequal top spacing.  */
+
+    /* Kill any Elementor-injected padding on the section/container wrapping
+       the hero widget — this is the most common source of extra top space.  */
+    .elementor-widget-plgc_hero,
+    .elementor-widget-plgc_hero > .elementor-widget-container {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
     .plgc-hero {
-        height: clamp(440px, 113vw, 530px);
-        min-height: 440px;
+        height: auto !important;
+        min-height: 0 !important;
+        display: flex;
+        flex-direction: column;
+        background-color: #233C26;
+        overflow: hidden;
+        padding: 0 !important;
     }
 
-    /* Mobile gradient — start clear stay clear through 35%, then ramp
-       smoothly so the image remains clearly visible in the top half while
-       the bottom third transitions into a rich dark green that reads like
-       the desktop gradient rather than a flat solid block.               */
+    /* Media block: fixed height in the flex flow */
+    .plgc-hero__media {
+        position: relative;
+        width: 100%;
+        height: 225px;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    /* Gradient overlay not needed — solid colour block handles contrast */
     .plgc-hero__overlay {
-        background: linear-gradient(
-            to bottom,
-            rgba(35,60,38,0)    0%,
-            rgba(35,60,38,0)    35%,
-            rgba(35,60,38,0.12) 52%,
-            rgba(35,60,38,0.65) 70%,
-            rgba(35,60,38,var(--plgc-hero-overlay, 0.92)) 100%
-        );
+        display: none !important;
     }
 
-    /* Content — span from where gradient becomes visually dark to the bottom,
-       then flex-center the text inside that zone so there is equal visual
-       breathing room above and below the heading/subheading pair.
-       62% aligns with the gradient start (≈ 0.2 opacity), meaning the
-       text actually renders in the 70–100% zone where the overlay is rich
-       and dark, while the container starts at 62% so justify-content:center
-       can distribute equal space above and below the text.                   */
+    /* Progress bar belongs below the image; hide it on mobile */
+    .plgc-hero__progress {
+        display: none;
+    }
+
+    /* Content block: equal padding top and bottom via !important so Elementor
+       editor spacing settings cannot override and cause unequal appearance.  */
     .plgc-hero__content {
-        top: 62%;
-        bottom: 0;
-        padding: 1rem 1.25rem;
-        gap: 0.5rem;
+        position: relative !important;
+        top: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        background-color: #233C26;
+        padding: 2rem 1.5rem !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
+        gap: 0.625rem;
+        text-align: center;
     }
 
-    /* 1.625rem (26px) — keeps heading at accessible large-text threshold (≥24px)
-       while fitting "Welcome to Prairie Landing Golf Club" in 2 lines at 390px */
-    .plgc-hero__heading { font-size: 1.625rem; line-height: 1.28; }
+    /* Explicitly zero margins on both elements so browser defaults and
+       Elementor typography resets cannot add asymmetric space.         */
+    .plgc-hero__heading {
+        font-size: 1.625rem !important;
+        line-height: 1.28 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-shadow: none;
+    }
 
-    /* 0.9375rem (15px) — keeps subheading to 2 lines at 390px and still
-       passes WCAG 4.5:1 contrast on the dark overlay.                   */
-    .plgc-hero__subheading { font-size: 0.9375rem; line-height: 1.55; }
+    .plgc-hero__subheading {
+        font-size: 0.9375rem !important;
+        line-height: 1.55 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-shadow: none;
+    }
 
+    /* Pause button sits over the image, top-left */
+    .plgc-hero__pause {
+        position: absolute;
+        top: 0.625rem;
+        left: 0.625rem;
+        bottom: auto;
+    }
+
+    /* Dots stay over the image */
+    .plgc-hero__dots {
+        top: 10px;
+        right: 10px;
+    }
+
+    /* Announcement pill: full width, square corners, below content block */
     .plgc-hero__announcement {
         position: relative;
-        bottom: auto; right: auto;
+        bottom: auto;
+        right: auto;
         border-radius: 0;
         width: 100%;
         max-width: 100%;
-        padding: 1rem;
+        padding: 1rem 1.5rem;
     }
-    .plgc-hero__ann-text,
-    .plgc-hero__ann-link { font-size: 1rem; }
-    .plgc-hero__dots { top: 10px; right: 10px; }
 
-    /* Pause button moves top-left on mobile so it never overlaps
-       the text that is now centered in the bottom gradient zone.  */
-    .plgc-hero__pause {
-        top: 0.625rem;
-        bottom: auto;
-        left: 0.625rem;
+    .plgc-hero__ann-text,
+    .plgc-hero__ann-link {
+        font-size: 1rem;
     }
 }
 

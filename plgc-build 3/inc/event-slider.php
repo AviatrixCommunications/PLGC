@@ -447,6 +447,7 @@ function plgc_es_shortcode( array $atts = [] ): string {
 				<div class="plgc-es__panel" aria-hidden="true"></div>
 
 				<div class="plgc-es__content">
+					<div class="plgc-es__text">
 					<?php if ( $date_str ) : ?>
 					<p class="plgc-es__date"><?php echo wp_kses_post( $date_str ); ?></p>
 					<?php endif; ?>
@@ -456,6 +457,7 @@ function plgc_es_shortcode( array $atts = [] ): string {
 					<?php if ( $price ) : ?>
 					<p class="plgc-es__price"><?php echo esc_html( $price ); ?></p>
 					<?php endif; ?>
+					</div><!-- /.plgc-es__text -->
 
 					<div class="plgc-es__divider" aria-hidden="true"></div>
 
