@@ -1,0 +1,429 @@
+/**
+ * PLGC Two-Column Accordion
+ *
+ * Implements the Figma "Accordion_2" component — two panel layout variants.
+ *
+ * Layout modes:
+ *  --simple   Desktop: 2-col grid [description | price heading + bullets]
+ *  --sub      Desktop: full-width intro + section heading + 2×2 tier card grid
+ *
+ * Responsive:
+ *  ≥1025px  — full desktop layouts above
+ *  768–1024px — reduced padding, columns maintained where practical
+ *  <768px   — all panels single column; header stacks title/summary vertically
+ *
+ * WCAG contrast summary (verified against PLGC style guide):
+ *  #000000 on #FFFFFF          21:1   normal + large text   ✅
+ *  #000000 on #F2F2F2          18.1:1 normal + large text   ✅
+ *  #567915 on #F2F2F2          4.52:1 normal text (4.5 req) ✅
+ *  #233C26 (chevron) on #F2F2F2 12:1  UI component (3 req)  ✅
+ *  Focus ring #567915 on white  5.07:1 UI (3 req)           ✅
+ *
+ * @package PLGC
+ * @since   1.6.31
+ */
+
+/* ============================================================
+   Container
+   ============================================================ */
+
+.plgc-two-col-accordion {
+    width: 100%;
+}
+
+/* ============================================================
+   Accordion Item
+   ============================================================ */
+
+.plgc-accordion-item {
+    border-bottom: 1px solid var(--plgc-dark-green-tone, #233C26);
+}
+
+/* ============================================================
+   Header / Trigger Button
+   ============================================================ */
+
+.plgc-accordion-header {
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-accordion-trigger {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;                      /* 24px — Figma gap-[24px] */
+    width: 100%;
+    padding: 2rem 7.5rem;             /* 32px 120px — Figma py-[32px] px-[120px] */
+    min-height: 2.75rem;              /* 44px — WCAG SC 2.5.5 */
+
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+
+    transition: background-color var(--plgc-transition-fast, 150ms ease-in-out);
+}
+
+.plgc-accordion-trigger:hover {
+    background-color: rgba(242, 242, 242, 0.6);
+}
+
+.plgc-accordion-item.is-open .plgc-accordion-trigger {
+    background-color: var(--plgc-light-grey, #F2F2F2);
+}
+
+/* Focus ring — WCAG SC 2.4.7, SC 1.4.11 */
+.plgc-accordion-trigger:focus-visible {
+    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
+    outline-offset: var(--plgc-focus-offset, 0.125rem);
+    box-shadow: inset 0 0 0 0.125rem var(--plgc-focus-color, #567915);
+}
+
+/* ============================================================
+   Title
+   ============================================================ */
+
+.plgc-accordion-title {
+    font-family: var(--plgc-font-heading, 'Libre Baskerville', serif);
+    font-size: 2.25rem;               /* 36px */
+    font-weight: 400;
+    line-height: 1.333;               /* 48/36 */
+    color: var(--plgc-black, #000000);
+
+    flex: 0 0 clamp(14rem, 30%, 22.375rem);
+    min-width: 0;
+}
+
+/* ============================================================
+   Summary
+   ============================================================ */
+
+.plgc-accordion-summary {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.0625rem;             /* 17px */
+    font-weight: 400;
+    line-height: 2rem;                /* 32px */
+    color: var(--plgc-black, #000000);
+
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: left;
+}
+
+/* ============================================================
+   Chevron icon
+   ============================================================ */
+
+.plgc-accordion-icon {
+    flex-shrink: 0;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.3125rem;                 /* 21px */
+    height: 0.75rem;                  /* 12px */
+
+    /* Closed: chevron points right */
+    transform: rotate(-90deg);
+    transition: transform var(--plgc-transition-default, 250ms ease-in-out);
+}
+
+/* Open: chevron points down */
+.plgc-accordion-item.is-open .plgc-accordion-icon {
+    transform: rotate(0deg);
+}
+
+.plgc-accordion-icon svg {
+    display: block;
+}
+
+/* ============================================================
+   Panel wrapper
+   ============================================================ */
+
+.plgc-accordion-panel[hidden] {
+    display: none !important;
+}
+
+/* ============================================================
+   Shared panel content base
+   ============================================================ */
+
+.plgc-accordion-content {
+    background-color: var(--plgc-light-grey, #F2F2F2);
+    padding: 1.5rem 7.5rem 2rem;      /* 24px 120px 32px */
+}
+
+/* ============================================================
+   -- simple: Two-column panel
+   ============================================================ */
+
+.plgc-accordion-content--simple {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;                     /* 20px — Figma gap-x-[20px] gap-y-[20px] */
+}
+
+.plgc-accordion-col1,
+.plgc-accordion-col2 {
+    align-self: start;
+}
+
+.plgc-accordion-col1 p,
+.plgc-accordion-col2 p {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.0625rem;             /* 17px */
+    font-weight: 400;
+    line-height: 2rem;                /* 32px */
+    color: var(--plgc-black, #000000);
+    margin: 0 0 1rem;
+}
+
+.plgc-accordion-col1 p:last-child,
+.plgc-accordion-col2 p:last-child {
+    margin-bottom: 0;
+}
+
+/* Price heading — right col, green semibold */
+.plgc-accordion-price-heading {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;    /* 20px */
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: var(--plgc-dark-green, #567915) !important;
+    margin: 0 0 0.75rem !important;
+    /* #567915 on #F2F2F2 = 4.52:1 ✅ */
+}
+
+/* Bullet lists — right col */
+.plgc-accordion-col2 ul {
+    list-style: disc;
+    padding-left: 1.375rem;
+    margin: 0;
+}
+
+.plgc-accordion-col2 li {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 2rem;
+    color: var(--plgc-black, #000000);
+    margin-bottom: 0;
+}
+
+/* Elementor resets list-style — override it */
+.elementor .plgc-accordion-col2 ul {
+    list-style: disc !important;
+    padding-left: 1.375rem !important;
+}
+
+.elementor .plgc-accordion-col2 li {
+    list-style-type: disc !important;
+}
+
+/* ============================================================
+   -- sub: Sub-items grid panel
+   ============================================================ */
+
+.plgc-accordion-content--sub {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Shared intro text above the tier grid */
+.plgc-accordion-intro p {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 2rem;
+    color: var(--plgc-black, #000000);
+    margin: 0 0 0.25rem;
+}
+
+.plgc-accordion-intro p:last-child {
+    margin-bottom: 0;
+}
+
+/* Full-width green section heading */
+.plgc-accordion-section-heading {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    color: var(--plgc-dark-green, #567915) !important;
+    margin: 0.25rem 0 0.5rem !important;
+    /* #567915 on #F2F2F2 = 4.52:1 ✅ */
+}
+
+/* 2-column tier card grid */
+.plgc-accordion-sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 2.5rem;                 /* row-gap col-gap */
+}
+
+/* Individual tier card */
+.plgc-accordion-sub-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Tier price/name heading — green semibold */
+.plgc-accordion-sub-heading {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.125rem !important;   /* 18px — slightly smaller than section heading */
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    color: var(--plgc-dark-green, #567915) !important;
+    margin: 0 !important;
+}
+
+/* Tier description */
+.plgc-accordion-sub-desc {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.0625rem !important;
+    font-weight: 400 !important;
+    line-height: 1.75rem !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 !important;
+}
+
+/* Tier benefits list */
+.plgc-accordion-sub-benefits ul {
+    list-style: disc;
+    padding-left: 1.375rem;
+    margin: 0.25rem 0 0;
+}
+
+.plgc-accordion-sub-benefits li {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 1.875rem;
+    color: var(--plgc-black, #000000);
+    margin-bottom: 0;
+}
+
+/* Elementor list resets for sub-benefits */
+.elementor .plgc-accordion-sub-benefits ul {
+    list-style: disc !important;
+    padding-left: 1.375rem !important;
+}
+
+.elementor .plgc-accordion-sub-benefits li {
+    list-style-type: disc !important;
+}
+
+/* ============================================================
+   Tablet (768px – 1024px)
+   ============================================================ */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    .plgc-accordion-trigger {
+        padding: 1.75rem 3.75rem;
+        gap: 1.25rem;
+    }
+
+    .plgc-accordion-title {
+        font-size: 1.75rem;
+        flex-basis: clamp(12rem, 28%, 18rem);
+    }
+
+    .plgc-accordion-content {
+        padding: 1.25rem 3.75rem 1.75rem;
+    }
+
+    .plgc-accordion-content--simple {
+        gap: 1rem;
+    }
+
+    .plgc-accordion-sub-grid {
+        gap: 1.5rem 1.75rem;
+    }
+}
+
+/* ============================================================
+   Mobile (< 768px) — single column throughout
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+    /* Header: stack title + summary, chevron top-right */
+    .plgc-accordion-trigger {
+        display: grid;
+        grid-template-areas:
+            "title  icon"
+            "summary summary";
+        grid-template-columns: 1fr 2rem;
+        align-items: start;
+        gap: 0.5rem 0.75rem;
+        padding: 1.25rem;
+        min-height: 2.75rem;          /* 44px touch target */
+    }
+
+    .plgc-accordion-title {
+        grid-area: title;
+        flex: none;
+        font-size: 1.375rem;
+        line-height: 1.4;
+    }
+
+    .plgc-accordion-summary {
+        grid-area: summary;
+        flex: none;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .plgc-accordion-icon {
+        grid-area: icon;
+        align-self: start;
+        margin-top: 0.375rem;
+    }
+
+    /* All panels go single column */
+    .plgc-accordion-content {
+        padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .plgc-accordion-content--simple {
+        grid-template-columns: 1fr;
+    }
+
+    .plgc-accordion-content--sub {
+        gap: 1rem;
+    }
+
+    .plgc-accordion-sub-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Typography adjustments */
+    .plgc-accordion-price-heading {
+        font-size: 1.0625rem !important;
+    }
+
+    .plgc-accordion-section-heading {
+        font-size: 1.0625rem !important;
+    }
+
+    .plgc-accordion-col2 li,
+    .plgc-accordion-sub-benefits li {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   Reduced motion — WCAG SC 2.3.3
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .plgc-accordion-icon,
+    .plgc-accordion-trigger {
+        transition: none !important;
+    }
+}

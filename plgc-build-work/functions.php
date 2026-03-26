@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.6.29');
+define('PLGC_VERSION', '1.6.31');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -269,10 +269,12 @@ add_action( 'elementor/widgets/register', function ( $widgets_manager ) {
     require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-gallery-filmstrip-widget.php';
     require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-content-slideshow-widget.php';
     require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-hero-widget.php';
+    require_once PLGC_DIR . '/inc/elementor-widgets/class-plgc-two-col-accordion-widget.php';
 
     $widgets_manager->register( new PLGC_Gallery_Filmstrip_Widget() );
     $widgets_manager->register( new PLGC_Content_Slideshow_Widget() );
     $widgets_manager->register( new PLGC_Hero_Widget() );
+    $widgets_manager->register( new PLGC_Two_Col_Accordion_Widget() );
 } );
 
 /**
@@ -331,5 +333,32 @@ add_action( 'elementor/preview/enqueue_styles', function () {
         PLGC_URI . '/assets/css/hero.css',
         [],
         PLGC_VERSION
+    );
+    wp_enqueue_style(
+        'plgc-two-col-accordion',
+        PLGC_URI . '/assets/css/accordion.css',
+        [ 'plgc-theme' ],
+        PLGC_VERSION
+    );
+} );
+
+/**
+ * Register the Two-Column Accordion CSS + JS.
+ * The widget declares these as dependencies via get_style_depends / get_script_depends,
+ * so they only load on pages that actually use the accordion widget.
+ */
+add_action( 'wp_enqueue_scripts', function () {
+    wp_register_style(
+        'plgc-two-col-accordion',
+        PLGC_URI . '/assets/css/accordion.css',
+        [ 'plgc-theme' ],
+        PLGC_VERSION
+    );
+    wp_register_script(
+        'plgc-two-col-accordion',
+        PLGC_URI . '/assets/js/accordion.js',
+        [],
+        PLGC_VERSION,
+        [ 'strategy' => 'defer', 'in_footer' => true ]
     );
 } );
