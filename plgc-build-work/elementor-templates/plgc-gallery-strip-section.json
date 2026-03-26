@@ -1,0 +1,50 @@
+{
+  "version": "0.4",
+  "title": "PLGC \u2014 Gallery Strip",
+  "type": "section",
+  "page_settings": [],
+  "content": [
+    {
+      "id": "plgcgs01",
+      "elType": "section",
+      "isInner": false,
+      "settings": {
+        "layout": "full_width",
+        "content_width": { "unit": "px", "size": 1440, "sizes": [] },
+        "padding": { "unit": "px", "top": "0", "right": "0", "bottom": "0", "left": "0", "isLinked": true }
+      },
+      "elements": [
+        {
+          "id": "plgcgs02",
+          "elType": "column",
+          "isInner": false,
+          "settings": {
+            "_column_size": 100,
+            "padding": { "unit": "px", "top": "0", "right": "0", "bottom": "0", "left": "0", "isLinked": true }
+          },
+          "elements": [
+            {
+              "id": "plgcgs03",
+              "elType": "widget",
+              "widgetType": "plgc_gallery_strip",
+              "isInner": false,
+              "settings": {
+                "visible_panels": "3",
+                "strip_height": { "unit": "px", "size": 480 },
+                "mobile_height": { "unit": "px", "size": 280 },
+                "gap": { "unit": "px", "size": 4 },
+                "enable_lightbox": "yes",
+                "images": [
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" },
+                  { "image": { "url": "" }, "caption": "" }
+                ]
+              },
+              "elements": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

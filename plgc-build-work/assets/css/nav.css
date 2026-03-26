@@ -1,0 +1,1065 @@
+/**
+ * PLGC Navigation Styles
+ *
+ * Covers the sticky header bar, mega menu panels, search panel,
+ * and mobile drawer. No announcement bar styles here — that's
+ * handled by the ACF alert banner plugin.
+ *
+ * Design tokens are defined in theme.css and referenced via var().
+ */
+
+/* ============================================================
+   HEADER BAR
+   ============================================================ */
+
+.plgc-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--plgc-light-grey, #F2F2F2);
+    border-bottom: 3px solid #fff;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+.plgc-header__inner {
+    display: flex;
+    align-items: center;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 40px;
+    height: 103px;
+    gap: 0;
+}
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+
+.plgc-header__logo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    margin-right: 48px;
+    padding: 10px 0;
+}
+
+.plgc-logo-img {
+    display: block;
+    width: auto;
+    max-width: 132px;
+    max-height: 87px;
+    height: auto;
+}
+
+.plgc-logo-text {
+    font-family: var(--plgc-font-heading, 'Libre Baskerville'), serif;
+    font-size: 20px;
+    color: var(--plgc-dark-green, #567915);
+    font-weight: 700;
+}
+
+/* ============================================================
+   PRIMARY NAV
+   ============================================================ */
+
+.plgc-nav {
+    flex: 0 0 auto;   /* natural width — actions pushed right by margin-left:auto */
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: visible;
+}
+
+.plgc-nav__list {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: nowrap;
+}
+
+.plgc-nav__item {
+    position: static;
+    flex-shrink: 0;
+}
+
+/* Shared styles — Figma: Open Sans SemiBold 16px, padding 15px, line-height normal */
+.plgc-nav__link,
+.plgc-nav__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 15px;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    color: var(--plgc-black, #000);
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+/* Hover: grey bg + underline (WCAG 1.4.1 — not colour alone) */
+.plgc-nav__link:hover,
+.plgc-nav__trigger:hover,
+.plgc-nav__trigger[aria-expanded="true"] {
+    background: var(--plgc-medium-grey, #E7E4E4);
+    color: var(--plgc-black, #000);
+    text-decoration: underline;
+}
+
+/* Current page — exact match */
+.plgc-nav__link[aria-current="page"],
+.plgc-nav__trigger[aria-current="page"] {
+    color: var(--plgc-dark-green, #567915);
+    text-decoration: underline;
+}
+
+/* Active ancestor — grey pill + underline when a child of this section is the current page.
+   Deliberately matches hover so the visual language is consistent: "you are here". */
+.plgc-nav__item--ancestor > .plgc-nav__trigger,
+.plgc-nav__item--ancestor > .plgc-nav__link {
+    background: var(--plgc-medium-grey, #E7E4E4);
+    color: var(--plgc-black, #000);
+    text-decoration: underline;
+}
+
+/* Focus — blue ring, passes contrast on F2F2F2 */
+.plgc-nav__link:focus-visible,
+.plgc-nav__trigger:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+    border-radius: 5px;
+}
+
+/* Chevron */
+.plgc-nav__chevron {
+    flex-shrink: 0;
+    transition: transform var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-nav__trigger[aria-expanded="true"] .plgc-nav__chevron {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+   HEADER ACTIONS (CTA + Search + Hamburger)
+   ============================================================ */
+
+.plgc-header__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;  /* push to right edge of header */
+    padding-left: 20px; /* breathing room between Contact Us and button */
+}
+
+/* "Book a Tee Time" — Figma: h-48px min-w-150px p-15px bg-#ffae40 rounded-100px
+   SemiBold 15px black. width:max-content prevents it stretching on wide screens. */
+.plgc-btn--tee-time {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: max-content;
+    min-width: 0;
+    padding: 0 15px;
+    background: #FFAE40;
+    color: #000;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: normal;
+    text-decoration: none;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-btn--tee-time:hover {
+    background: #FDBC69;
+    text-decoration: underline;
+    color: #000;
+}
+
+/* Focus: black ring on yellow — excellent contrast, passes WCAG AA.
+   color: #000 is explicit here to prevent the browser's default green
+   link focus colour from bleeding through. */
+.plgc-btn--tee-time:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 3px;
+    color: #000;
+    text-decoration: underline;
+}
+
+/* Search toggle */
+.plgc-header__search-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--plgc-black, #000);
+    flex-shrink: 0;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-header__search-toggle:hover {
+    background: var(--plgc-medium-grey, #E7E4E4);
+}
+
+.plgc-header__search-toggle:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+/* Icon swap: magnifier ↔ X */
+.plgc-header__search-toggle[aria-expanded="true"] .plgc-icon--search {
+    display: none !important;
+}
+.plgc-header__search-toggle[aria-expanded="true"] .plgc-icon--close {
+    display: block !important;
+}
+
+/* Icon size: Figma specifies ~27.5px icon inside 44px touch target */
+.plgc-header__search-toggle .plgc-icon--search,
+.plgc-header__search-toggle .plgc-icon--close {
+    width: 27px;
+    height: 27px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   MEGA PANEL
+   ============================================================ */
+
+.plgc-mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--plgc-light-grey, #F2F2F2);
+    border-top: 4px solid var(--plgc-light-blue, #C2D7FF);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    z-index: 999;
+    animation: megaSlideIn var(--plgc-transition-fast, 150ms) ease both;
+}
+
+@keyframes megaSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plgc-mega { animation: none; }
+}
+
+/* Grid — same horizontal padding as the header so columns sit flush with the nav.
+   Large menus (5+ cols): equal 1fr columns with a consistent gap.
+   Small menus (≤4 cols): auto-width columns, gap-only spacing so all rows left-align. */
+.plgc-mega__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--mega-cols, 7), 1fr);
+    column-gap: 32px;
+    row-gap: 24px;
+    list-style: none;
+    margin: 0 auto;
+    padding: 24px 40px;
+    max-width: 1440px;
+    align-items: start;
+}
+
+/* Small column count: natural content-width columns with equal gap.
+   justify-content: start keeps all rows flushed left — no sprawl. */
+.plgc-mega__grid[data-cols="2"],
+.plgc-mega__grid[data-cols="3"],
+.plgc-mega__grid[data-cols="4"] {
+    grid-template-columns: repeat(var(--mega-cols), auto);
+    column-gap: 48px;
+    justify-content: start;
+}
+
+/* Column — padding replaced by grid column-gap; no per-item padding needed */
+.plgc-mega__col {
+    /* intentionally empty — spacing handled by grid gap */
+}
+
+/* ── Column heading (second level) ──────────────────────────
+   Open Sans SemiBold 16px, line-height normal.
+   Hover/Active: dark green pill, white text, underline. */
+.plgc-mega__heading {
+    display: inline-block;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    color: #000;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    transition: background var(--plgc-transition-fast, 150ms) ease,
+                color var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mega__heading:hover {
+    background: var(--plgc-dark-green, #567915);
+    color: #fff;
+    text-decoration: none;  /* no underline on the filled green pill */
+}
+
+/* Active: same pill — also no underline on the pill itself */
+.plgc-mega__heading.current-menu-item,
+.plgc-mega__heading.current-menu-ancestor,
+.plgc-mega__heading.current-menu-parent {
+    background: var(--plgc-dark-green, #567915);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Silent heading: invisible label — client creates a Custom Link
+   with CSS class "plgc-col-silent" to group two items in one column
+   (e.g. Facilities & Amenities + Online Merchandise together). */
+.plgc-mega__heading--silent {
+    display: none !important;
+}
+
+/* Non-linking label (#) — no pointer, no hover state */
+.plgc-mega__heading--label {
+    cursor: default;
+    pointer-events: none;
+}
+
+.plgc-mega__heading--label:hover {
+    background: transparent;
+    color: #000;
+    text-decoration: none;
+}
+
+.plgc-mega__heading:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* ── Third-level sub-links ───────────────────────────────────
+   Open Sans Regular 15px (Regular weight distinguishes from headings).
+   Hover: green text + underline.
+   Active: green pill + white text + underline. */
+.plgc-mega__sub {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-mega__sub-item {
+    margin: 3px 0;
+}
+
+.plgc-mega__sub-link {
+    display: inline-block;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: normal;
+    color: #000;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: color var(--plgc-transition-fast, 150ms) ease,
+                background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mega__sub-link:hover {
+    color: var(--plgc-dark-green, #567915);
+    background: transparent;
+    text-decoration: underline;
+}
+
+/* Active/current: same as hover — green text + underline, no heavy pill */
+.plgc-mega__sub-link.current-menu-item,
+.plgc-mega__sub-link.current-menu-ancestor {
+    color: var(--plgc-dark-green, #567915);
+    background: transparent;
+    text-decoration: underline;
+}
+
+.plgc-mega__sub-link:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* ============================================================
+   SEARCH PANEL
+   ============================================================ */
+
+.plgc-search-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(231, 228, 228, 0.95);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    z-index: 998;
+    padding: 36px 120px 48px;
+}
+
+.plgc-search-panel[hidden] { display: none; }
+
+.plgc-search-panel__heading {
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: normal;
+    color: var(--plgc-black, #000);
+    text-align: center;
+    margin: 0 0 24px;
+}
+
+.plgc-search-panel__form-wrap {
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.plgc-search-form {
+    display: block;
+    width: 100%;
+}
+
+/* Pill: flex container — button is a flex child, not absolutely positioned.
+   This keeps the button flush against the right inner edge. */
+.plgc-search-form__pill {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    border-radius: 100px;
+    padding: 4px 4px 4px 1.5rem;
+    box-sizing: border-box;
+    transition: border-color var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-search-form__pill:focus-within {
+    border-color: var(--plgc-dark-green, #567915);
+}
+
+.plgc-search-form__input {
+    flex: 1;
+    height: 3.25rem;
+    min-width: 0;
+    padding: 0;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    color: #000;
+    background: transparent;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.plgc-search-form__input::placeholder {
+    font-weight: 600;
+    color: #000;
+    opacity: 1;
+}
+
+.plgc-search-form__input::-webkit-search-decoration,
+.plgc-search-form__input::-webkit-search-cancel-button,
+.plgc-search-form__input::-webkit-search-results-button,
+.plgc-search-form__input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+}
+
+/* Green circle button — flex child, flush inside the pill */
+.plgc-search-form__submit {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: var(--plgc-dark-green, #567915);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-search-form__submit:hover {
+    background: var(--plgc-dark-green-tone, #233C26);
+}
+
+.plgc-search-form__submit:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+/* Screen-reader label */
+.screen-reader-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* AJAX live results */
+.plgc-search-results {
+    margin: 12px 0 0;
+    background: #fff;
+    border: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.plgc-search-results[hidden] { display: none; }
+
+.plgc-search-results__group-label {
+    display: block;
+    padding: 10px 20px 6px;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    background: var(--plgc-light-grey, #F2F2F2);
+    border-bottom: 1px solid var(--plgc-medium-grey, #E7E4E4);
+}
+
+.plgc-search-results__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.plgc-search-results__item a {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-search-results__item:last-child a { border-bottom: none; }
+
+.plgc-search-results__item a:hover,
+.plgc-search-results__item a:focus-visible {
+    background: var(--plgc-very-light-green, #E5F0D0);
+    outline: none;
+}
+
+.plgc-search-results__item-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    opacity: 0.5;
+}
+
+.plgc-search-results__item-title {
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--plgc-black, #000);
+    line-height: 1.3;
+    display: block;
+}
+
+.plgc-search-results__item-type {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
+    display: block;
+}
+
+.plgc-search-results__status {
+    padding: 16px 20px;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.875rem;
+    color: #666;
+    text-align: center;
+}
+
+.plgc-search-results__footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    text-align: center;
+}
+
+.plgc-search-results__footer a {
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--plgc-dark-green, #567915);
+    text-decoration: none;
+}
+
+.plgc-search-results__footer a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================================
+   HAMBURGER
+   ============================================================ */
+
+.plgc-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 10px;
+    flex-shrink: 0;
+}
+
+.plgc-hamburger__bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--plgc-black, #000);
+    border-radius: 2px;
+    transition: transform var(--plgc-transition-fast, 150ms) ease,
+                opacity var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-hamburger:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+   MOBILE DRAWER
+   ============================================================ */
+
+.plgc-mobile-nav {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(320px, 90vw);
+    background: #fff;
+    z-index: 1100;
+    /* Flex column: inner scrolls freely, CTA always visible at bottom */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateX(100%);
+    transition: transform var(--plgc-transition-default, 250ms) ease;
+}
+
+.plgc-mobile-nav.is-open { transform: translateX(0); }
+
+.plgc-mobile-nav[aria-hidden="true"]  { visibility: hidden; }
+.plgc-mobile-nav[aria-hidden="false"] { visibility: visible; }
+
+.plgc-mobile-nav__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1099;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--plgc-transition-default, 250ms) ease;
+}
+
+.plgc-mobile-nav__overlay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Scrollable area — grows to fill remaining height above the CTA */
+.plgc-mobile-nav__inner {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px 20px 16px;
+}
+
+.plgc-mobile-nav__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--plgc-black, #000);
+    margin-left: auto;
+    margin-bottom: 8px;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mobile-nav__close:hover { background: var(--plgc-light-grey, #F2F2F2); }
+
+.plgc-mobile-nav__close:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+.plgc-mobile-nav__menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* All items get the same bottom border */
+.plgc-mobile-nav__item {
+    border-bottom: 1px solid var(--plgc-medium-grey, #E7E4E4);
+}
+
+.plgc-mobile-nav__item:last-child { border-bottom: none; }
+
+.plgc-mobile-nav__row {
+    display: flex;
+    align-items: center;
+}
+
+/* Full-row toggle button for hash (#) items — the entire row is one touch target.
+   WCAG 2.5.5: min 44px height, full width satisfies pointer target size. */
+.plgc-mobile-nav__row-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 52px;           /* generous touch target */
+    padding: 14px 8px 14px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    color: var(--plgc-black, #000);
+    text-align: left;
+    transition: color var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mobile-nav__row-btn:hover {
+    color: var(--plgc-dark-green, #567915);
+}
+
+.plgc-mobile-nav__row-btn:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.plgc-mobile-nav__row-label {
+    flex: 1;
+    text-align: left;
+}
+
+/* Chevron inside row-btn rotates when expanded */
+.plgc-mobile-nav__row-btn .plgc-mobile-nav__chevron {
+    flex-shrink: 0;
+    transition: transform var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mobile-nav__row-btn[aria-expanded="true"] .plgc-mobile-nav__chevron {
+    transform: rotate(180deg);
+}
+
+/* Top-level link — ALL top-level items styled identically
+   (with OR without children — no more inconsistency). */
+.plgc-mobile-nav__link {
+    flex: 1;
+    display: block;
+    padding: 14px 8px 14px 4px;
+    font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: normal;
+    color: var(--plgc-black, #000);
+    text-decoration: none;
+    transition: color var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mobile-nav__link--label { cursor: default; }
+
+/* Depth-1 sub-items (column headings in desktop mega menu) */
+.plgc-mobile-nav__link--sub {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    padding: 10px 8px 10px 16px;
+}
+
+/* Depth-2 sub-items (Membership Questions, Application, etc.) */
+.plgc-mobile-nav__link--deep {
+    font-size: 0.875rem;
+    font-weight: 400;
+    padding: 8px 8px 8px 32px;
+    color: #444;
+}
+
+.plgc-mobile-nav__link:hover,
+.plgc-mobile-nav__link--sub:hover,
+.plgc-mobile-nav__link--deep:hover {
+    color: var(--plgc-dark-green, #567915);
+    text-decoration: underline;
+}
+
+/* Active: same green + underline, persists as long as you're on that page */
+.plgc-mobile-nav__link.current-mobile-item,
+a.plgc-mobile-nav__link--sub.current-mobile-item,
+a.plgc-mobile-nav__link--deep.current-mobile-item {
+    color: var(--plgc-dark-green, #567915);
+    text-decoration: underline;
+}
+
+/* Label spans (# items) — never interactive, never styled as links */
+.plgc-mobile-nav__link--label {
+    cursor: default;
+    pointer-events: none;
+}
+
+.plgc-mobile-nav__link--label:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.plgc-mobile-nav__link:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+/* Expand button */
+.plgc-mobile-nav__expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--plgc-black, #000);
+    border-radius: 4px;
+    transition: background var(--plgc-transition-fast, 150ms) ease;
+}
+
+.plgc-mobile-nav__expand[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+.plgc-mobile-nav__expand:hover { background: var(--plgc-light-grey, #F2F2F2); }
+
+.plgc-mobile-nav__expand:focus-visible {
+    outline: 3px solid var(--plgc-focus-color, #005fcc);
+    outline-offset: 2px;
+}
+
+/* Depth-1 sub-menu (hidden by default, toggled by JS) */
+.plgc-mobile-nav__sub {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--plgc-light-grey, #F2F2F2);
+    border-top: 1px solid var(--plgc-medium-grey, #E7E4E4);
+}
+
+/* Depth-2 sub-menu (always visible once depth-1 is expanded — no extra toggle) */
+.plgc-mobile-nav__sub--nested {
+    background: #e4e4e4;
+    border-top: 1px solid #d8d8d8;
+}
+
+/* CTA — pinned footer, never scrolls off screen */
+.plgc-mobile-nav__cta {
+    flex: 0 0 auto;
+    padding: 16px 20px 24px;
+    border-top: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    background: #fff;
+    display: flex;
+    justify-content: center;
+}
+
+.plgc-mobile-nav__cta .plgc-btn--tee-time {
+    display: inline-flex !important;
+    width: auto;
+    padding: 0 24px;
+    height: 48px;
+}
+
+/* ============================================================
+   RESPONSIVE — WIDE TABLET (1100px – 1280px)
+   ============================================================ */
+
+@media (max-width: 1280px) {
+    .plgc-header__inner { padding: 0 24px; }
+
+    .plgc-nav__link,
+    .plgc-nav__trigger {
+        padding: 8px 10px;
+        font-size: 0.9375rem;
+    }
+
+    .plgc-mega__grid {
+        padding: 20px 24px;
+        column-gap: 24px;
+    }
+
+    .plgc-header__actions { gap: 6px; }
+}
+
+/* ============================================================
+   RESPONSIVE — NARROW TABLET (900px – 1099px)
+   ============================================================ */
+
+@media (max-width: 1099px) {
+    .plgc-header__inner { padding: 0 20px; }
+
+    .plgc-nav__link,
+    .plgc-nav__trigger {
+        padding: 6px 8px;
+        font-size: 0.875rem;
+    }
+
+    .plgc-btn--desktop-cta {
+        font-size: 0.875rem;
+        padding: 0 12px;
+        height: 42px;
+    }
+
+    /* Cap large grids at 3 columns so wrapped rows always start at col 1.
+       auto-fit minmax lets the browser calculate the natural column count. */
+    .plgc-mega__grid {
+        padding: 20px 20px;
+        column-gap: 20px;
+        row-gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    /* Small menus stay auto-width; cap gap slightly */
+    .plgc-mega__grid[data-cols="2"],
+    .plgc-mega__grid[data-cols="3"],
+    .plgc-mega__grid[data-cols="4"] {
+        grid-template-columns: repeat(var(--mega-cols), auto);
+        column-gap: 36px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — SMALL DESKTOP (769px – 900px)
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .plgc-header__inner { padding: 0 16px; }
+
+    .plgc-nav__link,
+    .plgc-nav__trigger {
+        padding: 6px 6px;
+        font-size: 0.8125rem;
+    }
+
+    .plgc-header__actions { padding-left: 8px; }
+
+    .plgc-btn--desktop-cta {
+        font-size: 0.8125rem;
+        padding: 0 10px;
+        height: 40px;
+    }
+
+    .plgc-mega__grid {
+        padding: 16px;
+        column-gap: 16px;
+        /* Minimum 150px per col — naturally wraps to ~4 cols at ~700px */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .plgc-mega__grid[data-cols="2"],
+    .plgc-mega__grid[data-cols="3"],
+    .plgc-mega__grid[data-cols="4"] {
+        grid-template-columns: repeat(var(--mega-cols), auto);
+        column-gap: 28px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .plgc-nav        { display: none; }
+    .plgc-hamburger  { display: flex; }
+
+    /* Hide ONLY the header desktop CTA — drawer CTA uses plgc-btn--tee-time alone */
+    .plgc-btn--desktop-cta { display: none; }
+
+    .plgc-header__inner {
+        height: 72px;
+        padding: 0 16px;
+    }
+
+    .plgc-logo-img {
+        max-width: 116px;   /* slightly larger on mobile per feedback */
+        max-height: 76px;
+    }
+
+    .plgc-header__actions { gap: 4px; padding-left: 0; }
+
+    .plgc-search-panel { padding: 20px 20px 28px; }
+
+    .plgc-search-panel__heading {
+        font-size: 1.25rem;
+        margin-bottom: 16px;
+    }
+
+    .plgc-search-form__input { height: 2.75rem; }
+    .plgc-search-form__submit { width: 44px; height: 44px; }
+}
+
+/* ============================================================
+   RESPONSIVE — SMALL MOBILE (≤ 480px)
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .plgc-header__inner {
+        height: 64px;
+        padding: 0 12px;
+    }
+
+    .plgc-logo-img {
+        max-width: 100px;
+        max-height: 66px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plgc-mobile-nav,
+    .plgc-mobile-nav__overlay { transition: none; }
+}
