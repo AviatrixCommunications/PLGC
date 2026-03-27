@@ -326,12 +326,12 @@
 /* Container — both ul (older GF) and div (GF5) */
 .gform_wrapper .gfield--type-checkbox .gfield_checkbox,
 .gform_wrapper ul.gfield_checkbox {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
 }
 
 /* Row — li (older GF) and div.gchoice (GF5).
@@ -472,12 +472,12 @@
 
 .gform_wrapper .gfield--type-radio .gfield_radio,
 .gform_wrapper ul.gfield_radio {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
 }
 
 .gform_wrapper .gfield--type-radio .gfield_radio li,
@@ -598,10 +598,8 @@
 
 /* ============================================================
    11. NAME FIELD (multi-part ginput_complex)
-   Layout intentionally not overridden — GF's native gform-grid-row
-   handles column layout and gap, which keeps First/Last visually
-   consistent with the Email/Phone half-width field pair.
-   Only width:100% on the input is set so inputs fill their column.
+   Layout fully deferred to GF's native gform-grid-row system.
+   Only input width is set — GF handles columns, gap, and mobile stacking.
    ============================================================ */
 
 .gform_wrapper .ginput_complex.ginput_container_name input {
