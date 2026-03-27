@@ -97,7 +97,11 @@
 
 	// Elementor frontend hook — fires whenever a widget is rendered/re-rendered
 	// in the live editor preview. $scope is a jQuery object wrapping the widget.
-	if ( window.elementorFrontend ) {
+	//
+	// Guard: check both elementorFrontend AND elementorFrontend.hooks before
+	// calling addAction. On the public frontend, elementorFrontend may exist as a
+	// partially-initialised object before hooks is set up, which causes a TypeError.
+	if ( window.elementorFrontend && window.elementorFrontend.hooks ) {
 		window.elementorFrontend.hooks.addAction(
 			'frontend/element_ready/plgc_two_col_accordion.default',
 			function ( $scope ) {
