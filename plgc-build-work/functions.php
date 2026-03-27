@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.6.34');
+define('PLGC_VERSION', '1.6.35');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -360,5 +360,43 @@ add_action( 'wp_enqueue_scripts', function () {
         [],
         PLGC_VERSION,
         [ 'strategy' => 'defer', 'in_footer' => true ]
+    );
+} );
+
+/**
+ * Gravity Forms — Brand Stylesheet
+ *
+ * Enqueued globally on all front-end pages (GF forms can appear anywhere).
+ * Also enqueued in the Elementor editor preview so form embeds look correct
+ * while editing. Loaded after GF's own styles so our overrides win cleanly.
+ *
+ * GF renders its own stylesheet with handle 'gforms_reset_css' and
+ * 'gforms_formsmain_css'. We declare those as optional dependencies so our
+ * sheet always loads after them when they're present.
+ */
+add_action( 'wp_enqueue_scripts', function () {
+    // Only load if Gravity Forms is active
+    if ( ! class_exists( 'GFForms' ) ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'plgc-gravity-forms',
+        PLGC_URI . '/assets/css/gravity-forms.css',
+        [ 'plgc-theme' ],           // load after our design tokens
+        PLGC_VERSION
+    );
+}, 20 ); // priority 20 — after GF's own wp_enqueue_scripts at priority 10
+
+add_action( 'elementor/preview/enqueue_styles', function () {
+    if ( ! class_exists( 'GFForms' ) ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'plgc-gravity-forms',
+        PLGC_URI . '/assets/css/gravity-forms.css',
+        [ 'plgc-theme' ],
+        PLGC_VERSION
     );
 } );
