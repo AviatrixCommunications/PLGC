@@ -373,30 +373,34 @@
     height: 126px;
     border-radius: 50%;
     object-fit: cover;
-    margin-top: 4px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    McCHESNEY'S SPECIFIC OVERRIDES
-   The badge (126px circular logo) is taken out of the normal flex flow by
-   making it position:absolute. This means all three cards share the same
-   natural height — heading + body + button — and the badge sits decoratively
-   in the corner of the card without pushing the card taller.
+   The badge is pulled out of flow so it has zero impact on card height, but
+   visually appears exactly 24px to the right of the button (matching Figma
+   node 42551:9344: gap-[24px] items-center).
+
+   Technique:
+   - btn-row uses `inline-flex` so its width collapses to the button's natural
+     width (the only in-flow child).
+   - badge-link is position:absolute relative to that btn-row.
+   - `left: calc(100% + 24px)` = btn-row width (= button width) + 24px gap.
+   - `top: 50%; translateY(-50%)` vertically centres the badge with the button.
+   - Card height stays the same as Golf Outings and Weddings cards. ✓
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* Badge-link pulled out of flex flow — lives in the bottom-right corner of card */
-.plgc-gs--mcchesneys .plgc-gs__badge-link {
-    position: absolute;
-    right: 44px;   /* inside 60px right padding, centred within it */
-    bottom: 44px;  /* inside 57px bottom padding, comfortable visual margin */
+.plgc-gs--mcchesneys .plgc-gs__btn-row {
+    display: inline-flex; /* width shrinks to button content only */
+    position: relative;   /* positioning context for the badge */
+    flex-wrap: nowrap;
 }
 
-/* On tablet/mobile, badge re-flows into the btn-row row (no overlap issues
-   since the card goes full-width and is taller).                            */
-@media (max-width: 1024px) {
-    .plgc-gs--mcchesneys .plgc-gs__badge-link {
-        position: static;
-    }
+.plgc-gs--mcchesneys .plgc-gs__badge-link {
+    position: absolute;
+    left: calc(100% + 24px); /* button width + 24px gap — matches Figma */
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -456,6 +460,20 @@
     .plgc-gs__image-col--dots-right .plgc-gs__dots {
         left: 20px;
         right: auto;
+    }
+
+    /* McChesney's badge: revert to normal flex flow on tablet/mobile.
+       The card is full-width here so the badge flowing inline is fine. */
+    .plgc-gs--mcchesneys .plgc-gs__btn-row {
+        display: flex;
+        position: static;
+    }
+
+    .plgc-gs--mcchesneys .plgc-gs__badge-link {
+        position: static;
+        transform: none;
+        left: auto;
+        top: auto;
     }
 }
 
