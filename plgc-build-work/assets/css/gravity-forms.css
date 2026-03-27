@@ -1,65 +1,38 @@
 /**
  * PLGC Gravity Forms — Theme Stylesheet
  *
- * Applies PLGC brand styles to ALL Gravity Forms field types so any form
- * an editor builds will automatically match the site design.
- *
  * Design source: Figma node 42551:9980 (Membership Questions form)
- * Figma tokens used:
+ *
+ * CORE PHILOSOPHY:
+ *   This stylesheet styles GF's visual appearance only.
+ *   It never touches GF's layout system (floats, grid, column classes).
+ *   GF's half-width, third-width, and inline columns are left completely
+ *   alone so they continue to work exactly as GF intends.
+ *
+ * Figma tokens:
  *   Labels       Open Sans SemiBold 20px / #000000
- *   Sub-labels   Open Sans SemiBold 20px / #000000
+ *   Sub-labels   Open Sans Regular 16px  / #000000
  *   (Required)   Open Sans Regular 17px  / #567915
- *   Descriptions Open Sans Regular 17px  / #000000
- *   Input border #2D5032 (medium green tone), 1px solid
- *   Input height 46px (Figma) → padded to meet 44px WCAG touch target
- *   Checkboxes   20px square, border #E7E4E4
- *   Radio        20px circle, border #E7E4E4
- *   Submit btn   #FFAE40 pill, Open Sans SemiBold 15px, 47px height
- *   Error        #000000 text on #FFF3F3 background with red-left-border
- *   Success      #000000 text on #E5F0D0 background (very light green)
+ *   Input border #2D5032, 1px solid
+ *   Input height 46px
+ *   Checkbox/Radio border #767676 (SC 1.4.11: 4.6:1 ✅)
+ *   Submit       #FFAE40 pill, SemiBold 15px, 47px
  *
- * WCAG 2.1 AA compliance:
- *   SC 1.4.3   — all text meets 4.5:1 contrast (#000 on white, on #F2F2F2)
- *   SC 1.4.11  — input borders #2D5032 on white = 9.1:1 ✅ (3:1 required)
- *   SC 1.4.1   — errors use border-left + icon text, not colour alone
- *   SC 2.4.7   — all focusable elements have visible focus ring #567915
- *   SC 2.5.5   — all interactive elements min 44×44px touch target
- *   SC 1.3.1   — labels associated to inputs via GF's native for/id
- *   SC 3.3.1   — error messages inline below the field
- *   SC 3.3.2   — labels and descriptions visible before user interacts
- *
- * GF field types covered:
- *   Text, Email, Phone, Number, Website, Password
- *   Name (multi-part), Address (multi-part)
- *   Textarea
- *   Select / Dropdown
- *   Multi-Select
- *   Checkboxes
- *   Radio Buttons
- *   File Upload
- *   Date, Time
- *   Section Break / Heading
- *   HTML Block
- *   List field
- *   Product, Quantity, Price, Total
- *   Consent
- *   Signature (if GF Signature add-on)
- *   Submit button
- *   Progress bar (multi-step forms)
- *   Confirmation / success message
- *   Validation errors (field-level + form-level)
- *
- * Specificity strategy:
- *   All selectors prefixed with `.gform_wrapper` to stay scoped and
- *   override GF's own default styles without touching anything else
- *   on the page. `!important` used only where GF inlines styles.
+ * WCAG 2.1 AA:
+ *   SC 1.4.3  — all text ≥4.5:1 ✅
+ *   SC 1.4.11 — input borders #2D5032 on white 9.1:1 ✅
+ *               checkbox/radio border #767676 on white 4.6:1 ✅
+ *   SC 1.4.1  — errors: border-left + text, not colour alone ✅
+ *   SC 2.4.7  — focus ring #567915 on white 5.07:1 ✅
+ *   SC 2.5.5  — inputs 46px; checkbox/radio label min-height 44px ✅
+ *   SC 3.3.2  — (Required) indicators always visible ✅
  *
  * @package PLGC
- * @since   1.6.35
+ * @since   1.6.37
  */
 
 /* ============================================================
-   1. WRAPPER & FORM RESET
+   1. WRAPPER RESET
    ============================================================ */
 
 .gform_wrapper {
@@ -74,18 +47,17 @@
     box-sizing: border-box;
 }
 
-/* Remove GF's default top margin on the form tag */
 .gform_wrapper form {
     margin: 0;
 }
 
 /* ============================================================
-   2. FIELD GROUPS & SPACING
+   2. FIELD SPACING
+   Only vertical rhythm — never touch GF's column/float layout.
    ============================================================ */
 
-/* Each field (li.gfield) */
 .gform_wrapper .gfield {
-    margin-bottom: 1.5rem;          /* 24px between fields */
+    margin-bottom: 1.5rem;           /* 24px — same as original v1.6.35 */
     padding: 0;
 }
 
@@ -93,59 +65,86 @@
     margin-bottom: 0;
 }
 
-/* GF4+ uses .gform-field-label, GF5+ also uses .gfield_label */
-.gform_wrapper .gfield_label,
-.gform_wrapper .gfield--type-name .gfield_label,
-.gform_wrapper .gfield--type-address .gfield_label {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 1.25rem;             /* 20px — Figma H4 */
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--plgc-black, #000000);
-    margin: 0 0 0.5rem;
+/* ============================================================
+   3. LABELS
+   GF uses several label classes depending on field type and version.
+   All are brought to the same font so every label looks identical.
+   ============================================================ */
+
+/* Primary field label — covers all field types */
+.gform_wrapper .gfield_label {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;   /* 20px — Figma H4 */
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 0 0.5rem !important;
     display: block;
 }
 
-/* Sub-labels (First / Last on Name, city/state on Address) */
+/* GF5 alternate label class */
+.gform_wrapper .gform-field-label {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 0 0.5rem !important;
+}
+
+/* Sub-labels inside complex fields: First/Last on Name, City/State on Address */
 .gform_wrapper .gfield_label_before_complex,
 .gform_wrapper .ginput_complex label,
 .gform_wrapper .ginput_address label,
 .gform_wrapper .name_sub_label,
 .gform_wrapper .address_sub_label {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 1.0625rem;           /* 17px */
-    font-weight: 600;
-    color: var(--plgc-black, #000000);
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    color: var(--plgc-black, #000000) !important;
     margin-top: 0.375rem;
     display: block;
 }
 
-/* (Required) indicator — green, not red */
-.gform_wrapper .gfield_required {
+/* ============================================================
+   4. REQUIRED INDICATORS
+   SC 3.3.2 — must be clearly visible.
+   Styled in brand green (#567915) per Figma design.
+   IMPORTANT: never add display:none to any of these.
+   ============================================================ */
+
+.gform_wrapper .gfield_required,
+.gform_wrapper .gfield_required_asterisk,
+.gform_wrapper .gfield_required_text {
     color: var(--plgc-dark-green, #567915) !important;
-    font-size: 1.0625rem;
-    font-weight: 400;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.0625rem !important;
+    font-weight: 400 !important;
     margin-left: 0.25rem;
 }
 
-/* GF5 uses .gfield--is-required marker differently */
+/* Suppress GF5's CSS-generated ::after indicator — GF adds its own span */
 .gform_wrapper .gfield--is-required .gfield_label::after {
-    content: none; /* GF adds its own span; we style that instead */
+    content: none;
 }
 
-/* Field description (below label, above input) */
+/* ============================================================
+   5. FIELD DESCRIPTION
+   ============================================================ */
+
 .gform_wrapper .gfield_description,
 .gform_wrapper .gfield_description.instruction {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1.0625rem;
     font-weight: 400;
-    line-height: 2rem;
+    line-height: 1.75rem;
     color: var(--plgc-black, #000000);
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.625rem;
 }
 
 /* ============================================================
-   3. TEXT INPUTS, EMAIL, PHONE, NUMBER, URL, PASSWORD
+   6. TEXT INPUTS — text, email, phone, number, url, password,
+      search, date, time
    ============================================================ */
 
 .gform_wrapper input[type="text"],
@@ -158,8 +157,8 @@
 .gform_wrapper input[type="date"],
 .gform_wrapper input[type="time"] {
     width: 100%;
-    height: 2.875rem;               /* 46px — Figma spec */
-    min-height: 2.75rem;            /* 44px — WCAG SC 2.5.5 */
+    height: 2.875rem;                /* 46px */
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 */
     padding: 0 0.875rem;
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1rem;
@@ -170,7 +169,7 @@
     border-radius: 0;
     outline: none;
     transition: border-color var(--plgc-transition-fast, 150ms ease-in-out),
-                box-shadow var(--plgc-transition-fast, 150ms ease-in-out);
+                box-shadow   var(--plgc-transition-fast, 150ms ease-in-out);
     -webkit-appearance: none;
     appearance: none;
 }
@@ -185,12 +184,12 @@
 .gform_wrapper input[type="date"]:focus,
 .gform_wrapper input[type="time"]:focus {
     border-color: var(--plgc-dark-green, #567915);
-    box-shadow: 0 0 0 var(--plgc-focus-width, 0.125rem) var(--plgc-focus-color, #567915);
+    box-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915);
     outline: none;
 }
 
 /* ============================================================
-   4. TEXTAREA
+   7. TEXTAREA
    ============================================================ */
 
 .gform_wrapper textarea,
@@ -198,7 +197,7 @@
 .gform_wrapper textarea.medium,
 .gform_wrapper textarea.small {
     width: 100%;
-    min-height: 10rem;              /* 160px — comfortable default */
+    min-height: 10rem;
     padding: 0.75rem 0.875rem;
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1rem;
@@ -210,23 +209,22 @@
     outline: none;
     resize: vertical;
     transition: border-color var(--plgc-transition-fast, 150ms ease-in-out),
-                box-shadow var(--plgc-transition-fast, 150ms ease-in-out);
+                box-shadow   var(--plgc-transition-fast, 150ms ease-in-out);
     -webkit-appearance: none;
     appearance: none;
 }
 
 .gform_wrapper textarea:focus {
     border-color: var(--plgc-dark-green, #567915);
-    box-shadow: 0 0 0 var(--plgc-focus-width, 0.125rem) var(--plgc-focus-color, #567915);
+    box-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915);
     outline: none;
 }
 
 /* ============================================================
-   5. SELECT / DROPDOWN
+   8. SELECT / DROPDOWN
    ============================================================ */
 
-.gform_wrapper select,
-.gform_wrapper .gfield_select {
+.gform_wrapper select {
     width: 100%;
     height: 2.875rem;
     min-height: 2.75rem;
@@ -236,7 +234,6 @@
     font-weight: 400;
     color: var(--plgc-black, #000000) !important;
     background-color: var(--plgc-white, #FFFFFF);
-    /* Custom chevron matching the site's arrow direction */
     background-image: url("data:image/svg+xml,%3Csvg width='21' height='12' viewBox='0 0 21 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L10.5 11L20 1' stroke='%23233C26' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.875rem center;
@@ -248,28 +245,42 @@
     -webkit-appearance: none;
     appearance: none;
     transition: border-color var(--plgc-transition-fast, 150ms ease-in-out),
-                box-shadow var(--plgc-transition-fast, 150ms ease-in-out);
+                box-shadow   var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
 .gform_wrapper select:focus {
     border-color: var(--plgc-dark-green, #567915);
-    box-shadow: 0 0 0 var(--plgc-focus-width, 0.125rem) var(--plgc-focus-color, #567915);
+    box-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915);
     outline: none;
 }
 
-/* Multi-select (select[multiple]) */
+/* Multi-select — restore height, remove chevron, allow multiple visible rows.
+   NOTE: <option> background styling has no reliable cross-browser support.
+   The OS/browser controls option highlighting in a native select[multiple].
+   We do not attempt to override it — doing so breaks click behaviour
+   in Chrome and Safari. The branded border and focus ring are sufficient. */
 .gform_wrapper select[multiple] {
     height: auto;
     min-height: 8rem;
-    background-image: none;
-    padding: 0.5rem 0.875rem;
+    background-image: none;          /* no chevron on multi-select */
+    padding: 0.25rem 0;
 }
 
 /* ============================================================
-   6. CHECKBOXES
+   9. CHECKBOXES
+   Custom-styled via label::before (box) and label::after (tick).
+
+   TOUCH TARGET APPROACH:
+   The native input is visually hidden but kept at its natural 20×20px
+   size, positioned at the left edge of the label. The label itself is the
+   full click/touch target (min-height 44px, full width).
+   We do NOT use inset:0 on the input — that made the invisible input
+   cover adjacent page elements and broke half-width field clicks.
+
+   SC 2.5.5 ✅: label min-height 44px, cursor:pointer on both input and label.
+   SC 1.4.11 ✅: border #767676 on white = 4.6:1 (3:1 required).
    ============================================================ */
 
-/* Container */
 .gform_wrapper .gfield--type-checkbox .gfield_checkbox,
 .gform_wrapper ul.gfield_checkbox {
     list-style: none;
@@ -277,45 +288,55 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;                  /* 10px between options */
+    gap: 0.375rem;
 }
 
 .gform_wrapper .gfield--type-checkbox .gfield_checkbox li,
 .gform_wrapper ul.gfield_checkbox li {
     display: flex;
-    align-items: flex-start;
-    gap: 0;
+    align-items: center;
     padding: 0;
     margin: 0;
+    min-height: 2.75rem;             /* 44px row height — SC 2.5.5 */
 }
 
-/* Hide native checkbox — replaced by styled pseudo-element */
+/* Native input: hidden, natural size, sits at left edge under the label */
 .gform_wrapper .gfield--type-checkbox input[type="checkbox"],
 .gform_wrapper ul.gfield_checkbox input[type="checkbox"] {
     position: absolute;
     opacity: 0;
-    width: 1.25rem;                 /* 20px */
+    width: 1.25rem;
     height: 1.25rem;
     margin: 0;
     cursor: pointer;
+    /* Do NOT use inset:0 — that caused adjacent field click failures */
 }
 
-/* Styled checkbox via label::before */
+/* Label = the touch target */
 .gform_wrapper .gfield--type-checkbox label,
 .gform_wrapper ul.gfield_checkbox label {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 1rem;                /* 16px — Figma */
+    font-size: 1rem;
     font-weight: 400;
-    line-height: 2rem;
+    line-height: 1.5rem;
     color: var(--plgc-black, #000000);
     cursor: pointer;
-    padding-left: 2rem;             /* 32px — Figma ml-[32px] */
+    padding: 0.625rem 0.75rem 0.625rem 2rem;
     position: relative;
-    min-height: 2.75rem;            /* 44px touch target */
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 */
     display: flex;
     align-items: center;
+    width: 100%;
+    border-radius: 2px;
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
+.gform_wrapper .gfield--type-checkbox label:hover,
+.gform_wrapper ul.gfield_checkbox label:hover {
+    background: rgba(86, 121, 21, 0.06);
+}
+
+/* Custom checkbox box */
 .gform_wrapper .gfield--type-checkbox label::before,
 .gform_wrapper ul.gfield_checkbox label::before {
     content: '';
@@ -323,25 +344,26 @@
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 1.25rem;                 /* 20px — Figma */
-    height: 1.25rem;
+    width: 1.125rem;                 /* 18px — slightly smaller than label indent */
+    height: 1.125rem;
     background: var(--plgc-white, #FFFFFF);
-    border: 1px solid var(--plgc-medium-grey, #E7E4E4);
-    border-radius: 2px;
-    transition: background var(--plgc-transition-fast, 150ms ease-in-out),
-                border-color var(--plgc-transition-fast, 150ms ease-in-out);
+    border: 2px solid #767676;       /* 4.6:1 on white — SC 1.4.11 ✅ */
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: background     var(--plgc-transition-fast, 150ms ease-in-out),
+                border-color   var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
-/* Checkmark via ::after */
+/* Checkmark tick */
 .gform_wrapper .gfield--type-checkbox label::after,
 .gform_wrapper ul.gfield_checkbox label::after {
     content: '';
     position: absolute;
-    left: 0.3125rem;                /* 5px from left */
+    left: 0.25rem;
     top: 50%;
-    transform: translateY(-60%) rotate(45deg);
-    width: 0.4375rem;               /* 7px */
-    height: 0.6875rem;              /* 11px */
+    transform: translateY(-65%) rotate(45deg);
+    width: 0.375rem;
+    height: 0.5625rem;
     border: 2px solid var(--plgc-white, #FFFFFF);
     border-top: none;
     border-left: none;
@@ -349,7 +371,7 @@
     transition: opacity var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
-/* Checked state */
+/* Checked */
 .gform_wrapper .gfield--type-checkbox input[type="checkbox"]:checked + label::before,
 .gform_wrapper ul.gfield_checkbox input[type="checkbox"]:checked + label::before {
     background: var(--plgc-dark-green, #567915);
@@ -361,15 +383,17 @@
     opacity: 1;
 }
 
-/* Focus ring on checkbox */
+/* Focus ring on box */
 .gform_wrapper .gfield--type-checkbox input[type="checkbox"]:focus-visible + label::before,
 .gform_wrapper ul.gfield_checkbox input[type="checkbox"]:focus-visible + label::before {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: 2px;
+    border-color: var(--plgc-focus-color, #567915);
+    box-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915);
 }
 
 /* ============================================================
-   7. RADIO BUTTONS
+   10. RADIO BUTTONS
+   Same approach as checkboxes — label is the touch target,
+   native input stays at natural size, no inset:0.
    ============================================================ */
 
 .gform_wrapper .gfield--type-radio .gfield_radio,
@@ -379,16 +403,16 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 0.375rem;
 }
 
 .gform_wrapper .gfield--type-radio .gfield_radio li,
 .gform_wrapper ul.gfield_radio li {
     display: flex;
-    align-items: flex-start;
-    gap: 0;
+    align-items: center;
     padding: 0;
     margin: 0;
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 */
 }
 
 .gform_wrapper .gfield--type-radio input[type="radio"],
@@ -406,14 +430,22 @@
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1rem;
     font-weight: 400;
-    line-height: 2rem;
+    line-height: 1.5rem;
     color: var(--plgc-black, #000000);
     cursor: pointer;
-    padding-left: 2rem;
+    padding: 0.625rem 0.75rem 0.625rem 2rem;
     position: relative;
-    min-height: 2.75rem;
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 */
     display: flex;
     align-items: center;
+    width: 100%;
+    border-radius: 2px;
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out);
+}
+
+.gform_wrapper .gfield--type-radio label:hover,
+.gform_wrapper ul.gfield_radio label:hover {
+    background: rgba(86, 121, 21, 0.06);
 }
 
 /* Radio circle */
@@ -424,13 +456,13 @@
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.125rem;
+    height: 1.125rem;
     background: var(--plgc-white, #FFFFFF);
-    border: 1px solid var(--plgc-medium-grey, #E7E4E4);
+    border: 2px solid #767676;       /* 4.6:1 on white — SC 1.4.11 ✅ */
     border-radius: 50%;
-    transition: background var(--plgc-transition-fast, 150ms ease-in-out),
-                border-color var(--plgc-transition-fast, 150ms ease-in-out);
+    transition: background     var(--plgc-transition-fast, 150ms ease-in-out),
+                border-color   var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
 /* Radio dot */
@@ -441,14 +473,15 @@
     left: 0.3125rem;
     top: 50%;
     transform: translateY(-50%);
-    width: 0.625rem;
-    height: 0.625rem;
+    width: 0.5rem;
+    height: 0.5rem;
     background: var(--plgc-white, #FFFFFF);
     border-radius: 50%;
     opacity: 0;
     transition: opacity var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
+/* Checked */
 .gform_wrapper .gfield--type-radio input[type="radio"]:checked + label::before,
 .gform_wrapper ul.gfield_radio input[type="radio"]:checked + label::before {
     background: var(--plgc-dark-green, #567915);
@@ -460,17 +493,19 @@
     opacity: 1;
 }
 
+/* Focus ring */
 .gform_wrapper .gfield--type-radio input[type="radio"]:focus-visible + label::before,
 .gform_wrapper ul.gfield_radio input[type="radio"]:focus-visible + label::before {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: 2px;
+    border-color: var(--plgc-focus-color, #567915);
+    box-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915);
 }
 
 /* ============================================================
-   8. NAME FIELD (multi-part)
+   11. NAME FIELD (multi-part ginput_complex)
+   GF's internal layout — we set the gap here to match the
+   column gap used by the GF grid for half-width fields.
    ============================================================ */
 
-/* GF renders Name as a complex input with multiple spans */
 .gform_wrapper .ginput_complex.ginput_container_name {
     display: flex;
     gap: 1.5rem;
@@ -489,7 +524,7 @@
 }
 
 /* ============================================================
-   9. ADDRESS FIELD (multi-part)
+   12. ADDRESS FIELD (multi-part)
    ============================================================ */
 
 .gform_wrapper .ginput_complex.ginput_container_address {
@@ -507,14 +542,13 @@
     width: 100%;
 }
 
-/* City + State side by side */
 .gform_wrapper .address_city,
 .gform_wrapper .address_state {
     flex: 1 1 calc(50% - 0.75rem);
 }
 
 /* ============================================================
-   10. FILE UPLOAD
+   13. FILE UPLOAD
    ============================================================ */
 
 .gform_wrapper .ginput_container_fileupload input[type="file"] {
@@ -524,14 +558,15 @@
     padding: 0.625rem 0;
     width: 100%;
     cursor: pointer;
+    min-height: 2.75rem;
 }
 
 .gform_wrapper .ginput_container_fileupload input[type="file"]:focus-visible {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
+    outline: 0.125rem solid var(--plgc-focus-color, #567915);
+    outline-offset: 0.125rem;
 }
 
-/* Drag-and-drop upload zone (GF multi-file) */
+/* Multi-file drag-drop zone */
 .gform_wrapper .gform_fileupload_multifile .gform_drop_area {
     border: 2px dashed var(--plgc-medium-green-tone, #2D5032);
     padding: 1.5rem;
@@ -545,7 +580,7 @@
 
 .gform_wrapper .gform_fileupload_multifile .gform_drop_area:hover,
 .gform_wrapper .gform_fileupload_multifile .gform_drop_area:focus-within {
-    background: color-mix(in srgb, var(--plgc-very-light-green, #E5F0D0) 70%, var(--plgc-white, #FFFFFF));
+    background: #d6e8be;
 }
 
 .gform_wrapper .gform_fileupload_multifile .gform_drop_instructions {
@@ -554,7 +589,7 @@
 }
 
 /* ============================================================
-   11. SECTION BREAK / HEADING
+   14. SECTION BREAK / HEADING
    ============================================================ */
 
 .gform_wrapper .gsection {
@@ -565,7 +600,7 @@
 
 .gform_wrapper .gsection_title {
     font-family: var(--plgc-font-heading, 'Libre Baskerville', serif);
-    font-size: 1.5rem;              /* 24px — H3 */
+    font-size: 1.5rem;
     font-weight: 400;
     line-height: 1.333;
     color: var(--plgc-black, #000000);
@@ -576,20 +611,20 @@
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1.0625rem;
     font-weight: 400;
-    line-height: 2rem;
+    line-height: 1.75rem;
     color: var(--plgc-black, #000000);
     margin: 0;
 }
 
 /* ============================================================
-   12. HTML BLOCK
+   15. HTML BLOCK
    ============================================================ */
 
 .gform_wrapper .gfield--type-html .ginput_container_html,
 .gform_wrapper .gfield_html {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1.0625rem;
-    line-height: 2rem;
+    line-height: 1.75rem;
     color: var(--plgc-black, #000000);
 }
 
@@ -605,7 +640,7 @@
 }
 
 /* ============================================================
-   13. LIST FIELD
+   16. LIST FIELD
    ============================================================ */
 
 .gform_wrapper .gfield_list {
@@ -626,10 +661,6 @@
     padding: 0.25rem 0.5rem 0.25rem 0;
 }
 
-.gform_wrapper .gfield_list td:last-child {
-    padding-right: 0;
-}
-
 .gform_wrapper .gfield_list_icons a {
     display: inline-flex;
     align-items: center;
@@ -642,20 +673,20 @@
 }
 
 .gform_wrapper .gfield_list_icons a:focus-visible {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
+    outline: 0.125rem solid var(--plgc-focus-color, #567915);
+    outline-offset: 0.125rem;
     border-radius: 2px;
 }
 
 /* ============================================================
-   14. CONSENT FIELD
+   17. CONSENT FIELD
    ============================================================ */
 
 .gform_wrapper .gfield--type-consent .gfield_consent_label {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1rem;
     font-weight: 400;
-    line-height: 2rem;
+    line-height: 1.75rem;
     color: var(--plgc-black, #000000);
     padding-left: 2rem;
     position: relative;
@@ -670,7 +701,7 @@
 }
 
 /* ============================================================
-   15. PRODUCT / PRICING FIELDS
+   18. PRODUCT / PRICING FIELDS
    ============================================================ */
 
 .gform_wrapper .gfield--type-product label,
@@ -691,10 +722,10 @@
 }
 
 /* ============================================================
-   16. SUBMIT BUTTON
+   19. SUBMIT BUTTON — yellow pill, matches site primary button
+   SC 2.5.5: 47px height ✅  SC 1.4.3: #000 on #FFAE40 = 11.38:1 ✅
    ============================================================ */
 
-/* Matches the primary button design (yellow pill) exactly */
 .gform_wrapper .gform_footer input[type="submit"],
 .gform_wrapper .gform_footer button[type="submit"],
 .gform_wrapper .gform_page_footer input[type="submit"],
@@ -704,29 +735,22 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    /* Figma: #FFAE40 pill, SemiBold 15px, 47px height */
     background: var(--plgc-yellow, #FFAE40) !important;
     color: var(--plgc-black, #000000) !important;
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
-    font-size: 0.9375rem !important; /* 15px */
+    font-size: 0.9375rem !important;
     font-weight: 600 !important;
     line-height: 1 !important;
-
-    height: 2.9375rem;               /* 47px */
-    min-height: 2.75rem;             /* 44px — WCAG SC 2.5.5 */
+    height: 2.9375rem;
+    min-height: 2.75rem;
     min-width: 6rem;
     padding: 0.9375rem 1.5rem !important;
-
     border: 2px solid transparent !important;
-    border-radius: 6.25rem !important; /* pill */
-
+    border-radius: 6.25rem !important;
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
-
     transition: background var(--plgc-transition-fast, 150ms ease-in-out) !important;
-
     -webkit-appearance: none;
     appearance: none;
 }
@@ -744,11 +768,11 @@
 .gform_wrapper input.gform_button:focus-visible,
 .gform_wrapper button.gform_button:focus-visible {
     background: var(--plgc-light-yellow, #FDBC69) !important;
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915) !important;
-    outline-offset: var(--plgc-focus-offset, 0.125rem) !important;
+    outline: 0.125rem solid var(--plgc-focus-color, #567915) !important;
+    outline-offset: 0.125rem !important;
 }
 
-/* Previous/Next buttons on multi-page forms */
+/* Prev/Next on multi-step forms */
 .gform_wrapper .gform_previous_button,
 .gform_wrapper .gform_next_button {
     display: inline-flex;
@@ -766,8 +790,7 @@
     border-radius: 6.25rem;
     cursor: pointer;
     text-decoration: none;
-    transition: background var(--plgc-transition-fast, 150ms ease-in-out),
-                color var(--plgc-transition-fast, 150ms ease-in-out);
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out);
     -webkit-appearance: none;
     appearance: none;
 }
@@ -779,11 +802,10 @@
 
 .gform_wrapper .gform_previous_button:focus-visible,
 .gform_wrapper .gform_next_button:focus-visible {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
+    outline: 0.125rem solid var(--plgc-focus-color, #567915);
+    outline-offset: 0.125rem;
 }
 
-/* Footer layout */
 .gform_wrapper .gform_footer,
 .gform_wrapper .gform_page_footer {
     margin-top: 1.5rem;
@@ -795,10 +817,11 @@
 }
 
 /* ============================================================
-   17. VALIDATION ERRORS
+   20. VALIDATION ERRORS
+   SC 1.4.1 — error not indicated by colour alone: border-left + text ✅
+   SC 1.4.3 — #000 on #FFF3F3 = 18.7:1 ✅
    ============================================================ */
 
-/* Form-level error banner at the top */
 .gform_wrapper .gform_validation_errors,
 .gform_wrapper .validation_error {
     background: #FFF3F3;
@@ -810,7 +833,6 @@
     font-size: 1rem;
     font-weight: 600;
     color: var(--plgc-black, #000000);
-    /* Not red text — black on light red background meets 4.5:1 SC 1.4.3 */
 }
 
 .gform_wrapper .gform_validation_errors h2,
@@ -821,7 +843,6 @@
     color: var(--plgc-black, #000000);
 }
 
-/* Individual field error state */
 .gform_wrapper .gfield--error input,
 .gform_wrapper .gfield--error textarea,
 .gform_wrapper .gfield--error select,
@@ -831,11 +852,10 @@
     border-color: #CC0000 !important;
 }
 
-/* Field-level error message — uses text + coloured border, not colour alone (SC 1.4.1) */
 .gform_wrapper .gfield_validation_message,
 .gform_wrapper .validation_message {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 0.875rem;            /* 14px min per style guide SC 6.3 */
+    font-size: 0.9375rem;
     font-weight: 400;
     color: var(--plgc-black, #000000);
     background: #FFF3F3;
@@ -845,21 +865,21 @@
     display: block;
 }
 
-/* Highlight label on error */
 .gform_wrapper .gfield--error .gfield_label,
 .gform_wrapper .gfield_error .gfield_label {
-    color: var(--plgc-black, #000000); /* Keep black — not red — for SC 1.4.3 */
+    color: var(--plgc-black, #000000); /* keep black — red alone fails SC 1.4.3 */
 }
 
 /* ============================================================
-   18. CONFIRMATION / SUCCESS MESSAGE
+   21. CONFIRMATION / SUCCESS
+   SC 1.4.3: #000 on #E5F0D0 = 12.6:1 ✅
    ============================================================ */
 
 .gform_confirmation_wrapper,
 .gform_wrapper .gform_confirmation_message {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 1.0625rem;
-    line-height: 2rem;
+    line-height: 1.75rem;
     color: var(--plgc-black, #000000);
     background: var(--plgc-very-light-green, #E5F0D0);
     border-left: 4px solid var(--plgc-dark-green, #567915);
@@ -868,12 +888,10 @@
 }
 
 /* ============================================================
-   19. PROGRESS BAR (multi-step forms)
+   22. PROGRESS BAR (multi-step)
    ============================================================ */
 
-.gform_wrapper .gf_progressbar_wrapper {
-    margin-bottom: 1.5rem;
-}
+.gform_wrapper .gf_progressbar_wrapper { margin-bottom: 1.5rem; }
 
 .gform_wrapper .gf_progressbar {
     background: var(--plgc-medium-grey, #E7E4E4);
@@ -889,15 +907,6 @@
     transition: width var(--plgc-transition-default, 250ms ease-in-out);
 }
 
-.gform_wrapper .gf_step_number,
-.gform_wrapper .gf_progressbar_percentage span {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--plgc-black, #000000);
-}
-
-/* Step indicator dots */
 .gform_wrapper .gf_step {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 0.9375rem;
@@ -911,12 +920,10 @@
     color: var(--plgc-dark-green, #567915);
 }
 
-.gform_wrapper .gf_step_completed {
-    opacity: 0.75;
-}
+.gform_wrapper .gf_step_completed { opacity: 0.75; }
 
 /* ============================================================
-   20. AJAX SPINNER
+   23. AJAX SPINNER
    ============================================================ */
 
 .gform_wrapper .gform_ajax_spinner {
@@ -936,12 +943,11 @@
 }
 
 /* ============================================================
-   21. RESPONSIVE — TABLET & MOBILE
+   24. RESPONSIVE — MOBILE  (< 768px)
    ============================================================ */
 
 @media (max-width: 767px) {
 
-    /* Single column for Name, Address multi-part fields */
     .gform_wrapper .ginput_complex.ginput_container_name {
         flex-direction: column;
         gap: 1rem;
@@ -952,17 +958,10 @@
         width: 100%;
     }
 
-    /* Section break title smaller on mobile */
-    .gform_wrapper .gsection_title {
-        font-size: 1.25rem;
-    }
+    .gform_wrapper .gsection_title { font-size: 1.25rem; }
+    .gform_wrapper .gfield_label   { font-size: 1.125rem !important; }
 
-    /* Labels slightly smaller */
-    .gform_wrapper .gfield_label {
-        font-size: 1.125rem;
-    }
-
-    /* Ensure full-width inputs */
+    /* Prevent iOS auto-zoom on input focus (needs ≥16px) */
     .gform_wrapper input[type="text"],
     .gform_wrapper input[type="email"],
     .gform_wrapper input[type="tel"],
@@ -970,23 +969,26 @@
     .gform_wrapper input[type="url"],
     .gform_wrapper input[type="password"],
     .gform_wrapper select {
-        font-size: 1rem; /* Prevent iOS zoom on focus (requires ≥16px) */
+        font-size: 1rem;
     }
 }
 
 /* ============================================================
-   22. REDUCED MOTION
+   25. REDUCED MOTION — SC 2.3.3
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
     .gform_wrapper input,
     .gform_wrapper textarea,
     .gform_wrapper select,
+    .gform_wrapper label,
     .gform_wrapper label::before,
     .gform_wrapper label::after,
     .gform_wrapper .gform_button,
     .gform_wrapper input[type="submit"],
-    .gform_wrapper .gf_progressbar_percentage {
+    .gform_wrapper .gf_progressbar_percentage,
+    .gform_wrapper .gform_previous_button,
+    .gform_wrapper .gform_next_button {
         transition: none !important;
         animation: none !important;
     }
@@ -998,12 +1000,9 @@
 }
 
 /* ============================================================
-   23. GRAVITY FORMS LEGACY SELECTORS
-   GF changed many class names between v2, v3, and v4+.
-   These aliases catch older markup GF may still emit.
+   26. LEGACY SELECTORS (GF v2/v3 class names)
    ============================================================ */
 
-/* Legacy input containers */
 .gform_wrapper .ginput_container input[type="text"],
 .gform_wrapper .ginput_container input[type="email"],
 .gform_wrapper .ginput_container input[type="tel"],
@@ -1013,18 +1012,8 @@
     width: 100%;
 }
 
-/* Legacy required mark */
-.gform_wrapper .gfield_required_text {
-    display: none; /* GF sometimes renders a hidden span — suppress */
-}
-
-/* Legacy error classes */
 .gform_wrapper li.gfield_error input,
 .gform_wrapper li.gfield_error textarea,
 .gform_wrapper li.gfield_error select {
     border-color: #CC0000 !important;
 }
-
-/* Legacy checkbox/radio containers (GF2/GF3) */
-.gform_wrapper ul.gfield_checkbox li input[type="checkbox"] { position: absolute; opacity: 0; }
-.gform_wrapper ul.gfield_radio  li input[type="radio"]      { position: absolute; opacity: 0; }
