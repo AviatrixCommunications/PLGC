@@ -608,26 +608,18 @@
 
 /* ============================================================
    12. ADDRESS FIELD (multi-part)
+   Layout fully deferred to GF's native gform-grid-row system,
+   same as the name field. GF handles Street/Line2 (full-width),
+   City/State (left/right), ZIP/Country (left/right) via
+   ginput_full, ginput_left, ginput_right, and gform-grid-col.
+   Overriding display/flex here breaks sub-label placement when
+   the GF setting is changed between "above" and "below".
+   Only input/select width is set so they fill their column.
    ============================================================ */
 
-.gform_wrapper .ginput_complex.ginput_container_address {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.gform_wrapper .ginput_complex.ginput_container_address span {
-    display: flex;
-    flex-direction: column;
-}
-
-.gform_wrapper .ginput_complex.ginput_container_address .ginput_full {
+.gform_wrapper .ginput_complex.ginput_container_address input,
+.gform_wrapper .ginput_complex.ginput_container_address select {
     width: 100%;
-}
-
-.gform_wrapper .address_city,
-.gform_wrapper .address_state {
-    flex: 1 1 calc(50% - 0.75rem);
 }
 
 /* ============================================================
