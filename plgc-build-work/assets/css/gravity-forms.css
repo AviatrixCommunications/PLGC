@@ -71,17 +71,27 @@
    All are brought to the same font so every label looks identical.
    ============================================================ */
 
-/* Primary field label — covers all field types.
-   gfield_label_before_complex is the group-level label shown above Name/Address
-   complex fields ("Name", "Membership Type") — it must match gfield_label exactly. */
-.gform_wrapper .gfield_label,
-.gform_wrapper .gfield_label_before_complex {
+/* Primary field label — covers all field types. */
+.gform_wrapper .gfield_label {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
     font-size: 1.25rem !important;   /* 20px — Figma H4 */
     font-weight: 600 !important;
     line-height: 1.35 !important;
     color: var(--plgc-black, #000000) !important;
     margin: 0 0 0.5rem !important;
+    display: block;
+}
+
+/* Group-level label on complex fields (Name, Address, Email confirm, etc.)
+   Needs more bottom margin than a simple field label because it sits above
+   a row of sub-labeled inputs — visually needs extra separation. */
+.gform_wrapper .gfield_label_before_complex {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 0 0.875rem !important;  /* 14px — more gap before sub-label columns */
     display: block;
 }
 
@@ -335,13 +345,13 @@
 }
 
 /* Row — li (older GF) and div.gchoice (GF5).
-   !important on margin prevents GF5 framework from adding spacing between rows. */
+   !important on margin AND padding prevents GF5 framework from adding spacing. */
 .gform_wrapper .gfield--type-checkbox .gfield_checkbox li,
 .gform_wrapper ul.gfield_checkbox li,
 .gform_wrapper .gfield_checkbox .gchoice {
     display: flex;
     align-items: center;
-    padding: 0;
+    padding: 0 !important;
     margin: 0 !important;
     min-height: 2.75rem;             /* 44px — SC 2.5.5 WCAG AA floor, cannot reduce */
     position: relative;
@@ -716,6 +726,9 @@
 
 /* ============================================================
    16. LIST FIELD
+   GF5 renders column headers as div.gfield_header_item.gform-field-label
+   (not <th>) inside .gfield_list_header. We target both the legacy
+   <th> pattern and the GF5 div pattern.
    ============================================================ */
 
 .gform_wrapper .gfield_list {
@@ -723,12 +736,36 @@
     border-collapse: collapse;
 }
 
+/* Space between the legend ("Family Memberships...") and the column headers */
+.gform_wrapper .ginput_container_list {
+    margin-top: 0.625rem;            /* 10px gap after the field legend */
+}
+
+/* GF5 column header row */
+.gform_wrapper .gfield_list_header {
+    margin-bottom: 0.375rem;
+}
+
+/* GF5 column header labels — div.gfield_header_item.gform-field-label.
+   Override our broad gform-field-label rule: these are sub-labels, not
+   group labels, so 400 weight to match First/Last/City/State style. */
+.gform_wrapper .gfield_header_item.gform-field-label,
+.gform_wrapper .gfield_header_item {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 1.25rem !important;
+    font-weight: 400 !important;     /* 400 — matches sub-label style */
+    line-height: 1.35 !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 !important;
+}
+
+/* Legacy <th> column headers (older GF) */
 .gform_wrapper .gfield_list th {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.25rem;
+    font-weight: 400;
     color: var(--plgc-black, #000000);
-    padding: 0 0 0.5rem;
+    padding: 0 0 0.375rem;
     text-align: left;
 }
 
