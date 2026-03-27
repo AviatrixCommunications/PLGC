@@ -57,7 +57,7 @@
    ============================================================ */
 
 .gform_wrapper .gfield {
-    margin-bottom: 1.5rem;           /* 24px — same as original v1.6.35 */
+    margin-bottom: 1.125rem;          /* 18px — slightly tighter than default 24px */
     padding: 0;
 }
 
@@ -85,10 +85,10 @@
     display: block;
 }
 
-/* GF5 alternate label class — applies to complex sub-labels (First/Last) and
-   top-level field labels in newer GF builds. Exclude choice labels (checkboxes,
-   radios) — those get their own 1rem/400 treatment below. */
-.gform_wrapper .gform-field-label:not(.gform-field-label--type-inline) {
+/* GF5 alternate label class — applies to top-level field labels in newer GF builds.
+   Exclude choice labels (checkboxes, radios) and sub-labels (--type-sub, --type-inline)
+   — those get their own treatment below. */
+.gform_wrapper .gform-field-label:not(.gform-field-label--type-inline):not(.gform-field-label--type-sub) {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
     font-size: 1.25rem !important;
     font-weight: 600 !important;
@@ -97,12 +97,15 @@
     margin: 0 0 0.5rem !important;
 }
 
-/* Sub-labels on Name, Address complex fields that DO use --type-inline
-   (First, Last, City, State) — keep them at H4 size per Figma. */
+/* Sub-labels on Name, Address complex fields (First, Last, City, State).
+   GF5 marks these with --type-sub; older GF uses --type-inline.
+   Kept at 20px to match the field input size, but 400 weight so they read as
+   a sub-label rather than a peer of the group label above. */
+.gform_wrapper .ginput_complex .gform-field-label--type-sub,
 .gform_wrapper .ginput_complex .gform-field-label--type-inline {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
     font-size: 1.25rem !important;
-    font-weight: 600 !important;
+    font-weight: 400 !important;
     line-height: 1.35 !important;
     color: var(--plgc-black, #000000) !important;
     margin: 0 0 0.5rem !important;
@@ -421,9 +424,9 @@
 .gform_wrapper .gfield_checkbox .gchoice .gform-field-label::after {
     content: '' !important;
     position: absolute !important;
-    left: 0.25rem !important;
+    left: 0.375rem !important;        /* (18px box - 6px tick) / 2 = 6px — true horizontal center */
     top: 50% !important;
-    transform: translateY(-65%) rotate(45deg) !important;
+    transform: translateY(-60%) rotate(45deg) !important;  /* -60% visually centers diagonal tick */
     width: 0.375rem !important;
     height: 0.5625rem !important;
     border: 2px solid var(--plgc-white, #FFFFFF) !important;
@@ -859,11 +862,26 @@
 
 .gform_wrapper .gform_footer input[type="submit"]:focus-visible,
 .gform_wrapper .gform_footer button[type="submit"]:focus-visible,
+.gform_wrapper .gform_page_footer input[type="submit"]:focus-visible,
+.gform_wrapper .gform_page_footer button[type="submit"]:focus-visible,
 .gform_wrapper input.gform_button:focus-visible,
 .gform_wrapper button.gform_button:focus-visible {
     background: var(--plgc-light-yellow, #FDBC69) !important;
     outline: 0.125rem solid var(--plgc-focus-color, #567915) !important;
     outline-offset: 0.125rem !important;
+}
+
+/* Active state — SC 2.5.3 / best practice: provide visual feedback on press.
+   Darker yellow (#E89A2A) on #000 = 9.74:1 ✅ SC 1.4.3 */
+.gform_wrapper .gform_footer input[type="submit"]:active,
+.gform_wrapper .gform_footer button[type="submit"]:active,
+.gform_wrapper .gform_page_footer input[type="submit"]:active,
+.gform_wrapper .gform_page_footer button[type="submit"]:active,
+.gform_wrapper input.gform_button:active,
+.gform_wrapper button.gform_button:active {
+    background: #E89A2A !important;
+    text-decoration: underline !important;
+    transform: translateY(1px);       /* subtle press-down feedback */
 }
 
 /* Prev/Next on multi-step forms */
