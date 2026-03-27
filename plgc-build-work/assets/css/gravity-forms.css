@@ -57,7 +57,7 @@
    ============================================================ */
 
 .gform_wrapper .gfield {
-    margin-bottom: 0.875rem;          /* 14px — tighter rhythm between fields */
+    margin-bottom: 0.5rem;            /* 8px — tight but readable rhythm between fields */
     padding: 0;
 }
 
@@ -331,18 +331,19 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0;                           /* spacing handled by row min-height */
+    gap: 0;
 }
 
-/* Row — li (older GF) and div.gchoice (GF5) */
+/* Row — li (older GF) and div.gchoice (GF5).
+   !important on margin prevents GF5 framework from adding spacing between rows. */
 .gform_wrapper .gfield--type-checkbox .gfield_checkbox li,
 .gform_wrapper ul.gfield_checkbox li,
 .gform_wrapper .gfield_checkbox .gchoice {
     display: flex;
     align-items: center;
     padding: 0;
-    margin: 0;
-    min-height: 2.75rem;             /* 44px row height — SC 2.5.5 */
+    margin: 0 !important;
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 WCAG AA floor, cannot reduce */
     position: relative;
 }
 
@@ -370,10 +371,10 @@
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
     font-size: 1rem !important;
     font-weight: 400 !important;
-    line-height: 2rem !important;
+    line-height: 1.5rem !important;  /* tighter than 2rem — row height still 44px via min-height */
     color: var(--plgc-black, #000000) !important;
     cursor: pointer;
-    padding: 0.1875rem 0.75rem 0.1875rem 2rem !important; /* 3px v-padding — min-height handles touch target */
+    padding: 0.1875rem 0.75rem 0.1875rem 2rem !important;
     position: relative;
     min-height: 2.75rem;             /* 44px — SC 2.5.5 ✅ */
     display: flex !important;
@@ -485,8 +486,8 @@
     display: flex;
     align-items: center;
     padding: 0;
-    margin: 0;
-    min-height: 2.75rem;             /* 44px — SC 2.5.5 */
+    margin: 0 !important;
+    min-height: 2.75rem;             /* 44px — SC 2.5.5 WCAG AA floor */
     position: relative;
 }
 
@@ -512,10 +513,10 @@
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
     font-size: 1rem !important;
     font-weight: 400 !important;
-    line-height: 2rem !important;
+    line-height: 1.5rem !important;  /* tighter — row height still 44px via min-height */
     color: var(--plgc-black, #000000) !important;
     cursor: pointer;
-    padding: 0.1875rem 0.75rem 0.1875rem 2rem !important; /* 3px v-padding — min-height handles touch target */
+    padding: 0.1875rem 0.75rem 0.1875rem 2rem !important;
     position: relative;
     min-height: 2.75rem;             /* 44px — SC 2.5.5 ✅ */
     display: flex !important;
