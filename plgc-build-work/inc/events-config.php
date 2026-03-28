@@ -192,3 +192,25 @@ function plgc_events_remove_facebook_opengraph(): void {
  * If an image contains information NOT present in the HTML description,
  * it must have a meaningful alt text instead.
  */
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. BACK LINK — "« All Events" → /calendar/ instead of /events/
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * TEC's "« All Events" back link on single event pages points to /events/ by
+ * default (the auto-generated archive URL). We want it to go to /calendar/
+ * which is the Elementor-wrapped page with the shortcode.
+ *
+ * tribe_get_events_link is the filter for tribe_get_events_link(). Only runs
+ * on single event pages to avoid affecting any admin pagination links.
+ */
+add_filter( 'tribe_get_events_link', 'plgc_events_back_link' );
+
+function plgc_events_back_link( string $link ): string {
+	if ( is_singular( 'tribe_events' ) ) {
+		return home_url( '/calendar/' );
+	}
+	return $link;
+}
