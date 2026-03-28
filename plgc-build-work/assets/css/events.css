@@ -1,0 +1,1318 @@
+/**
+ * PLGC Events Calendar & Tickets Styling
+ *
+ * Covers:
+ *  - The Events Calendar Pro — Views V2 (List, Month)
+ *  - Single event pages — V1 legacy template
+ *  - Event Tickets Plus ticket block
+ *
+ * Strategy: Override TEC/ECP CSS custom properties at the source first
+ * (kills the purple globally), then handle layout/typography with direct
+ * selectors. "Default Styles" must remain selected in Events > Settings.
+ *
+ * @package PLGC
+ * @since   1.6.58
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   1. CSS VARIABLE OVERRIDES — replaces tribe's purple accent globally
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-common,
+.tribe-events,
+.tribe-tickets,
+#tribe-events,
+#tribe-events-content {
+    /* Core accent — was purple */
+    --tribe-color-accent:                    #567915;
+    --tribe-color-accent-background:         #E5F0D0;
+    --tribe-color-accent-hover:              #2D5032;
+    --tribe-color-accent-text-color:         #FFFFFF;
+    --tribe-color-secondary:                 #567915;
+    --tribe-color-secondary-background:      #E5F0D0;
+
+    /* Borders */
+    --tribe-border-color:                    #E7E4E4;
+    --tribe-color-divider-main:              #E7E4E4;
+
+    /* Text / page */
+    --tribe-color-text:                      #000000;
+    --tribe-color-base-text:                 #000000;
+    --tribe-color-base-background:           #FFFFFF;
+
+    /* Typography */
+    --tribe-font-family-sans-serif:          'Open Sans', sans-serif;
+    --tribe-font-family-serif:               'Libre Baskerville', Georgia, serif;
+
+    /* Buttons */
+    --tribe-color-button-background:         #FFAE40;
+    --tribe-color-button-text:               #000000;
+    --tribe-color-button-background-hover:   #FDBC69;
+
+    /* Focus */
+    --tribe-form-field-focus-shadow:         0 0 0 3px rgba(86, 121, 21, 0.35);
+    --tribe-color-focus-shadow:              rgba(86, 121, 21, 0.35);
+}
+
+/* SVG icon fills inherit from their parent color — override any hard-coded purple */
+.tribe-common-c-svgicon__svg-fill {
+    fill: currentColor;
+}
+
+/* Loader dots (purple by default) */
+.tribe-common-c-loader .tribe-common-c-svgicon--dot,
+.tribe-events-view-loader .tribe-common-c-svgicon--dot {
+    fill: #567915 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   2. TYPOGRAPHY NORMALIZATION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-common,
+.tribe-events {
+    font-family: 'Open Sans', sans-serif;
+    color: #000000;
+}
+
+/* "h--alt" — tribe's all-caps heading treatment */
+.tribe-common-h--alt {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   3. EVENTS BAR — search + view selector (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-header {
+    margin-bottom: 2rem;
+}
+
+.tribe-events-c-events-bar {
+    background: #FFFFFF;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* ── Hide location search — all events are at PLGC ── */
+.tribe-events-c-search__input-control--location {
+    display: none !important;
+}
+
+/* Search input */
+.tribe-common-form-control-text__input {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    min-height: 2.75rem;
+    color: #000000;
+    background: #FFFFFF;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tribe-common-form-control-text__input:focus {
+    border-color: #567915;
+    box-shadow: 0 0 0 3px rgba(86, 121, 21, 0.25);
+    outline: none;
+}
+
+/* "Find Events" submit button */
+.tribe-events-c-search__button.tribe-common-c-btn {
+    background: #FFAE40;
+    color: #000000;
+    border: none;
+    border-radius: 6.25rem;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    padding: 0.625rem 1.25rem;
+    min-height: 2.75rem;
+    min-width: 44px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-search__button.tribe-common-c-btn:hover {
+    background: #FDBC69;
+}
+.tribe-events-c-search__button.tribe-common-c-btn:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+
+/* Search button (magnifier icon in collapsed state) */
+.tribe-events-c-events-bar__search-button {
+    color: #567915;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-events-bar__search-button:hover {
+    background: #E5F0D0;
+}
+.tribe-events-c-events-bar__search-button:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   4. VIEW SELECTOR DROPDOWN (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-c-view-selector__button {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #567915;
+    border: 1px solid #567915;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    min-height: 2.75rem;
+    min-width: 44px;
+    background: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-view-selector__button:hover {
+    background: #E5F0D0;
+}
+.tribe-events-c-view-selector__button:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+
+/* Caret icon inside the button */
+.tribe-events-c-view-selector__button-icon-caret-svg path {
+    fill: currentColor;
+}
+
+/* Dropdown panel */
+.tribe-events-c-view-selector__content {
+    background: #FFFFFF;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0;
+    min-width: 10rem;
+    z-index: 200;
+}
+
+.tribe-events-c-view-selector__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tribe-events-c-view-selector__list-item-link {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9375rem;
+    color: #000000;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    min-height: 2.75rem;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-view-selector__list-item-link:hover {
+    background: #E5F0D0;
+    color: #2D5032;
+    text-decoration: none;
+}
+.tribe-events-c-view-selector__list-item--active .tribe-events-c-view-selector__list-item-link {
+    color: #567915;
+    font-weight: 700;
+}
+.tribe-events-c-view-selector__list-item-link:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: -2px;
+    background: #E5F0D0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   5. TOP BAR — date navigation + Today button (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-c-top-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+/* "Upcoming" datepicker label button */
+.tribe-events-c-top-bar__datepicker-button {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    color: #000000;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 44px;
+}
+.tribe-events-c-top-bar__datepicker-button:hover {
+    color: #567915;
+}
+.tribe-events-c-top-bar__datepicker-button:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+
+/* "Today" button */
+.tribe-events-c-top-bar__today-button {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #567915;
+    border: 1px solid #567915;
+    border-radius: 6.25rem;
+    padding: 0.375rem 0.875rem;
+    min-height: 2.75rem;
+    min-width: 44px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-top-bar__today-button:hover {
+    background: #E5F0D0;
+    text-decoration: none;
+}
+.tribe-events-c-top-bar__today-button:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+
+/* Prev / Next icon buttons (top bar) */
+.tribe-events-c-top-bar__nav-link {
+    color: #567915;
+    border: 1px solid #E7E4E4;
+    border-radius: 50%;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.tribe-events-c-top-bar__nav-link:hover:not(:disabled) {
+    background: #E5F0D0;
+    border-color: #567915;
+}
+.tribe-events-c-top-bar__nav-link:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.tribe-events-c-top-bar__nav-link:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+.tribe-events-c-top-bar__nav-link-icon-svg path {
+    fill: currentColor;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   6. LIST VIEW — Month separators (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-calendar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tribe-events-calendar-list__month-separator {
+    list-style: none;
+    padding: 0;
+    margin: 2.5rem 0 1.25rem;
+}
+.tribe-events-calendar-list__month-separator:first-child {
+    margin-top: 0;
+}
+.tribe-events-calendar-list__month-separator h3 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* The time element inside the separator */
+.tribe-events-calendar-list__month-separator-text {
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.6875rem !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: #567915 !important;
+    display: flex !important;
+    align-items: center;
+    gap: 0.625rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 2px solid #E5F0D0;
+}
+.tribe-events-calendar-list__month-separator-text::before {
+    content: '';
+    display: inline-block;
+    width: 1.25rem;
+    height: 2px;
+    background: #FFAE40;
+    flex-shrink: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   7. LIST VIEW — Event cards (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Space between rows */
+.tribe-events-calendar-list__event-row {
+    list-style: none;
+    margin-bottom: 0.875rem;
+}
+
+/* ── Date tag column (left of each card) ── */
+.tribe-events-calendar-list__event-date-tag {
+    flex-shrink: 0;
+    width: 4.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 1.125rem;
+    padding-right: 0.875rem;
+    /* No border — visual separation comes from the card itself */
+}
+
+.tribe-events-calendar-list__event-date-tag-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tribe-events-calendar-list__event-date-tag-weekday {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #567915;
+    line-height: 1;
+    margin-bottom: 0.125rem;
+}
+
+/* Day number */
+.tribe-events-calendar-list__event-date-tag-daynum {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000000;
+}
+
+/* ── Card wrapper ── */
+.tribe-events-calendar-list__event-wrapper {
+    flex: 1;
+    min-width: 0; /* prevent flex overflow */
+}
+
+/* The article itself */
+.tribe-events-calendar-list__event {
+    background: #FFFFFF;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    position: relative; /* anchors the overlay link pseudo-element */
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    align-items: stretch; /* flex children fill card height */
+}
+.tribe-events-calendar-list__event:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-color: #8C9B5A;
+}
+
+/* ── Overlay link — makes the whole card clickable via the title link ── */
+/* The title <a> already has good link text; the pseudo-element just expands
+   its hit area. z-index: 1 keeps it above the card but below any interactive
+   elements inside (future ticket button etc.). WCAG 2.5.3 compliant.       */
+.tribe-events-calendar-list__event-title-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 0.5rem;
+}
+
+/* ── Featured image ── */
+.tribe-events-calendar-list__event-featured-image-wrapper {
+    flex-shrink: 0;
+    width: 200px;
+    overflow: hidden;
+    /* article uses align-items: stretch, so this fills full card height */
+    min-height: 160px;
+}
+.tribe-events-calendar-list__event-featured-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Bias toward the top of portrait flyer images so logos/titles show.
+       As the client migrates to 16:9 landscape images this will look ideal. */
+    object-position: center 20%;
+    transition: transform 0.3s ease;
+}
+.tribe-events-calendar-list__event:hover
+.tribe-events-calendar-list__event-featured-image {
+    transform: scale(1.04);
+}
+
+/* ── Event details column ── */
+.tribe-events-calendar-list__event-details {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.375rem;
+    min-width: 0;
+}
+
+.tribe-events-calendar-list__event-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+/* Title */
+.tribe-events-calendar-list__event-title {
+    font-family: 'Libre Baskerville', Georgia, serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    color: #000000 !important;
+}
+.tribe-events-calendar-list__event-title-link {
+    color: #000000 !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+}
+.tribe-events-calendar-list__event-title-link:hover {
+    color: #567915 !important;
+    text-decoration: none !important;
+}
+.tribe-events-calendar-list__event-title-link:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.125rem;
+}
+
+/* Date / time */
+.tribe-events-calendar-list__event-datetime-wrapper {
+    margin: 0;
+}
+.tribe-events-calendar-list__event-datetime {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #567915;
+}
+.tribe-event-date-start,
+.tribe-event-time {
+    color: #567915;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+}
+
+/* Description — tribe hides this visually but it's readable by screen readers.
+   Leave it alone; visual hide is correct WCAG behavior.                       */
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   8. LIST VIEW — Bottom pagination (Views V2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-c-nav {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #E7E4E4;
+}
+
+.tribe-events-c-nav__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.tribe-events-c-nav__prev,
+.tribe-events-c-nav__next {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: #567915;
+    background: none;
+    border: 1px solid #567915;
+    border-radius: 6.25rem;
+    padding: 0.625rem 1.25rem;
+    min-height: 2.75rem;
+    min-width: 44px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: background 0.15s ease;
+    text-decoration: none;
+}
+.tribe-events-c-nav__prev:hover:not(:disabled),
+.tribe-events-c-nav__next:hover:not(:disabled) {
+    background: #E5F0D0;
+    text-decoration: none;
+}
+.tribe-events-c-nav__prev:disabled,
+.tribe-events-c-nav__next:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: #E7E4E4;
+    color: #888;
+}
+.tribe-events-c-nav__prev:focus-visible,
+.tribe-events-c-nav__next:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+.tribe-events-c-nav__prev-icon-svg path,
+.tribe-events-c-nav__next-icon-svg path {
+    fill: currentColor;
+}
+
+.tribe-events-c-nav__today {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000000;
+    text-decoration: underline;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.75rem;
+    transition: color 0.15s ease;
+}
+.tribe-events-c-nav__today:hover {
+    color: #567915;
+}
+.tribe-events-c-nav__today:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   9. SUBSCRIBE / ADD TO CALENDAR DROPDOWN
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Hide the "Subscribe to calendar" bulk export on list/month views —
+   it's not useful for most visitors and adds clutter.
+   Single-event "Add to calendar" is kept (different container context). */
+.tribe-events-view--list .tribe-events-c-subscribe-dropdown__container,
+.tribe-events-view--month .tribe-events-c-subscribe-dropdown__container {
+    display: none;
+}
+
+/* Style the "Add to calendar" button on single event pages */
+.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border {
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    background: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    transition: border-color 0.15s ease;
+}
+.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover {
+    border-color: #567915;
+}
+
+.tribe-events-c-subscribe-dropdown__button-text {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #000000;
+    padding: 0.625rem 1rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+.tribe-events-c-subscribe-dropdown__button-text:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+.tribe-events-c-subscribe-dropdown__content {
+    background: #FFFFFF;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0;
+    min-width: 12rem;
+    z-index: 200;
+}
+
+.tribe-events-c-subscribe-dropdown__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tribe-events-c-subscribe-dropdown__list-item-link {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    color: #000000;
+    text-decoration: none;
+    padding: 0.625rem 1rem;
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-subscribe-dropdown__list-item-link:hover {
+    background: #E5F0D0;
+    color: #2D5032;
+    text-decoration: none;
+}
+.tribe-events-c-subscribe-dropdown__list-item-link:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: -2px;
+    background: #E5F0D0;
+    border-radius: 0;
+}
+
+/* Calendar export icon */
+.tribe-events-c-subscribe-dropdown__export-icon {
+    color: #567915;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   10. SINGLE EVENT PAGE — V1 legacy template
+       (#tribe-events-content.tribe-events-single)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+#tribe-events-content.tribe-events-single {
+    max-width: 56.25rem; /* 900px */
+    margin: 0 auto;
+    padding: 0 1.5rem 3rem;
+}
+
+/* Back link */
+.tribe-events-back {
+    margin-bottom: 1.5rem;
+}
+.tribe-events-back a {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #567915;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 44px;
+    padding: 0.375rem 0;
+    transition: color 0.15s ease;
+}
+.tribe-events-back a:hover {
+    color: #2D5032;
+    text-decoration: underline;
+}
+.tribe-events-back a:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.125rem;
+}
+
+/* Event title H1 */
+.tribe-events-single-event-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 2.25rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #000000;
+    margin: 0 0 0.5rem;
+}
+
+/* Date / time bar */
+.tribe-events-schedule {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #567915;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #E5F0D0;
+}
+.tribe-events-schedule .tribe-event-date-start,
+.tribe-events-schedule .tribe-event-time {
+    color: #567915;
+}
+
+/* Featured image — constrain portrait flyers gracefully */
+.tribe-events-event-image {
+    margin-bottom: 1.75rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #233C26; /* dark green fallback while image loads */
+}
+.tribe-events-event-image img {
+    display: block;
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    object-position: center 15%;
+    border-radius: 0.5rem;
+}
+
+/* Event description / content area */
+.tribe-events-single-event-description.tribe-events-content {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    line-height: 2;
+    color: #000000;
+    margin-bottom: 2rem;
+}
+
+/* Strip inline classes injected by Canva and other social media editors.
+   These add zero semantic value and can interfere with our typography.   */
+.tribe-events-content [class*="font-feature-"],
+.tribe-events-content [class*="a_GcMg"],
+.tribe-events-content [class*="cvGsUA"],
+.tribe-events-content [class*="text-decoration-none"],
+.tribe-events-content [class*="text-strikethrough"],
+.tribe-events-content [class*="direction-ltr"],
+.tribe-events-content [class*="para-style"],
+.tribe-events-content [class*="align-center"] {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    letter-spacing: inherit !important;
+    color: inherit !important;
+    display: inline;
+}
+
+/* Prev / Next event navigation */
+#tribe-events-header,
+#tribe-events-footer {
+    margin: 1.5rem 0;
+}
+
+.tribe-events-sub-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tribe-events-nav-previous a,
+.tribe-events-nav-next a {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #567915;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 44px;
+    padding: 0.375rem 0;
+    transition: color 0.15s ease;
+}
+.tribe-events-nav-previous a:hover,
+.tribe-events-nav-next a:hover {
+    color: #2D5032;
+    text-decoration: underline;
+}
+.tribe-events-nav-previous a:focus-visible,
+.tribe-events-nav-next a:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.125rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   11. SINGLE EVENT — Meta / Details block (V1)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-single-section.tribe-events-event-meta.primary {
+    background: #F2F2F2;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Section heading ("Details", "Venue", etc.) */
+.tribe-events-single-section-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #567915;
+    margin: 0 0 0.875rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #E5F0D0;
+    line-height: 1;
+}
+
+.tribe-events-meta-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tribe-events-meta-item {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9375rem;
+    color: #000000;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.375rem;
+}
+.tribe-events-meta-label {
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.tribe-events-meta-item a {
+    color: #567915;
+    text-decoration: underline;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+}
+.tribe-events-meta-item a:hover {
+    color: #2D5032;
+}
+.tribe-events-meta-item a:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+    border-radius: 0.125rem;
+}
+
+/* Hide organizer section — no organizer records configured */
+.tribe-events-meta-group-organizer {
+    display: none !important;
+}
+
+/* Hide the entire secondary meta section (venue + Google Map).
+   All events are at PLGC — this section adds no value and the
+   embedded Google Map uses TEC's rate-limited default API key. */
+.tribe-events-single-section.tribe-events-event-meta.secondary {
+    display: none !important;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   12. SINGLE EVENT — Related Events grid (V1)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tribe-events-related-events-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #000000;
+    margin: 2.5rem 0 1.25rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #E7E4E4;
+    line-height: 1.3;
+}
+
+.tribe-related-events {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.tribe-related-events > li {
+    background: #FFFFFF;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.tribe-related-events > li:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #8C9B5A;
+}
+
+.tribe-related-events-thumbnail {
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #233C26;
+}
+.tribe-related-events-thumbnail a {
+    display: block;
+    height: 100%;
+    /* Decorative — role="presentation" and aria-hidden already set by TEC */
+}
+.tribe-related-events-thumbnail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transition: transform 0.3s ease;
+}
+.tribe-related-events > li:hover .tribe-related-events-thumbnail img {
+    transform: scale(1.04);
+}
+
+.tribe-related-event-info {
+    padding: 1rem;
+}
+
+/* Override tribe's h3 reset for related event titles */
+.tribe-related-events .tribe-related-events-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 0.375rem;
+    border: none;
+    padding: 0;
+    color: #000000;
+}
+.tribe-related-events .tribe-related-events-title a {
+    color: #000000;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+/* Overlay link covers the entire card */
+.tribe-related-events .tribe-related-events-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+.tribe-related-events .tribe-related-events-title a:hover {
+    color: #567915;
+}
+.tribe-related-events .tribe-related-events-title a:focus-visible {
+    outline: 3px solid #567915;
+    outline-offset: 2px;
+}
+
+.tribe-related-event-info .tribe-event-date-start,
+.tribe-related-event-info .tribe-event-time {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #567915;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   13. EVENT TICKETS PLUS — Ticket block
+       Placeholder styles — expand once first ticketed event is configured.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Ticket section wrapper */
+.tribe-tickets {
+    margin-top: 2rem;
+    padding-top: 1.75rem;
+    border-top: 2px solid #E5F0D0;
+}
+
+/* Section heading */
+.tribe-tickets h2,
+.tribe-tickets__header-title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #000000;
+    margin: 0 0 1.25rem;
+    line-height: 1.3;
+}
+
+/* Individual ticket rows */
+.tribe-ticket,
+.tribe-tickets__item {
+    border: 1px solid #E7E4E4;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    background: #FFFFFF;
+    transition: border-color 0.15s ease;
+}
+.tribe-ticket:hover,
+.tribe-tickets__item:hover {
+    border-color: #8C9B5A;
+}
+
+/* Ticket name */
+.tribe-tickets__item-title,
+.tribe-ticket__title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #000000;
+    margin: 0 0 0.25rem;
+}
+
+/* Price */
+.tribe-tickets__item-price,
+.tribe-ticket__price {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #000000;
+}
+
+/* Quantity input */
+.tribe-tickets__item-quantity-input,
+input[name*="quantity_ticket"] {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    border: 1px solid #E7E4E4;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    min-height: 2.75rem;
+    text-align: center;
+    width: 4rem;
+    color: #000000;
+}
+.tribe-tickets__item-quantity-input:focus,
+input[name*="quantity_ticket"]:focus {
+    border-color: #567915;
+    box-shadow: 0 0 0 3px rgba(86, 121, 21, 0.25);
+    outline: none;
+}
+
+/* "Get Tickets" / "Add to Cart" / Submit buttons */
+.tribe-tickets .tribe-common-c-btn,
+.tribe-tickets-footer__quantity-submit,
+#tribe-tickets .tribe-tickets-btn {
+    background: #FFAE40 !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 6.25rem !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.9375rem !important;
+    padding: 0.9375rem 1.5rem !important;
+    min-height: 2.75rem !important;
+    min-width: 44px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.15s ease !important;
+}
+.tribe-tickets .tribe-common-c-btn:hover,
+.tribe-tickets-footer__quantity-submit:hover,
+#tribe-tickets .tribe-tickets-btn:hover {
+    background: #FDBC69 !important;
+    text-decoration: none !important;
+}
+.tribe-tickets .tribe-common-c-btn:focus-visible,
+.tribe-tickets-footer__quantity-submit:focus-visible,
+#tribe-tickets .tribe-tickets-btn:focus-visible {
+    outline: 3px solid #567915 !important;
+    outline-offset: 2px !important;
+}
+
+/* "Sold out" label */
+.tribe-tickets__item--disabled .tribe-tickets__item-title,
+.tribe-ticket--unavailable .tribe-ticket__title {
+    color: #888;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   14. RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Tablet (≤ 960px — tribe's "full" breakpoint) */
+@media (max-width: 60rem) {
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 160px;
+        min-height: 130px;
+    }
+
+    .tribe-events-calendar-list__event-details {
+        padding: 1rem 1.125rem;
+    }
+
+    .tribe-events-calendar-list__event-title {
+        font-size: 1.125rem !important;
+    }
+
+    .tribe-events-single-event-title {
+        font-size: 1.875rem;
+    }
+
+    .tribe-related-events {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Small tablet / large mobile (≤ 768px) */
+@media (max-width: 48rem) {
+    .tribe-events-calendar-list__event-date-tag {
+        width: 3.25rem;
+        padding-right: 0.625rem;
+    }
+    .tribe-events-calendar-list__event-date-tag-daynum {
+        font-size: 1.5rem;
+    }
+
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 130px;
+        min-height: 110px;
+    }
+
+    .tribe-events-calendar-list__event-details {
+        padding: 0.875rem 1rem;
+    }
+
+    .tribe-events-calendar-list__event-title {
+        font-size: 1.0625rem !important;
+    }
+
+    .tribe-events-single-event-title {
+        font-size: 1.625rem;
+    }
+}
+
+/* Mobile (≤ 500px — tribe's "xsmall" breakpoint) */
+@media (max-width: 31.25rem) {
+
+    /* Stack the card: image on top, text below */
+    .tribe-events-calendar-list__event {
+        flex-direction: column;
+    }
+
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 16 / 9;
+    }
+
+    .tribe-events-calendar-list__event-featured-image {
+        height: 100%;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+
+    .tribe-events-calendar-list__event-details {
+        padding: 1rem;
+    }
+
+    /* Slim down date tag column */
+    .tribe-events-calendar-list__event-date-tag {
+        width: 2.75rem;
+        padding-right: 0.5rem;
+        padding-top: 0.75rem;
+    }
+    .tribe-events-calendar-list__event-date-tag-weekday {
+        font-size: 0.5rem;
+    }
+    .tribe-events-calendar-list__event-date-tag-daynum {
+        font-size: 1.25rem;
+    }
+
+    .tribe-events-calendar-list__event-title {
+        font-size: 1rem !important;
+    }
+
+    #tribe-events-content.tribe-events-single {
+        padding: 0 1rem 2rem;
+    }
+
+    .tribe-events-single-event-title {
+        font-size: 1.375rem;
+    }
+
+    .tribe-events-event-image img {
+        max-height: 360px;
+    }
+
+    .tribe-events-c-nav__prev,
+    .tribe-events-c-nav__next {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    .tribe-events-c-nav__prev-label-plural,
+    .tribe-events-c-nav__next-label-plural {
+        /* "Events" text — tribe already hides via tribe-common-a11y-visual-hide */
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   15. REDUCED MOTION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .tribe-events-calendar-list__event,
+    .tribe-events-calendar-list__event-featured-image,
+    .tribe-related-events > li,
+    .tribe-related-events-thumbnail img,
+    .tribe-events-c-view-selector__button,
+    .tribe-events-c-nav__prev,
+    .tribe-events-c-nav__next,
+    .tribe-events-c-top-bar__today-button,
+    .tribe-events-c-subscribe-dropdown__list-item-link,
+    .tribe-events-c-search__button {
+        transition: none !important;
+    }
+}
