@@ -509,3 +509,28 @@ a.elementor-item,
         transition: none;
     }
 }
+
+/* ============================================================
+   Anchor Link Scroll Offset
+   Compensates for the sticky header so anchor targets are not
+   hidden behind the nav when jumping to a section.
+   scroll-padding-top is the modern CSS approach and works for
+   both click-triggered anchors and keyboard navigation.
+   Header heights: desktop 103px, <=768px 72px, <=480px 64px.
+   Add ~20px breathing room so headings don't sit flush with nav.
+   ============================================================ */
+html {
+    scroll-padding-top: 123px; /* 103px header + 20px breathing room */
+}
+
+@media (max-width: 768px) {
+    html {
+        scroll-padding-top: 92px; /* 72px header + 20px breathing room */
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        scroll-padding-top: 84px; /* 64px header + 20px breathing room */
+    }
+}
