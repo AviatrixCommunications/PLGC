@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.6.57');
+define('PLGC_VERSION', '1.6.58');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -243,6 +243,9 @@ require_once PLGC_DIR . '/inc/greener-section.php';
 // Featured Events Slider — [plgc_event_slider] shortcode + ECP + Woo Tickets integration
 require_once PLGC_DIR . '/inc/event-slider.php';
 
+// Events Calendar Pro + Event Tickets Plus — branding, behavior, schema
+require_once PLGC_DIR . '/inc/events-config.php';
+
 // [plgc_social_icons] shortcode — used in Section 2 and anywhere else needed
 require_once PLGC_DIR . '/inc/social-icons-shortcode.php';
 
@@ -400,3 +403,24 @@ add_action( 'elementor/preview/enqueue_styles', function () {
         PLGC_VERSION
     );
 } );
+
+/**
+ * Events Calendar Pro — Brand Stylesheet
+ *
+ * Loaded at priority 20 so it enqueues after TEC's own stylesheets,
+ * ensuring our overrides win without needing excessive !important usage.
+ * Gated on TEC being active so it doesn't load on non-events pages when
+ * TEC is deactivated.
+ */
+add_action( 'wp_enqueue_scripts', function () {
+    if ( ! class_exists( 'Tribe__Events__Main' ) ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'plgc-events',
+        PLGC_URI . '/assets/css/events.css',
+        [ 'plgc-theme' ],
+        PLGC_VERSION
+    );
+}, 20 );
