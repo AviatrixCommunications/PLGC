@@ -8,7 +8,7 @@
  * Registered in functions.php alongside the other inc/ modules.
  *
  * @package PLGC
- * @since   1.6.58
+ * @since   1.6.59
  */
 
 defined( 'ABSPATH' ) || exit;
