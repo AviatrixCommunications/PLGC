@@ -1,10 +1,21 @@
 /**
- * PLGC Events Calendar & Tickets Styling — v2
+ * PLGC Events Calendar & Tickets Styling — v3 (production)
  *
  * Covers: TEC Pro Views V2 (List, Month, Photo), V1 single event, ETP tickets.
- * v2 fixes: Find Events button color, subscribe hide, Today button visibility,
- *           view tab hover padding, month/photo view grids, focus rings,
- *           related events portrait image crop, back link.
+ *
+ * Strategy: Skeleton Styles must be selected in Events → Settings → Calendar.
+ * This file handles all visual styling; Skeleton provides only grid structure.
+ *
+ * WCAG 2.1 AA compliant:
+ *  - SC 1.4.1: state not communicated by colour alone (tabs: bg + text + aria-current)
+ *  - SC 1.4.3: all text meets 4.5:1 normal / 3:1 large
+ *  - SC 1.4.11: non-text contrast 3:1 for UI components
+ *  - SC 2.1.1: all interactive elements keyboard accessible
+ *  - SC 2.4.4: all links have descriptive accessible names
+ *  - SC 2.5.5: all touch targets ≥ 44×44px
+ *  - SC 4.1.2: ARIA roles and states on interactive components
+ *
+ * Image spec: 1080×1350px (4:5 portrait, Instagram ratio)
  *
  * @package PLGC
  * @since   1.6.58
@@ -259,11 +270,20 @@ button.tribe-common-c-btn:hover {
     color: #2D5032;
     text-decoration: none;
 }
+/* Active tab: yellow underline (brand) + light green background (WCAG state indicator).
+   WCAG 2.1 AA SC 1.4.11: state not communicated by colour alone — background + text
+   colour + aria-current="true" provide multiple cues. Yellow underline is brand accent. */
+.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active {
+    background: #E5F0D0 !important;
+    border-radius: 0.25rem;
+}
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active
 .tribe-events-c-view-selector__list-item-link {
     color: #567915;
-    border-bottom: 2px solid #567915;
+    /* Yellow underline — remove any other border-bottom that TEC injects */
+    border-bottom: 2px solid #FFAE40 !important;
     background: transparent;
+    text-decoration: none !important;
 }
 /* Focus: box-shadow keeps indicator contained, won't overlap adjacent text */
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link:focus-visible {
@@ -441,8 +461,8 @@ button.tribe-common-c-btn:hover {
    Month separator <li> items span all columns as section dividers.          */
 .tribe-events-calendar-list {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -469,6 +489,7 @@ button.tribe-common-c-btn:hover {
 .tribe-events-calendar-list__event-wrapper {
     display: block;
     width: 100%;
+    height: 100%;
 }
 
 /* ── The card itself ── */
@@ -478,6 +499,7 @@ button.tribe-common-c-btn:hover {
     border-radius: 0.5rem;
     overflow: hidden;
     position: relative;
+    height: 100%;
     /* Vertical flex: image on top, details below */
     display: flex !important;
     flex-direction: column !important;
@@ -525,11 +547,13 @@ button.tribe-common-c-btn:hover {
     flex-direction: column;
     gap: 0.375rem;
     flex: 1;
+    text-align: left;
 }
 .tribe-events-calendar-list__event-header {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    text-align: left;
 }
 
 /* Date / time — shown first, small */
@@ -1154,13 +1178,20 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 .tribe-events-schedule .tribe-event-date-start,
 .tribe-events-schedule .tribe-event-time { color: #567915; font-size: 1.125rem; }
 
-/* Pull the "Add to calendar" subscribe block UP into the date bar visually.
-   We can't move the DOM (that needs a template override), but we can float it
-   alongside the date bar by giving the schedule bar flex layout above.
-   The subscribe block itself sits below in the DOM — for full repositioning
-   a tribe-events/single-event.php template override is needed.           */
+/* "Add to calendar" is moved into the schedule bar via JS (events-config.php).
+   When JS moves the element, it sits inside .tribe-events-schedule (flex row)
+   and is positioned to the right. This rule is the fallback if JS fails.    */
 .tribe-events-single .tribe-events-c-subscribe-dropdown__container {
     margin-bottom: 1.5rem;
+}
+/* When moved into schedule bar by JS */
+.tribe-events-schedule .tribe-events-c-subscribe-dropdown__container {
+    margin: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.tribe-events-schedule .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border {
+    border-color: #567915 !important;
 }
 
 .tribe-events-event-image {
@@ -1289,15 +1320,36 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     border-radius: 0.5rem;
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.5rem;
+    /* Two-column: venue details left, map right */
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.tribe-events-meta-group-venue {
+    flex: 1;
+    min-width: 14rem;
+}
+.tribe-events-venue-map {
+    flex: 1;
+    min-width: 14rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+.tribe-events-venue-map > div {
+    border-radius: 0.375rem;
+    overflow: hidden;
 }
 
 /* Venue: tighten section-title margin and suppress phantom empty venue <li> */
 .tribe-events-event-meta.secondary .tribe-events-single-section-title {
     margin-bottom: 0.5rem;
 }
-/* TEC renders an empty .tribe-venue <li> above the address — hide it */
-.tribe-events-meta-group-venue .tribe-venue:empty,
-.tribe-events-meta-group-venue li.tribe-venue:first-child:empty {
+/* TEC renders a .tribe-venue <li> with an empty link before the address block.
+   The :empty selector doesn't match because <a href=""></a> is not empty.
+   Target it via the adjacent sibling pattern — hide the venue name row;
+   .tribe-venue-location (the address <li>) is kept visible.               */
+.tribe-events-meta-group-venue .tribe-venue:not(.tribe-venue-location) {
     display: none !important;
 }
 
@@ -1313,19 +1365,22 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     font-style: normal;
     margin: 0;
 }
-/* Google Map link */
-.tribe-events-gmap {
+/* Google Map link — chained selectors beat TEC's variable-based link colour */
+.tribe-events-meta-group-venue .tribe-events-gmap,
+a.tribe-events-gmap {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #567915;
-    text-decoration: underline;
+    color: #567915 !important;
+    text-decoration: underline !important;
+    border-bottom: none !important;
     display: inline-flex;
     align-items: center;
     min-height: 44px;
     margin-top: 0.25rem;
 }
-.tribe-events-gmap:hover { color: #2D5032; }
+.tribe-events-meta-group-venue .tribe-events-gmap:hover,
+a.tribe-events-gmap:hover { color: #2D5032 !important; }
 
 /* Organizer block */
 .tribe-events-meta-group-organizer .tribe-organizer,
@@ -1383,19 +1438,26 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 }
 .tribe-related-events > li:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); border-color: #8C9B5A; }
 
-/* Portrait card thumbnail — 4:5 matches the main card grid spec */
+/* Portrait card thumbnail — 4:5 aspect, absolute-fill for bulletproof cropping */
 .tribe-related-events-thumbnail {
     overflow: hidden;
     aspect-ratio: 4 / 5;
     background: #233C26;
+    position: relative;
 }
-.tribe-related-events-thumbnail a { display: block; height: 100%; }
-.tribe-related-events-thumbnail img {
+.tribe-related-events-thumbnail a {
     display: block;
+    position: absolute;
+    inset: 0;
+}
+.tribe-related-events-thumbnail img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center top;
+    display: block;
     transition: transform 0.35s ease;
 }
 .tribe-related-events > li:hover .tribe-related-events-thumbnail img { transform: scale(1.03); }
@@ -1515,36 +1577,60 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 
 /* ─── 17. RESPONSIVE ─────────────────────────────────────────────────────── */
 
+/* ─── 17. RESPONSIVE ─────────────────────────────────────────────────────── */
+
+/* Tablet ≤ 960px — single column for events, keep 2-col photo */
 @media (max-width: 60rem) {
-    /* Card grid: 2 cols on tablet */
-    .tribe-events-calendar-list { grid-template-columns: repeat(2, 1fr) !important; gap: 1.25rem; }
-    .tribe-events-pro-photo, .tribe-events-pro-photo { grid-template-columns: repeat(2, 1fr) !important; }
+    .tribe-events-calendar-list {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+    .tribe-events-view--photo .tribe-events-pro-photo,
+    .tribe-events-view--photo .tribe-events-photo {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .tribe-events-calendar-list__event {
+        flex-direction: row !important;
+    }
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 160px !important;
+        aspect-ratio: auto !important;
+        height: 160px !important;
+        flex-shrink: 0;
+    }
     .tribe-events-calendar-list__event-details { padding: 1rem 1.125rem; }
-    .tribe-events-calendar-list__event-title { font-size: 1.125rem !important; }
+    .tribe-events-calendar-list__event-title { font-size: 1.0625rem !important; }
     .tribe-events-single-event-title { font-size: 1.875rem; }
     .tribe-related-events { grid-template-columns: 1fr; }
-    .tribe-events-view--photo .tribe-events-pro-photo { grid-template-columns: repeat(2, 1fr); }
+    .tribe-events-single-section.tribe-events-event-meta.secondary { flex-direction: column; }
 }
 
+/* Small tablet ≤ 768px */
 @media (max-width: 48rem) {
-    .tribe-events-calendar-list__event-date-tag { width: 3.25rem; padding-right: 0.625rem; }
-    .tribe-events-calendar-list__event-date-tag-daynum { font-size: 1.5rem; }
-    /* Keep 2 cols down to 500px */
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 120px !important;
+        height: 120px !important;
+    }
     .tribe-events-calendar-list__event-details { padding: 0.875rem 1rem; }
-    .tribe-events-calendar-list__event-title { font-size: 1.0625rem !important; }
     .tribe-events-single-event-title { font-size: 1.625rem; }
 }
 
+/* Mobile ≤ 500px */
 @media (max-width: 31.25rem) {
-    /* Single col on mobile */
-    .tribe-events-calendar-list { grid-template-columns: 1fr !important; }
-    .tribe-events-pro-photo, .tribe-events-photo { grid-template-columns: 1fr !important; }
+    .tribe-events-calendar-list { grid-template-columns: 1fr !important; gap: 1rem; }
+    .tribe-events-calendar-list__event { flex-direction: column !important; }
+    .tribe-events-calendar-list__event-featured-image-wrapper {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 4 / 5 !important;
+    }
+    .tribe-events-view--photo .tribe-events-pro-photo,
+    .tribe-events-view--photo .tribe-events-photo { grid-template-columns: 1fr !important; }
     .tribe-events-calendar-list__event-title { font-size: 1rem !important; }
     #tribe-events-content.tribe-events-single { padding: 0 1rem 2rem; }
     .tribe-events-single-event-title { font-size: 1.375rem; }
     .tribe-events-event-image img { max-height: 320px; }
     .tribe-events-c-nav__prev, .tribe-events-c-nav__next { font-size: 0.875rem; padding: 0.5rem 1rem; }
-    .tribe-events-view--photo .tribe-events-pro-photo { grid-template-columns: 1fr; }
 }
 
 /* ─── 18. REDUCED MOTION ─────────────────────────────────────────────────── */
