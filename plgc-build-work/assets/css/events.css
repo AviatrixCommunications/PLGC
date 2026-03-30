@@ -15,10 +15,10 @@
  *  - SC 2.5.5: all touch targets ≥ 44×44px
  *  - SC 4.1.2: ARIA roles and states on interactive components
  *
- * Image spec: 1080×1350px (4:5 portrait, Instagram ratio)
+ * Image spec: 4:3 landscape (1200×900 or equivalent — matches Instagram landscape)
  *
  * @package PLGC
- * @since   1.6.58
+ * @since   1.6.59
  */
 
 /* ─── 1. CSS VARIABLE OVERRIDES — kills purple/blue globally ─────────────── */
@@ -270,9 +270,9 @@ button.tribe-common-c-btn:hover {
     color: #2D5032;
     text-decoration: none;
 }
-/* Active tab: yellow underline (brand) + light green background (WCAG state indicator).
+/* Active tab: dark green underline (brand) + light green background (WCAG state indicator).
    WCAG 2.1 AA SC 1.4.11: state not communicated by colour alone — background + text
-   colour + aria-current="true" provide multiple cues. Yellow underline is brand accent. */
+   colour + aria-current="true" provide multiple cues. */
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active {
     background: #E5F0D0 !important;
     border-radius: 0.25rem;
@@ -280,8 +280,8 @@ button.tribe-common-c-btn:hover {
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active
 .tribe-events-c-view-selector__list-item-link {
     color: #567915;
-    /* Yellow underline — remove any other border-bottom that TEC injects */
-    border-bottom: 2px solid #FFAE40 !important;
+    /* Dark green underline — brand accent */
+    border-bottom: 2px solid #567915 !important;
     background: transparent;
     text-decoration: none !important;
 }
@@ -447,7 +447,7 @@ button.tribe-common-c-btn:hover {
     display: inline-block;
     width: 1.25rem;
     height: 2px;
-    background: #FFAE40;
+    background: #567915;
     flex-shrink: 0;
 }
 
@@ -461,8 +461,8 @@ button.tribe-common-c-btn:hover {
    Month separator <li> items span all columns as section dividers.          */
 .tribe-events-calendar-list {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -506,7 +506,7 @@ button.tribe-common-c-btn:hover {
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .tribe-events-calendar-list__event:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     border-color: #8C9B5A;
 }
 
@@ -519,21 +519,21 @@ button.tribe-common-c-btn:hover {
     border-radius: 0.5rem;
 }
 
-/* ── Portrait image — fills top of card at 4:5 ratio ── */
+/* ── Portrait image — fills top of card at 4:3 ratio ── */
 .tribe-events-calendar-list__event-featured-image-wrapper {
     width: 100%;
-    /* 4:5 portrait aspect ratio — matches 1080×1350 flyer spec */
-    aspect-ratio: 4 / 5;
+    /* 4:3 landscape aspect ratio — standard flyer ratio, no cropping */
+    aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: #233C26;
+    background: #F2F2F2;
     flex-shrink: 0;
 }
 .tribe-events-calendar-list__event-featured-image {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center top;
+    object-fit: contain;
+    object-position: center center;
     transition: transform 0.35s ease;
 }
 .tribe-events-calendar-list__event:hover .tribe-events-calendar-list__event-featured-image {
@@ -595,24 +595,9 @@ button.tribe-common-c-btn:hover {
     color: #567915 !important;
 }
 
-/* Excerpt — 2-line teaser */
+/* Excerpt — hidden for cleaner card layout (Ace Hotel–style minimal cards) */
 .tribe-events-calendar-list__event-description {
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    color: #666666;
-    margin-top: 0.25rem !important;
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
-    clip: auto !important;
-    clip-path: none !important;
-    white-space: normal !important;
+    display: none !important;
 }
 
 /* ─── 9. LIST VIEW — Bottom pagination ───────────────────────────────────── */
@@ -798,6 +783,17 @@ button.tribe-events-c-subscribe-dropdown__button-text {
     padding: 0.25rem 0;
     min-width: 12rem;
     z-index: 200;
+    /* Overlay content — don't push page down */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.25rem;
+    overflow: hidden;
+}
+/* Ensure the dropdown wrapper is the positioning context */
+.tribe-events-c-subscribe-dropdown,
+.tribe-events-c-subscribe-dropdown__container {
+    position: relative;
 }
 .tribe-events-c-subscribe-dropdown__list { list-style: none; padding: 0; margin: 0; }
 .tribe-events-c-subscribe-dropdown__list-item-link {
@@ -1055,24 +1051,24 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 }
 .tribe-events-pro-photo__event:hover,
 .tribe-events-photo__event:hover {
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     border-color: #8C9B5A;
 }
 .tribe-events-pro-photo__event-featured-image-link,
 .tribe-events-photo__event-featured-image-link {
     display: block !important;
     width: 100% !important;
-    aspect-ratio: 4 / 5 !important;
+    aspect-ratio: 4 / 3 !important;
     overflow: hidden !important;
-    background: #233C26;
+    background: #F2F2F2;
     flex-shrink: 0;
 }
 .tribe-events-pro-photo__event-featured-image-link img,
 .tribe-events-photo__event-featured-image-link img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important;
-    object-position: center top !important;
+    object-fit: contain !important;
+    object-position: center center !important;
     transition: transform 0.35s ease;
 }
 .tribe-events-pro-photo__event:hover img,
@@ -1123,7 +1119,7 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     padding: 0 1.5rem 3rem;
 }
 
-.tribe-events-back { margin-bottom: 1.5rem; }
+.tribe-events-back { margin-bottom: 0.75rem; }
 .tribe-events-back a {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.875rem;
@@ -1150,7 +1146,7 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     font-weight: 400;
     line-height: 1.3;
     color: #000000;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.25rem;
 }
 
 /* Date/time header — larger and displayed alongside "Add to calendar" */
@@ -1159,14 +1155,15 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     font-size: 1.125rem;
     font-weight: 600;
     color: #567915;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
     border-bottom: 2px solid #E5F0D0;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: space-between;
+    position: relative;
 }
 /* The date/time text portion */
 .tribe-events-schedule > div,
@@ -1198,14 +1195,12 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     margin-bottom: 1.75rem;
     border-radius: 0.5rem;
     overflow: hidden;
-    background: #233C26;
+    background: #F2F2F2;
 }
 .tribe-events-event-image img {
     display: block;
     width: 100%;
-    max-height: 480px;
-    object-fit: cover;
-    object-position: center 15%;
+    height: auto;
     border-radius: 0.5rem;
 }
 
@@ -1436,13 +1431,13 @@ a.tribe-events-gmap:hover { color: #2D5032 !important; }
     position: relative;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.tribe-related-events > li:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); border-color: #8C9B5A; }
+.tribe-related-events > li:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); border-color: #8C9B5A; }
 
-/* Portrait card thumbnail — 4:5 aspect, absolute-fill for bulletproof cropping */
+/* Card thumbnail — 4:3 aspect, contain for no-crop flyer display */
 .tribe-related-events-thumbnail {
     overflow: hidden;
-    aspect-ratio: 4 / 5;
-    background: #233C26;
+    aspect-ratio: 4 / 3;
+    background: #F2F2F2;
     position: relative;
 }
 .tribe-related-events-thumbnail a {
@@ -1455,8 +1450,8 @@ a.tribe-events-gmap:hover { color: #2D5032 !important; }
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center top;
+    object-fit: contain;
+    object-position: center center;
     display: block;
     transition: transform 0.35s ease;
 }
@@ -1577,29 +1572,17 @@ a.tribe-events-gmap:hover { color: #2D5032 !important; }
 
 /* ─── 17. RESPONSIVE ─────────────────────────────────────────────────────── */
 
-/* ─── 17. RESPONSIVE ─────────────────────────────────────────────────────── */
-
-/* Tablet ≤ 960px — single column for events, keep 2-col photo */
+/* Tablet ≤ 960px — 2 columns for list + photo views */
 @media (max-width: 60rem) {
     .tribe-events-calendar-list {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 1.25rem;
     }
     .tribe-events-view--photo .tribe-events-pro-photo,
     .tribe-events-view--photo .tribe-events-photo {
         grid-template-columns: repeat(2, 1fr) !important;
     }
-    .tribe-events-calendar-list__event {
-        flex-direction: row !important;
-    }
-    .tribe-events-calendar-list__event-featured-image-wrapper {
-        width: 160px !important;
-        aspect-ratio: auto !important;
-        height: 160px !important;
-        flex-shrink: 0;
-    }
-    .tribe-events-calendar-list__event-details { padding: 1rem 1.125rem; }
-    .tribe-events-calendar-list__event-title { font-size: 1.0625rem !important; }
+    .tribe-events-calendar-list__event-title { font-size: 1rem !important; }
     .tribe-events-single-event-title { font-size: 1.875rem; }
     .tribe-related-events { grid-template-columns: 1fr; }
     .tribe-events-single-section.tribe-events-event-meta.secondary { flex-direction: column; }
@@ -1607,10 +1590,6 @@ a.tribe-events-gmap:hover { color: #2D5032 !important; }
 
 /* Small tablet ≤ 768px */
 @media (max-width: 48rem) {
-    .tribe-events-calendar-list__event-featured-image-wrapper {
-        width: 120px !important;
-        height: 120px !important;
-    }
     .tribe-events-calendar-list__event-details { padding: 0.875rem 1rem; }
     .tribe-events-single-event-title { font-size: 1.625rem; }
 }
@@ -1618,19 +1597,18 @@ a.tribe-events-gmap:hover { color: #2D5032 !important; }
 /* Mobile ≤ 500px */
 @media (max-width: 31.25rem) {
     .tribe-events-calendar-list { grid-template-columns: 1fr !important; gap: 1rem; }
-    .tribe-events-calendar-list__event { flex-direction: column !important; }
-    .tribe-events-calendar-list__event-featured-image-wrapper {
-        width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 4 / 5 !important;
-    }
     .tribe-events-view--photo .tribe-events-pro-photo,
     .tribe-events-view--photo .tribe-events-photo { grid-template-columns: 1fr !important; }
     .tribe-events-calendar-list__event-title { font-size: 1rem !important; }
     #tribe-events-content.tribe-events-single { padding: 0 1rem 2rem; }
     .tribe-events-single-event-title { font-size: 1.375rem; }
-    .tribe-events-event-image img { max-height: 320px; }
     .tribe-events-c-nav__prev, .tribe-events-c-nav__next { font-size: 0.875rem; padding: 0.5rem 1rem; }
+    /* Dropdown needs to be wider than trigger on mobile */
+    .tribe-events-c-subscribe-dropdown__content {
+        right: auto;
+        left: 0;
+        min-width: 10rem;
+    }
 }
 
 /* ─── 18. REDUCED MOTION ─────────────────────────────────────────────────── */
