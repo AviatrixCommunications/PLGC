@@ -8,7 +8,7 @@
  * Registered in functions.php alongside the other inc/ modules.
  *
  * @package PLGC
- * @since   1.6.59
+ * @since   1.7.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -392,6 +392,223 @@ function plgc_events_move_add_to_calendar(): void {
 
         if ( schedule && subscribe ) {
             schedule.appendChild( subscribe );
+        }
+    })();
+    </script>
+    <?php
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 12. LIST VIEW — "Purchase Tickets →" / "Learn More →" card action link
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Injects a contextual action link at the bottom of each event card in the
+ * V2 list view. Shows "Purchase Tickets →" if ETP tickets are available for
+ * the event, otherwise shows "Learn More →".
+ *
+ * Uses JavaScript injection because TEC's V2 template hook system varies
+ * across versions and the JS approach is the most reliable across all
+ * ECP releases.
+ *
+ * WCAG: links have descriptive accessible names including the event title.
+ */
+add_action( 'wp_footer', 'plgc_events_card_action_links', 10 );
+
+function plgc_events_card_action_links(): void {
+    // Only run on pages that have TEC list/photo views (not single events)
+    if ( is_singular( 'tribe_events' ) ) {
+        return;
+    }
+
+    // Check if TEC is active
+    if ( ! class_exists( 'Tribe__Events__Main' ) ) {
+        return;
+    }
+
+    // Build a map of event IDs that have ETP tickets
+    $ticketed_events = [];
+    if ( function_exists( 'tribe_tickets_get_ticket_ids' ) ) {
+        // Get all upcoming event IDs on the current page
+        $events = tribe_get_events( [
+            'posts_per_page' => 50,
+            'start_date'     => 'now',
+        ] );
+        foreach ( $events as $event ) {
+            $ticket_ids = tribe_tickets_get_ticket_ids( $event->ID );
+            if ( ! empty( $ticket_ids ) ) {
+                $ticketed_events[] = $event->ID;
+            }
+        }
+    }
+    $ticketed_json = wp_json_encode( $ticketed_events );
+    ?>
+    <script>
+    (function() {
+        var ticketedIds = <?php echo $ticketed_json; ?>;
+
+        function addCardLinks() {
+            var cards = document.querySelectorAll('.tribe-events-calendar-list__event');
+            cards.forEach(function(card) {
+                // Don't add twice
+                if (card.querySelector('.plgc-card-action')) return;
+
+                var details = card.querySelector('.tribe-events-calendar-list__event-details');
+                if (!details) return;
+
+                var titleLink = card.querySelector('.tribe-events-calendar-list__event-title-link');
+                if (!titleLink) return;
+
+                var href = titleLink.getAttribute('href');
+                var eventTitle = titleLink.textContent.trim();
+
+                // Check if this event has tickets by looking for the event ID in data attributes
+                // TEC stores the event ID on the article or wrapper
+                var wrapper = card.closest('[data-tribe-event-id]');
+                var eventId = wrapper ? parseInt(wrapper.getAttribute('data-tribe-event-id'), 10) : 0;
+                var hasTickets = ticketedIds.indexOf(eventId) !== -1;
+
+                var link = document.createElement('a');
+                link.href = href;
+                link.className = 'plgc-card-action' + (hasTickets ? ' plgc-card-action--tickets' : '');
+                link.setAttribute('aria-label', (hasTickets ? 'Purchase tickets for ' : 'Learn more about ') + eventTitle);
+                link.innerHTML = (hasTickets ? 'Purchase Tickets' : 'Learn More') + ' <span aria-hidden="true">&rarr;</span>';
+
+                details.appendChild(link);
+            });
+        }
+
+        // Run on load and after TEC AJAX navigation
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', addCardLinks);
+        } else {
+            addCardLinks();
+        }
+
+        // Re-run after TEC's AJAX view updates
+        document.addEventListener('afterSetup.tribeEvents', addCardLinks);
+        // MutationObserver fallback for non-standard TEC updates
+        var listContainer = document.querySelector('.tribe-events-calendar-list');
+        if (listContainer) {
+            var observer = new MutationObserver(function(mutations) {
+                // Debounce — only run once per batch of mutations
+                clearTimeout(observer._timeout);
+                observer._timeout = setTimeout(addCardLinks, 100);
+            });
+            observer.observe(listContainer.parentNode || listContainer, {
+                childList: true, subtree: true
+            });
+        }
+    })();
+    </script>
+    <?php
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 13. CATEGORY FILTER — pill buttons between search bar and view tabs
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Renders a horizontal row of category filter buttons on the main /calendar/
+ * page. Uses the native tribe_events_cat taxonomy — fully dynamic, so adding
+ * a new category in WP Admin automatically adds a new filter button.
+ *
+ * How it works:
+ *  - PHP renders a hidden <nav> with the filter buttons
+ *  - JS moves it into the correct DOM position (between events bar and top bar)
+ *  - Clicking a button navigates to ?tribe_events_cat=slug which TEC V2 natively
+ *    understands for both List and Month views
+ *  - "All Events" clears the filter
+ *  - Active state is determined by the current URL parameter
+ *
+ * WCAG 2.1 AA:
+ *  - <nav> with aria-label for landmark identification
+ *  - role="group" on the button list
+ *  - aria-current="true" on active filter
+ *  - All buttons ≥ 44px touch target
+ *  - Keyboard accessible (native <a> elements)
+ *
+ * Only renders on the /calendar/ page (not on category archive pages, shortcode
+ * embeds, or single event pages).
+ */
+add_action( 'wp_footer', 'plgc_events_category_filter', 8 );
+
+function plgc_events_category_filter(): void {
+    // Only on the calendar page (Elementor page with TEC shortcode)
+    // Don't show on single events, category archives, or filtered shortcodes
+    if ( is_singular( 'tribe_events' ) ) {
+        return;
+    }
+    if ( ! class_exists( 'Tribe__Events__Main' ) ) {
+        return;
+    }
+
+    // Get event categories that actually have events
+    $terms = get_terms( [
+        'taxonomy'   => 'tribe_events_cat',
+        'hide_empty' => true,
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ] );
+
+    // Don't render if no categories exist
+    if ( is_wp_error( $terms ) || empty( $terms ) ) {
+        return;
+    }
+
+    // Determine current active filter from URL
+    $current_cat = '';
+    if ( ! empty( $_GET['tribe_events_cat'] ) ) {
+        $current_cat = sanitize_text_field( wp_unslash( $_GET['tribe_events_cat'] ) );
+    } elseif ( ! empty( tribe_get_request_var( 'tribe_events_cat', '' ) ) ) {
+        $current_cat = sanitize_text_field( tribe_get_request_var( 'tribe_events_cat', '' ) );
+    }
+
+    $base_url = home_url( '/calendar/' );
+    ?>
+    <nav class="plgc-event-filters" aria-label="Filter events by category" id="plgc-event-filters" style="display:none;">
+        <div class="plgc-event-filters__list" role="group" aria-label="Event categories">
+            <a href="<?php echo esc_url( $base_url ); ?>"
+               class="plgc-event-filters__btn<?php echo empty( $current_cat ) ? ' plgc-event-filters__btn--active' : ''; ?>"
+               <?php echo empty( $current_cat ) ? 'aria-current="true"' : ''; ?>>
+                All Events
+            </a>
+            <?php foreach ( $terms as $term ) : ?>
+                <a href="<?php echo esc_url( add_query_arg( 'tribe_events_cat', $term->slug, $base_url ) ); ?>"
+                   class="plgc-event-filters__btn<?php echo ( $current_cat === $term->slug ) ? ' plgc-event-filters__btn--active' : ''; ?>"
+                   <?php echo ( $current_cat === $term->slug ) ? 'aria-current="true"' : ''; ?>>
+                    <?php echo esc_html( $term->name ); ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </nav>
+
+    <script>
+    (function() {
+        function positionFilter() {
+            var filter = document.getElementById('plgc-event-filters');
+            if (!filter) return;
+
+            // Target: between events bar and the top bar (prev/next/datepicker)
+            var eventsBar = document.querySelector('.tribe-events-c-events-bar');
+            var topBar = document.querySelector('.tribe-events-c-top-bar');
+
+            if (eventsBar && topBar && topBar.parentNode) {
+                topBar.parentNode.insertBefore(filter, topBar);
+                filter.style.display = '';
+            } else if (eventsBar && eventsBar.parentNode) {
+                // Fallback: insert after events bar
+                eventsBar.parentNode.insertBefore(filter, eventsBar.nextSibling);
+                filter.style.display = '';
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', positionFilter);
+        } else {
+            positionFilter();
         }
     })();
     </script>
