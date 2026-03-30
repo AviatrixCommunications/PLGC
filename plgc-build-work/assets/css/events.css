@@ -472,16 +472,19 @@ button.tribe-common-c-btn:hover {
 
 .tribe-events-calendar-list__event-featured-image-wrapper {
     flex-shrink: 0;
-    width: 200px;
+    width: 180px;
+    /* Fixed height caps portrait flyers — card height driven by text, not image ratio */
+    height: 160px;
     overflow: hidden;
-    min-height: 160px;
+    align-self: stretch; /* still fills card height if text is taller */
 }
 .tribe-events-calendar-list__event-featured-image {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 20%;
+    /* Bias to top so logo/title area of portrait flyers shows */
+    object-position: center 15%;
     transition: transform 0.3s ease;
 }
 .tribe-events-calendar-list__event:hover .tribe-events-calendar-list__event-featured-image {
@@ -533,6 +536,33 @@ button.tribe-common-c-btn:hover {
     font-size: 0.875rem;
     font-weight: 600;
     color: #567915;
+}
+
+/* Excerpt — show a 2-line teaser on the card for better text/image balance.
+   Tribe hides this with tribe-common-a11y-hidden; we un-hide it on desktop
+   with a clamp so it never dominates the card.                              */
+.tribe-events-calendar-list__event-description {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #555555;
+    margin-top: 0.375rem !important;
+    /* Override tribe's a11y visual-hide */
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    clip: auto !important;
+    clip-path: none !important;
+    white-space: normal !important;
+}
+/* Hide excerpt below tablet where cards stack — not enough room */
+@media (max-width: 48rem) {
+    .tribe-events-calendar-list__event-description { display: none !important; }
 }
 
 /* ─── 9. LIST VIEW — Bottom pagination ───────────────────────────────────── */
@@ -880,7 +910,8 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     background: #FFFFFF;
     border: 1px solid #E7E4E4;
     border-radius: 0.5rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    /* Outer drop shadow only — no inset */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10) !important;
     padding: 1rem;
     max-width: 18rem;
     z-index: 100;
@@ -1398,7 +1429,7 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 /* ─── 17. RESPONSIVE ─────────────────────────────────────────────────────── */
 
 @media (max-width: 60rem) {
-    .tribe-events-calendar-list__event-featured-image-wrapper { width: 160px; min-height: 130px; }
+    .tribe-events-calendar-list__event-featured-image-wrapper { width: 150px; height: 140px; }
     .tribe-events-calendar-list__event-details { padding: 1rem 1.125rem; }
     .tribe-events-calendar-list__event-title { font-size: 1.125rem !important; }
     .tribe-events-single-event-title { font-size: 1.875rem; }
@@ -1409,7 +1440,7 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 @media (max-width: 48rem) {
     .tribe-events-calendar-list__event-date-tag { width: 3.25rem; padding-right: 0.625rem; }
     .tribe-events-calendar-list__event-date-tag-daynum { font-size: 1.5rem; }
-    .tribe-events-calendar-list__event-featured-image-wrapper { width: 130px; min-height: 110px; }
+    .tribe-events-calendar-list__event-featured-image-wrapper { width: 120px; height: 130px; }
     .tribe-events-calendar-list__event-details { padding: 0.875rem 1rem; }
     .tribe-events-calendar-list__event-title { font-size: 1.0625rem !important; }
     .tribe-events-single-event-title { font-size: 1.625rem; }
