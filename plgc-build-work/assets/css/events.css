@@ -98,6 +98,15 @@ button.tribe-common-c-btn:hover {
     text-transform: uppercase;
 }
 
+
+/* Strip browser default dotted underline from TEC <abbr> tags (dates, times).
+   The underline implies interactivity which these elements don't have.        */
+.tribe-events abbr,
+#tribe-events-content abbr {
+    text-decoration: none !important;
+    cursor: default;
+}
+
 /* ─── 4. EVENTS BAR ──────────────────────────────────────────────────────── */
 
 .tribe-events-header { margin-bottom: 2rem; }
@@ -605,38 +614,69 @@ button.tribe-common-c-btn:hover {
     border-radius: 0.25rem;
 }
 
-/* ─── 10. SUBSCRIBE DROPDOWN — hide on archive views, keep on single ──────── */
-/* Subscribe to calendar — shown on archive views at bottom of list.
-   Styled below to match brand. Single event "Add to calendar" is a separate
-   instance and is always shown. */
-
-.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border {
-    border: 1px solid #E7E4E4;
-    border-radius: 0.5rem;
-    background: #FFFFFF;
-    display: inline-flex;
-    align-items: center;
-    transition: border-color 0.15s ease;
+/* ─── 10. SUBSCRIBE / ADD TO CALENDAR DROPDOWN ──────────────────────────── */
+/* Archive view uses tribe-common-c-btn--clear (no background by default but
+   TEC injects its accent colour). Override here specifically.               */
+.tribe-events-c-subscribe-dropdown__button-text.tribe-common-c-btn--clear,
+button.tribe-events-c-subscribe-dropdown__button-text {
+    background: none !important;
+    background-color: transparent !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 0.75rem !important;
+    min-height: 2.75rem !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;  /* gap handled by parent flex container */
+    cursor: pointer !important;
 }
-.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover { border-color: #567915; }
+.tribe-events-c-subscribe-dropdown__button-text.tribe-common-c-btn--clear:hover {
+    background: none !important;
+    color: #000000 !important;
+    text-decoration: none !important;
+}
 
-/* "Add to calendar" trigger button — icon + label properly spaced */
+/* Add .tribe-common prefix to beat .tribe-common .tribe-common-c-btn-border */
+.tribe-common .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border,
+.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border {
+    border: 1px solid #E7E4E4 !important;
+    border-radius: 0.5rem !important;
+    background: #FFFFFF !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    padding: 0 0.75rem 0 0.875rem !important;
+    min-height: 2.75rem !important;
+    transition: border-color 0.15s ease !important;
+}
+.tribe-common .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover,
+.tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover {
+    border-color: #567915 !important;
+}
+
+/* Button text label — no padding of its own; parent handles spacing */
 .tribe-events-c-subscribe-dropdown__button-text {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
     color: #000000 !important;
-    padding: 0.625rem 1rem 0.625rem 0.75rem;
-    min-height: 2.75rem;
+    /* No padding — parent flex wrapper handles it */
+    padding: 0 !important;
+    min-height: 0;
     cursor: pointer;
     background: none !important;
     border: none;
-    display: inline-flex;
-    align-items: center;
-    /* Gap between calendar icon and label text */
-    gap: 0.5rem;
+    display: inline;
+    gap: 0;
     border-radius: 0 !important;
-    line-height: 1;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 .tribe-events-c-subscribe-dropdown__button-text:focus-visible {
     outline: none;
@@ -668,13 +708,17 @@ button.tribe-common-c-btn:hover {
     font-size: 0.875rem;
     color: #000000;
     text-decoration: none;
-    padding: 0.625rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    /* Symmetric padding ensures text centres naturally in the row */
+    padding: 0.75rem 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    /* height not min-height so flex centering isn't fighting an implicit size */
     min-height: 2.75rem;
-    line-height: 1.2;
+    line-height: 1 !important;
     transition: background 0.15s ease;
+    /* Reset any inherited vertical-align that causes top alignment */
+    vertical-align: middle;
 }
 .tribe-events-c-subscribe-dropdown__list-item-link:hover {
     background: #F2F2F2;
@@ -687,14 +731,54 @@ button.tribe-common-c-btn:hover {
     background: #F2F2F2;
 }
 
+
+/* ─── 10b. DATEPICKER — Month/year picker (pikaday) ─────────────────────── */
+/* The active month uses TEC's purple accent by default. These classes come
+   from pikaday which TEC bundles for its date navigation popup.              */
+
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month,
+.pika-button {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    color: #000000;
+    background: none;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.5rem;
+    cursor: pointer;
+    border: none;
+    text-transform: none !important;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month:hover {
+    background: #E5F0D0 !important;
+    color: #2D5032 !important;
+}
+/* Past months */
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.past {
+    color: #AAAAAA;
+}
+/* Current / selected / focused month — replaces purple */
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.current,
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.active,
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.focused,
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.current.active,
+.tribe-events-c-top-bar__datepicker-container .datepicker-grid .month.focused.active.current,
+.is-selected .pika-button,
+.is-today .pika-button {
+    background: #567915 !important;
+    color: #FFFFFF !important;
+    border-radius: 0.25rem !important;
+    font-weight: 700 !important;
+}
+
 /* ─── 11. MONTH VIEW — Calendar grid ─────────────────────────────────────── */
 
 .tribe-events-calendar-month__header-column {
     font-family: 'Open Sans', sans-serif;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    /* text-transform intentionally NOT set — PHP filter handles full day names */
     color: #567915;
     padding: 0.75rem 0.5rem;
     text-align: center;
@@ -840,15 +924,19 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 
 /* ─── 12. PHOTO VIEW ─────────────────────────────────────────────────────── */
 
-.tribe-events-view--photo .tribe-events-pro-photo {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+/* Photo view — cover both naming variants across TEC Pro versions */
+.tribe-events-view--photo .tribe-events-pro-photo,
+.tribe-events-view--photo .tribe-events-photo {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 1.25rem;
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 100%;
 }
-.tribe-events-pro-photo__event {
+.tribe-events-pro-photo__event,
+.tribe-events-photo__event {
     border-radius: 0.5rem;
     overflow: hidden;
     border: 1px solid #E7E4E4;
@@ -860,21 +948,25 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border-color: #8C9B5A;
 }
-.tribe-events-pro-photo__event-featured-image-link {
-    display: block;
-    height: 12rem;
-    overflow: hidden;
+.tribe-events-pro-photo__event-featured-image-link,
+.tribe-events-photo__event-featured-image-link {
+    display: block !important;
+    height: 12rem !important;
+    overflow: hidden !important;
     background: #233C26;
 }
-.tribe-events-pro-photo__event-featured-image-link img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.tribe-events-pro-photo__event-featured-image-link img,
+.tribe-events-photo__event-featured-image-link img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     object-position: center 20%;
     transition: transform 0.3s ease;
 }
-.tribe-events-pro-photo__event:hover img { transform: scale(1.04); }
-.tribe-events-pro-photo__event-details { padding: 1rem 1.125rem; }
+.tribe-events-pro-photo__event:hover img,
+.tribe-events-photo__event:hover img { transform: scale(1.04); }
+.tribe-events-pro-photo__event-details,
+.tribe-events-photo__event-details { padding: 1rem 1.125rem; }
 .tribe-events-pro-photo__event-title {
     font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 1rem;
@@ -1047,14 +1139,21 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     border-radius: 0.125rem;
 }
 
-/* ─── 14. SINGLE EVENT — Details meta ───────────────────────────────────── */
-
+/* ─── 14. SINGLE EVENT — Details meta — HIDDEN ──────────────────────────── */
+/* The Details block shows Date, Time, and Event Categories. All three are
+   already visible in the event header (H1 + date/time bar) and category links
+   go to noindexed archive pages. Hiding keeps the page cleaner.
+   To restore: remove the display:none rule below.                           */
+.tribe-events-single-section.tribe-events-event-meta.primary {
+    display: none !important;
+}
+/* Keep styles below in case it's re-enabled later:
 .tribe-events-single-section.tribe-events-event-meta.primary {
     background: #F2F2F2;
     border-radius: 0.5rem;
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.5rem;
-}
+}*/
 .tribe-events-single-section-title {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.6875rem;
@@ -1082,8 +1181,64 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 .tribe-events-meta-item a:hover { color: #2D5032; }
 
 /* Hide organizer + secondary meta (venue/map) */
-.tribe-events-meta-group-organizer,
-.tribe-events-single-section.tribe-events-event-meta.secondary { display: none !important; }
+/* Organizer meta group — re-enabled now that organizer records are configured */
+/* .tribe-events-meta-group-organizer — removed hide */
+
+/* Secondary meta section (Venue + Organizer) — re-enabled.
+   Google Map is suppressed via PHP filter tribe_events_enable_event_maps
+   so the map div never renders; we don't need to CSS-hide it separately.    */
+.tribe-events-single-section.tribe-events-event-meta.secondary {
+    background: #F2F2F2;
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Venue address styling */
+.tribe-events-meta-group-venue .tribe-venue,
+.tribe-events-meta-group-venue .tribe-venue-location {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9375rem;
+    color: #000000;
+    line-height: 1.6;
+}
+.tribe-events-meta-group-venue address {
+    font-style: normal;
+}
+/* Google Map link */
+.tribe-events-gmap {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #567915;
+    text-decoration: underline;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 0.25rem;
+}
+.tribe-events-gmap:hover { color: #2D5032; }
+
+/* Organizer block */
+.tribe-events-meta-group-organizer .tribe-organizer,
+.tribe-events-meta-group-organizer .tribe-organizer-tel,
+.tribe-events-meta-group-organizer .tribe-organizer-email,
+.tribe-events-meta-group-organizer .tribe-organizer-url {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9375rem;
+    color: #000000;
+    line-height: 1.6;
+    display: block;
+    margin-bottom: 0.125rem;
+}
+.tribe-events-meta-group-organizer a {
+    color: #567915;
+    text-decoration: underline;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+}
+.tribe-events-meta-group-organizer a:hover { color: #2D5032; }
 
 /* Hide "Event Categories" row — the category links go to noindexed archive pages
    and add no useful information to the visitor on the single event page.
