@@ -353,20 +353,15 @@ function plgc_events_full_day_names( string $title, int $day_num ): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 11. MOVE "ADD TO CALENDAR" INTO DATE/TIME HEADER ON SINGLE EVENT PAGES
+// 11. MOVE "ADD TO CALENDAR" INTO HERO DETAILS ON SINGLE EVENT PAGES
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * The V1 single event template renders the "Add to calendar" subscribe block
- * below the event description, far from the date/time header. This small
- * inline script moves the DOM element into .tribe-events-schedule so it sits
- * inline with the date and time — aligning with how the client wants it.
+ * The custom single-event.php template places the subscribe block via TEC's
+ * action hooks, but TEC may render it outside the hero area depending on
+ * the version. This script ensures it lands in .plgc-event-hero__actions.
  *
- * CSS in events.css positions it to the right via margin-left: auto on the
- * flex row. Falls back gracefully (element stays in original position) if JS
- * is disabled.
- *
- * Only enqueued on singular tribe_events pages.
+ * Falls back gracefully if JS is disabled (element stays in original position).
  */
 add_action( 'wp_footer', 'plgc_events_move_add_to_calendar', 5 );
 
@@ -377,21 +372,20 @@ function plgc_events_move_add_to_calendar(): void {
     ?>
     <script>
     (function() {
-        var schedule = document.querySelector( '.tribe-events-single .tribe-events-schedule' );
-        var subscribe = document.querySelector( '.tribe-events-single #post-' + document.body.className.match(/postid-(\d+)/)?.[1] + ' .tribe-events-c-subscribe-dropdown__container, .tribe-events-single-event-description ~ .tribe-events .tribe-events-c-subscribe-dropdown__container, .tribe-events-content ~ .tribe-events .tribe-events-c-subscribe-dropdown__container' );
+        var target = document.querySelector( '.plgc-event-hero__actions' );
+        if ( ! target ) return;
 
-        // Broader fallback selector — finds the single-event subscribe block
-        if ( ! subscribe ) {
-            var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
-            allContainers.forEach( function( el ) {
-                if ( el.closest( '#tribe-events-content' ) ) {
-                    subscribe = el;
-                }
-            });
-        }
+        // Find the subscribe dropdown wherever TEC rendered it
+        var subscribe = null;
+        var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
+        allContainers.forEach( function( el ) {
+            if ( el.closest( '#tribe-events-content' ) ) {
+                subscribe = el;
+            }
+        });
 
-        if ( schedule && subscribe ) {
-            schedule.appendChild( subscribe );
+        if ( subscribe && ! target.contains( subscribe ) ) {
+            target.appendChild( subscribe );
         }
     })();
     </script>
@@ -507,37 +501,30 @@ function plgc_events_card_action_links(): void {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 13. CATEGORY FILTER — pill buttons between search bar and view tabs
+// 13. CATEGORY FILTER — dropdown <select> inside the events bar
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Renders a horizontal row of category filter buttons on the main /calendar/
- * page. Uses the native tribe_events_cat taxonomy — fully dynamic, so adding
- * a new category in WP Admin automatically adds a new filter button.
+ * Renders a category filter <select> dropdown and injects it into the events
+ * bar (between search input and the Find Events / List|Month buttons).
  *
- * How it works:
- *  - PHP renders a hidden <nav> with the filter buttons
- *  - JS moves it into the correct DOM position (between events bar and top bar)
- *  - Clicking a button navigates to ?tribe_events_cat=slug which TEC V2 natively
- *    understands for both List and Month views
- *  - "All Events" clears the filter
- *  - Active state is determined by the current URL parameter
+ * Fully dynamic — queries tribe_events_cat taxonomy at runtime. Adding a new
+ * category in WP Admin automatically adds a new dropdown option.
+ *
+ * Uses native TEC URL param: ?tribe_events_cat=slug
+ * Works with both List and Month views.
  *
  * WCAG 2.1 AA:
- *  - <nav> with aria-label for landmark identification
- *  - role="group" on the button list
- *  - aria-current="true" on active filter
- *  - All buttons ≥ 44px touch target
- *  - Keyboard accessible (native <a> elements)
+ *  - <label> linked to <select> via for/id
+ *  - visually-hidden label for screen readers
+ *  - ≥ 44px touch target
+ *  - Keyboard accessible (native <select>)
  *
- * Only renders on the /calendar/ page (not on category archive pages, shortcode
- * embeds, or single event pages).
+ * Only renders on pages with TEC views (not single event pages).
  */
 add_action( 'wp_footer', 'plgc_events_category_filter', 8 );
 
 function plgc_events_category_filter(): void {
-    // Only on the calendar page (Elementor page with TEC shortcode)
-    // Don't show on single events, category archives, or filtered shortcodes
     if ( is_singular( 'tribe_events' ) ) {
         return;
     }
@@ -545,7 +532,6 @@ function plgc_events_category_filter(): void {
         return;
     }
 
-    // Get event categories that actually have events
     $terms = get_terms( [
         'taxonomy'   => 'tribe_events_cat',
         'hide_empty' => true,
@@ -553,12 +539,10 @@ function plgc_events_category_filter(): void {
         'order'      => 'ASC',
     ] );
 
-    // Don't render if no categories exist
     if ( is_wp_error( $terms ) || empty( $terms ) ) {
         return;
     }
 
-    // Determine current active filter from URL
     $current_cat = '';
     if ( ! empty( $_GET['tribe_events_cat'] ) ) {
         $current_cat = sanitize_text_field( wp_unslash( $_GET['tribe_events_cat'] ) );
@@ -568,47 +552,52 @@ function plgc_events_category_filter(): void {
 
     $base_url = home_url( '/calendar/' );
     ?>
-    <nav class="plgc-event-filters" aria-label="Filter events by category" id="plgc-event-filters" style="display:none;">
-        <div class="plgc-event-filters__list" role="group" aria-label="Event categories">
-            <a href="<?php echo esc_url( $base_url ); ?>"
-               class="plgc-event-filters__btn<?php echo empty( $current_cat ) ? ' plgc-event-filters__btn--active' : ''; ?>"
-               <?php echo empty( $current_cat ) ? 'aria-current="true"' : ''; ?>>
-                All Events
-            </a>
+    <div id="plgc-cat-filter-wrap" style="display:none;">
+        <label for="plgc-cat-filter" class="screen-reader-text">Filter by event category</label>
+        <select id="plgc-cat-filter" class="plgc-cat-filter" aria-label="Filter by event category">
+            <option value="<?php echo esc_url( $base_url ); ?>"<?php echo empty( $current_cat ) ? ' selected' : ''; ?>>All Events</option>
             <?php foreach ( $terms as $term ) : ?>
-                <a href="<?php echo esc_url( add_query_arg( 'tribe_events_cat', $term->slug, $base_url ) ); ?>"
-                   class="plgc-event-filters__btn<?php echo ( $current_cat === $term->slug ) ? ' plgc-event-filters__btn--active' : ''; ?>"
-                   <?php echo ( $current_cat === $term->slug ) ? 'aria-current="true"' : ''; ?>>
+                <option value="<?php echo esc_url( add_query_arg( 'tribe_events_cat', $term->slug, $base_url ) ); ?>"<?php echo ( $current_cat === $term->slug ) ? ' selected' : ''; ?>>
                     <?php echo esc_html( $term->name ); ?>
-                </a>
+                </option>
             <?php endforeach; ?>
-        </div>
-    </nav>
+        </select>
+    </div>
 
     <script>
     (function() {
-        function positionFilter() {
-            var filter = document.getElementById('plgc-event-filters');
-            if (!filter) return;
+        function initFilter() {
+            var wrap = document.getElementById('plgc-cat-filter-wrap');
+            var select = document.getElementById('plgc-cat-filter');
+            if (!wrap || !select) return;
 
-            // Target: between events bar and the top bar (prev/next/datepicker)
+            // Insert into the events bar — between search and the Find Events / view buttons
             var eventsBar = document.querySelector('.tribe-events-c-events-bar');
-            var topBar = document.querySelector('.tribe-events-c-top-bar');
+            var searchGroup = document.querySelector('.tribe-events-c-events-bar__search');
+            var filterGroup = document.querySelector('.tribe-events-c-events-bar__filters, .tribe-events-c-events-bar__views');
 
-            if (eventsBar && topBar && topBar.parentNode) {
-                topBar.parentNode.insertBefore(filter, topBar);
-                filter.style.display = '';
-            } else if (eventsBar && eventsBar.parentNode) {
-                // Fallback: insert after events bar
-                eventsBar.parentNode.insertBefore(filter, eventsBar.nextSibling);
-                filter.style.display = '';
+            if (eventsBar) {
+                // Try to insert before the filter/views section
+                if (filterGroup) {
+                    eventsBar.insertBefore(wrap, filterGroup);
+                } else if (searchGroup && searchGroup.nextSibling) {
+                    eventsBar.insertBefore(wrap, searchGroup.nextSibling);
+                } else {
+                    eventsBar.appendChild(wrap);
+                }
+                wrap.style.display = '';
             }
+
+            // Navigate on change
+            select.addEventListener('change', function() {
+                window.location.href = this.value;
+            });
         }
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', positionFilter);
+            document.addEventListener('DOMContentLoaded', initFilter);
         } else {
-            positionFilter();
+            initFilter();
         }
     })();
     </script>
