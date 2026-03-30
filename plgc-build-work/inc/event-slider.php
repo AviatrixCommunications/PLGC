@@ -71,6 +71,27 @@ function plgc_es_register_acf_fields(): void {
 				'ui_on_text'   => 'Featured',
 				'ui_off_text'  => 'Not featured',
 			],
+			[
+				'key'          => 'field_plgc_event_banner',
+				'label'        => 'Homepage Banner Image',
+				'name'         => 'plgc_event_banner',
+				'type'         => 'image',
+				'instructions' => 'Optional landscape image for the homepage slider (recommended: 1600×900px, 16:9 ratio). If left empty, the Featured Image will be used instead. Only needed when this event is featured in the carousel.',
+				'required'     => 0,
+				'return_format'=> 'url',
+				'preview_size' => 'medium',
+				'library'      => 'all',
+				'mime_types'   => 'jpg, jpeg, png, webp',
+				'conditional_logic' => [
+					[
+						[
+							'field'    => 'field_plgc_event_featured',
+							'operator' => '==',
+							'value'    => '1',
+						],
+					],
+				],
+			],
 		],
 		'location' => [
 			[
@@ -483,7 +504,17 @@ function plgc_es_shortcode( array $atts = [] ): string {
 		$event_id = $event->ID;
 		$title    = get_the_title( $event_id );
 		$url      = get_permalink( $event_id );
-		$img_url  = get_the_post_thumbnail_url( $event_id, 'large' ) ?: '';
+		$img_url  = '';
+		// Priority: ACF banner image → Featured Image → empty (placeholder)
+		if ( function_exists( 'get_field' ) ) {
+			$banner = get_field( 'plgc_event_banner', $event_id );
+			if ( $banner ) {
+				$img_url = is_array( $banner ) ? ( $banner['url'] ?? '' ) : (string) $banner;
+			}
+		}
+		if ( ! $img_url ) {
+			$img_url = get_the_post_thumbnail_url( $event_id, 'large' ) ?: '';
+		}
 		$date_str = plgc_es_format_date( $event_id );
 		$price    = plgc_es_format_price( $event_id );
 		$state    = plgc_es_ticket_state( $event_id );
