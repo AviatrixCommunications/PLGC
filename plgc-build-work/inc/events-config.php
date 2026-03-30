@@ -177,6 +177,25 @@ function plgc_events_remove_facebook_opengraph(): void {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 5b. DEQUEUE FACEBOOK SDK SCRIPT ENTIRELY
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The wp_head hook approach above removes the meta tag but TEC may still
+ * enqueue the Facebook SDK JS via wp_enqueue_scripts. This dequeues it
+ * directly, which is what stops the CSP console error on event pages.
+ */
+add_action( 'wp_enqueue_scripts', 'plgc_events_dequeue_facebook_sdk', 20 );
+
+function plgc_events_dequeue_facebook_sdk(): void {
+    wp_dequeue_script( 'facebook-sdk' );
+    wp_deregister_script( 'facebook-sdk' );
+    // TEC may also register it under these handles:
+    wp_dequeue_script( 'tribe-events-facebook-sdk' );
+    wp_deregister_script( 'tribe-events-facebook-sdk' );
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 6. ALT TEXT ENFORCEMENT — COVERAGE REMINDER
