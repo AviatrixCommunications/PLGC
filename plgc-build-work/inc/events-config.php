@@ -350,3 +350,50 @@ function plgc_events_full_day_names( string $title, int $day_num ): string {
     ];
     return $full_names[ $day_num ] ?? $title;
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 11. MOVE "ADD TO CALENDAR" INTO DATE/TIME HEADER ON SINGLE EVENT PAGES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The V1 single event template renders the "Add to calendar" subscribe block
+ * below the event description, far from the date/time header. This small
+ * inline script moves the DOM element into .tribe-events-schedule so it sits
+ * inline with the date and time — aligning with how the client wants it.
+ *
+ * CSS in events.css positions it to the right via margin-left: auto on the
+ * flex row. Falls back gracefully (element stays in original position) if JS
+ * is disabled.
+ *
+ * Only enqueued on singular tribe_events pages.
+ */
+add_action( 'wp_footer', 'plgc_events_move_add_to_calendar', 5 );
+
+function plgc_events_move_add_to_calendar(): void {
+    if ( ! is_singular( 'tribe_events' ) ) {
+        return;
+    }
+    ?>
+    <script>
+    (function() {
+        var schedule = document.querySelector( '.tribe-events-single .tribe-events-schedule' );
+        var subscribe = document.querySelector( '.tribe-events-single #post-' + document.body.className.match(/postid-(\d+)/)?.[1] + ' .tribe-events-c-subscribe-dropdown__container, .tribe-events-single-event-description ~ .tribe-events .tribe-events-c-subscribe-dropdown__container, .tribe-events-content ~ .tribe-events .tribe-events-c-subscribe-dropdown__container' );
+
+        // Broader fallback selector — finds the single-event subscribe block
+        if ( ! subscribe ) {
+            var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
+            allContainers.forEach( function( el ) {
+                if ( el.closest( '#tribe-events-content' ) ) {
+                    subscribe = el;
+                }
+            });
+        }
+
+        if ( schedule && subscribe ) {
+            schedule.appendChild( subscribe );
+        }
+    })();
+    </script>
+    <?php
+}
