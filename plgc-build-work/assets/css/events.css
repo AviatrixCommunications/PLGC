@@ -78,7 +78,7 @@ button.tribe-common-c-btn:hover {
     background: #FDBC69 !important;
     background-color: #FDBC69 !important;
     color: #000000 !important;
-    text-decoration: none !important;
+    text-decoration: underline !important;
 }
 .tribe-common-c-btn:focus-visible,
 .tribe-common-c-btn--alt:focus-visible {
@@ -196,13 +196,18 @@ button.tribe-common-c-btn:hover {
 }
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item {
     position: relative;
+    /* Hover BG lives on the li so it fills the full tab slot edge-to-edge */
+    border-radius: 0.25rem;
+    transition: background 0.15s ease;
+}
+.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item:hover {
+    background: #F2F2F2;
 }
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.9375rem;
     font-weight: 600;
     color: #000000;
-    /* Generous padding so hover BG has breathing room around the text */
     padding: 0.5rem 1rem;
     min-height: 2.75rem;
     min-width: 44px;
@@ -210,12 +215,14 @@ button.tribe-common-c-btn:hover {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    border-radius: 0.375rem;
+    /* No border-radius and no background — parent li handles hover fill */
+    border-radius: 0;
+    background: transparent;
     border-bottom: 2px solid transparent;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: color 0.15s ease;
 }
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link:hover {
-    background: #E5F0D0;
+    background: transparent;
     color: #2D5032;
     text-decoration: none;
 }
@@ -308,28 +315,19 @@ button.tribe-common-c-btn:hover {
     border-radius: 0.25rem;
 }
 
+/* Today button — only set brand colours; let tribe-common-c-btn-border-small
+   handle all layout, padding, and centering so we don't break the native UX. */
 .tribe-events-c-top-bar__today-button {
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #567915;
-    border: 1px solid #567915;
-    border-radius: 6.25rem;
-    padding: 0.375rem 0.875rem;
-    min-height: 2.75rem;
-    min-width: 44px;
-    text-decoration: none;
-    /* No display property — let TEC control visibility */
-    transition: background 0.15s ease;
+    color: #567915 !important;
+    border-color: #567915 !important;
 }
 .tribe-events-c-top-bar__today-button:hover {
-    background: #E5F0D0;
-    text-decoration: none;
+    background-color: #E5F0D0 !important;
+    text-decoration: none !important;
 }
 .tribe-events-c-top-bar__today-button:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(86, 121, 21, 0.4);
-    border-radius: 6.25rem;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(86, 121, 21, 0.4) !important;
 }
 
 .tribe-events-c-top-bar__nav-link {
@@ -608,12 +606,9 @@ button.tribe-common-c-btn:hover {
 }
 
 /* ─── 10. SUBSCRIBE DROPDOWN — hide on archive views, keep on single ──────── */
-/* Hides on all Views V2 pages (.tribe-events-view wrapper).
-   Single event V1 pages don't have this class so "Add to calendar" stays.   */
-
-.tribe-events-view .tribe-events-c-subscribe-dropdown__container {
-    display: none !important;
-}
+/* Subscribe to calendar — shown on archive views at bottom of list.
+   Styled below to match brand. Single event "Add to calendar" is a separate
+   instance and is always shown. */
 
 .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border {
     border: 1px solid #E7E4E4;
@@ -625,26 +620,39 @@ button.tribe-common-c-btn:hover {
 }
 .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover { border-color: #567915; }
 
+/* "Add to calendar" trigger button — icon + label properly spaced */
 .tribe-events-c-subscribe-dropdown__button-text {
     font-family: 'Open Sans', sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
     color: #000000 !important;
-    padding: 0.625rem 1rem;
+    padding: 0.625rem 1rem 0.625rem 0.75rem;
     min-height: 2.75rem;
     cursor: pointer;
     background: none !important;
     border: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
+    /* Gap between calendar icon and label text */
+    gap: 0.5rem;
     border-radius: 0 !important;
+    line-height: 1;
 }
 .tribe-events-c-subscribe-dropdown__button-text:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(86, 121, 21, 0.4);
     border-radius: 0.375rem;
 }
+/* Calendar export icon — same size as text so it doesn't crowd */
+.tribe-events-c-subscribe-dropdown__export-icon {
+    color: #567915;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    position: relative;
+    top: 0; /* prevent any baseline offset */
+}
+
 .tribe-events-c-subscribe-dropdown__content {
     background: #FFFFFF;
     border: 1px solid #E7E4E4;
@@ -663,20 +671,21 @@ button.tribe-common-c-btn:hover {
     padding: 0.625rem 1rem;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     min-height: 2.75rem;
+    line-height: 1.2;
     transition: background 0.15s ease;
 }
 .tribe-events-c-subscribe-dropdown__list-item-link:hover {
-    background: #E5F0D0;
-    color: #2D5032;
+    background: #F2F2F2;
+    color: #000000;
     text-decoration: none;
 }
 .tribe-events-c-subscribe-dropdown__list-item-link:focus-visible {
     outline: none;
     box-shadow: inset 0 0 0 3px rgba(86, 121, 21, 0.4);
-    background: #E5F0D0;
+    background: #F2F2F2;
 }
-.tribe-events-c-subscribe-dropdown__export-icon { color: #567915; width: 1.25rem; height: 1.25rem; }
 
 /* ─── 11. MONTH VIEW — Calendar grid ─────────────────────────────────────── */
 
@@ -931,17 +940,39 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     margin: 0 0 0.5rem;
 }
 
+/* Date/time header — larger and displayed alongside "Add to calendar" */
 .tribe-events-schedule {
     font-family: 'Open Sans', sans-serif;
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 600;
     color: #567915;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #E5F0D0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+/* The date/time text portion */
+.tribe-events-schedule > div,
+.tribe-events-schedule > time {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #567915;
 }
 .tribe-events-schedule .tribe-event-date-start,
-.tribe-events-schedule .tribe-event-time { color: #567915; }
+.tribe-events-schedule .tribe-event-time { color: #567915; font-size: 1.125rem; }
+
+/* Pull the "Add to calendar" subscribe block UP into the date bar visually.
+   We can't move the DOM (that needs a template override), but we can float it
+   alongside the date bar by giving the schedule bar flex layout above.
+   The subscribe block itself sits below in the DOM — for full repositioning
+   a tribe-events/single-event.php template override is needed.           */
+.tribe-events-single .tribe-events-c-subscribe-dropdown__container {
+    margin-bottom: 1.5rem;
+}
 
 .tribe-events-event-image {
     margin-bottom: 1.75rem;
@@ -1054,6 +1085,11 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 .tribe-events-meta-group-organizer,
 .tribe-events-single-section.tribe-events-event-meta.secondary { display: none !important; }
 
+/* Hide "Event Categories" row — the category links go to noindexed archive pages
+   and add no useful information to the visitor on the single event page.
+   To re-enable, remove this rule. */
+.tribe-events-meta-item:has(.tribe-events-event-categories-label) { display: none !important; }
+
 /* ─── 15. SINGLE EVENT — Related Events ─────────────────────────────────── */
 
 .tribe-events-related-events-title {
@@ -1097,7 +1133,7 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
 }
 .tribe-related-events > li:hover .tribe-related-events-thumbnail img { transform: scale(1.04); }
 
-.tribe-related-event-info { padding: 1rem; }
+.tribe-related-event-info { padding: 1rem 1.25rem 1.25rem; }
 .tribe-related-events .tribe-related-events-title {
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
@@ -1254,4 +1290,14 @@ a.tribe-events-calendar-month__calendar-event-link:hover {
     .tribe-events-c-nav__next,
     .tribe-events-c-subscribe-dropdown__list-item-link,
     .tribe-common-c-btn { transition: none !important; }
+}
+
+/* ─── 19. FILTERED SHORTCODE — hide view selector when category is set ───── */
+/* Applied via PHP filter (events-config.php #9) when [tribe_events category="x"]
+   is used. Prevents visitors switching to Month/Photo which ignores the filter.
+   The main /calendar/ page never gets this class so it's unaffected.          */
+
+.tribe-events-view.plgc-filtered .tribe-events-c-events-bar__views,
+.tribe-events-view.plgc-filtered .tribe-events-c-view-selector {
+    display: none !important;
 }
