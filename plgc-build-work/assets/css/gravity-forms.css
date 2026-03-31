@@ -337,9 +337,13 @@
 
 /* Override GF's orbital theme label spacing variable for checkbox fields.
    --gf-label-space-y-md-secondary defaults to 12px in gform-theme--framework,
-   which adds extra vertical space between checkbox choice rows and makes them
-   look looser than radio button rows. Setting to 0 matches radio spacing exactly.
-   Scoped to checkbox only — radio is already correct without this override. */
+   which adds extra vertical space between checkbox rows.
+   Chained with .gform-theme--framework to match the specificity of the
+   rule that originally sets this variable, ensuring we win. */
+.gform-theme--framework .gfield--type-checkbox,
+.gform-theme--framework .gfield--type-multi_choice,
+.gform-theme--orbital .gfield--type-checkbox,
+.gform-theme--orbital .gfield--type-multi_choice,
 .gform_wrapper .gfield--type-checkbox,
 .gform_wrapper .gfield--type-multi_choice {
     --gf-label-space-y-md-secondary: 0px !important;
@@ -784,88 +788,42 @@
     padding: 0.25rem 0.5rem 0.25rem 0;
 }
 
-/* Icon column — let GF control its own grid column sizing entirely.
-   We only set display:flex so buttons sit side by side. */
-.gform_wrapper .gfield_list_icons.gform-grid-col {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 0.25rem !important;
-    align-items: center !important;
-    padding-left: 0.5rem !important;
-    overflow: visible !important;
-    /* Do NOT set width, flex-shrink, align-self — breaks GF's grid column sizing */
-}
+/* Icon column — no layout overrides, let GF handle it entirely */
 
-/* Add/Remove buttons — 44px circle.
-   position:relative + absolute ::before = reliable centering regardless of
-   GF framework overrides on font-size or line-height.
-   overflow:visible so the circle isn't clipped by its grid cell.
-   SC 2.5.5: 44px ✅  aria-label on element ✅  #FFF on #567915 = 5.07:1 ✅ */
+/* Add/Remove buttons — brand color + 44px touch target only.
+   All layout (position, display, flex, stacking) left to GF's defaults.
+   SC 2.5.5: min-width/height 44px ✅  aria-label on element ✅  5.07:1 contrast ✅ */
 .gform_wrapper .gfield_list_icons button,
 .gform_wrapper .gfield_list_icons a {
-    position: relative !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 2.75rem !important;       /* 44px */
-    height: 2.75rem !important;      /* 44px */
-    flex-shrink: 0 !important;
-    padding: 0 !important;
-    background: var(--plgc-dark-green, #567915) !important;
-    border: none !important;
+    min-width: 2.75rem !important;   /* 44px — SC 2.5.5 */
+    min-height: 2.75rem !important;  /* 44px — SC 2.5.5 */
+    background-color: var(--plgc-dark-green, #567915) !important;
+    color: var(--plgc-white, #FFFFFF) !important;
+    border-color: var(--plgc-dark-green, #567915) !important;
     border-radius: 50% !important;
     cursor: pointer !important;
-    overflow: visible !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    transition: background var(--plgc-transition-fast, 150ms ease-in-out) !important;
-    /* Hide GF's text node */
-    color: transparent !important;
-    font-size: 0 !important;
-}
-
-/* Icons via absolute — immune to font-size:0 on the parent */
-.gform_wrapper .gfield_list_icons .add_list_item::before,
-.gform_wrapper .gfield_list_icons .delete_list_item::before {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    font-size: 1.25rem !important;
-    font-weight: 400 !important;
-    line-height: 1 !important;
-    color: var(--plgc-white, #FFFFFF) !important;
-    pointer-events: none !important;
-}
-
-.gform_wrapper .gfield_list_icons .add_list_item::before {
-    content: '+' !important;
-    font-size: 1.5rem !important;
-}
-
-.gform_wrapper .gfield_list_icons .delete_list_item::before {
-    content: '×' !important;
-    font-size: 1.375rem !important;
-}
-
-.gform_wrapper .gfield_list_icons .delete_list_item {
-    background: var(--plgc-medium-green-tone, #2D5032) !important;
 }
 
 .gform_wrapper .gfield_list_icons button:hover,
 .gform_wrapper .gfield_list_icons a:hover {
-    background: var(--plgc-dark-green-tone, #233C26) !important;
-}
-
-.gform_wrapper .gfield_list_icons .delete_list_item:hover {
-    background: var(--plgc-dark-green-tone, #233C26) !important;
+    background-color: var(--plgc-dark-green-tone, #233C26) !important;
+    border-color: var(--plgc-dark-green-tone, #233C26) !important;
 }
 
 .gform_wrapper .gfield_list_icons button:focus-visible,
 .gform_wrapper .gfield_list_icons a:focus-visible {
-    background: var(--plgc-dark-green-tone, #233C26) !important;
     outline: 0.125rem solid var(--plgc-focus-color, #567915) !important;
     outline-offset: 0.125rem !important;
+}
+
+.gform_wrapper .gfield_list_icons .delete_list_item {
+    background-color: var(--plgc-medium-green-tone, #2D5032) !important;
+    border-color: var(--plgc-medium-green-tone, #2D5032) !important;
+}
+
+.gform_wrapper .gfield_list_icons .delete_list_item:hover {
+    background-color: var(--plgc-dark-green-tone, #233C26) !important;
+    border-color: var(--plgc-dark-green-tone, #233C26) !important;
 }
 
 

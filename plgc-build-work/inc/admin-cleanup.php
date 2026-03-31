@@ -607,7 +607,13 @@ add_action('admin_init', 'plgc_cleanup_events_calendar', 20);
  */
 
 /**
- * Custom login logo (uses custom-logo if set).
+ * Custom login logo and branded styling.
+ *
+ * Matches the PLGC brand: dark green background, Open Sans typography,
+ * yellow accent buttons, and pill-shaped CTA consistent with the site.
+ *
+ * @since 1.0.0
+ * @since 1.7.12  Enhanced styling — fonts, inputs, button shape, focus states.
  */
 function plgc_login_logo() {
     $logo_id = get_theme_mod('custom_logo');
@@ -617,38 +623,165 @@ function plgc_login_logo() {
         return;
     }
 
+    // Enqueue Open Sans for the login page
+    wp_enqueue_style(
+        'plgc-login-fonts',
+        'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap',
+        [],
+        null
+    );
+
     ?>
     <style>
+
+        /* ── Page background ── */
+        body.login {
+            background-color: #233C26;
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* ── Logo ── */
         #login h1 a {
             background-image: url('<?php echo esc_url($logo_url); ?>');
             background-size: contain;
-            width: 300px;
-            height: 80px;
+            width: 280px;
+            height: 100px;
             background-repeat: no-repeat;
             background-position: center;
+            margin-bottom: 24px;
         }
-        body.login {
-            background-color: #233C26;
-        }
+
+        /* ── Form card ── */
         .login form {
-            border-radius: 8px;
+            border-radius: 10px;
+            border: none !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+            padding: 26px 24px 34px;
+            background: #fff;
         }
-        .login #backtoblog a,
-        .login #nav a {
-            color: #FFAE40 !important;
+
+        /* ── Labels ── */
+        .login form .forgetmenot label,
+        .login label {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
         }
-        .login #backtoblog a:hover,
-        .login #nav a:hover {
-            color: #FDBC69 !important;
+
+        /* ── Inputs ── */
+        .login form input[type="text"],
+        .login form input[type="password"] {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 16px;
+            border: 2px solid #E7E4E4;
+            border-radius: 6px;
+            padding: 10px 14px;
+            background: #fff;
+            color: #000;
+            transition: border-color 0.2s ease;
         }
+
+        .login form input[type="text"]:focus,
+        .login form input[type="password"]:focus {
+            border-color: #567915;
+            box-shadow: 0 0 0 2px rgba(86, 121, 21, 0.2);
+            outline: none;
+        }
+
+        /* ── Password visibility toggle ── */
+        .login .wp-pwd .button.wp-hide-pw {
+            color: #567915;
+        }
+        .login .wp-pwd .button.wp-hide-pw:focus {
+            color: #567915;
+            box-shadow: 0 0 0 2px rgba(86, 121, 21, 0.3);
+            outline: 2px solid #567915;
+            outline-offset: 2px;
+        }
+
+        /* ── Checkbox ── */
+        .login input[type="checkbox"]:checked::before {
+            content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34%201.22-7.16%208-4.18-3.71%201.34-1.51%202.69%202.39z%27%20fill%3D%27%23567915%27%2F%3E%3C%2Fsvg%3E");
+        }
+        .login input[type="checkbox"]:focus {
+            border-color: #567915;
+            box-shadow: 0 0 0 2px rgba(86, 121, 21, 0.2);
+        }
+
+        /* ── Submit button ── */
         .wp-core-ui .button-primary {
             background: #FFAE40 !important;
-            border-color: #FFAE40 !important;
+            border: none !important;
+            border-radius: 100px !important;
+            color: #000 !important;
+            font-family: 'Open Sans', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            padding: 8px 28px !important;
+            height: auto !important;
+            line-height: 1.6 !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            transition: background-color 0.15s ease;
+            min-height: 44px;
+        }
+        .wp-core-ui .button-primary:hover,
+        .wp-core-ui .button-primary:focus {
+            background: #FDBC69 !important;
             color: #000 !important;
         }
-        .wp-core-ui .button-primary:hover {
-            background: #FDBC69 !important;
-            border-color: #FDBC69 !important;
+        .wp-core-ui .button-primary:focus {
+            outline: 2px solid #567915 !important;
+            outline-offset: 2px !important;
+        }
+
+        /* ── Submit row layout ── */
+        .login .submit {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ── Links below form ── */
+        .login #backtoblog a,
+        .login #nav a,
+        .login .privacy-policy-page-link a {
+            color: #FFAE40 !important;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .login #backtoblog a:hover,
+        .login #nav a:hover,
+        .login .privacy-policy-page-link a:hover {
+            color: #FDBC69 !important;
+            text-decoration: underline;
+        }
+        .login #backtoblog a:focus,
+        .login #nav a:focus,
+        .login .privacy-policy-page-link a:focus {
+            color: #FDBC69 !important;
+            outline: 2px solid #FFAE40;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* ── Error / message boxes ── */
+        .login .message,
+        .login .success {
+            border-left-color: #567915;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .login #login_error {
+            border-left-color: #FFAE40;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* ── Language switcher (WP 5.9+) ── */
+        .language-switcher {
+            font-family: 'Open Sans', sans-serif;
         }
     </style>
     <?php
