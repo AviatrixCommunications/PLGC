@@ -578,33 +578,18 @@ add_filter( 'tribe_get_organizer_website_link', '__return_empty_string' );
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 15. UNHOOK RELATED EVENTS FROM TEC'S ACTION
+// 15. RELATED EVENTS POSITIONING
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * TEC renders related events via a hook on tribe_events_single_event_after_the_content
- * which fires inside our hero layout. We render them explicitly in the template
- * in a full-width wrapper below the venue/organizer/map section.
+ * Related events are rendered explicitly in single-event.php inside
+ * .plgc-related-events-full (outside the <article>). Any duplicate related
+ * events that TEC auto-renders inside the article are hidden via CSS:
+ *   .plgc-single-event .tribe-related-events { display:none }
  *
- * This prevents double-rendering and ensures related events appear at the bottom.
+ * We do NOT unhook TEC's related events action because the template part
+ * relies on TEC's internal state being initialized by that action.
  *
  * @since 1.7.9
  */
-add_action( 'wp', 'plgc_events_unhook_related_events' );
-
-function plgc_events_unhook_related_events(): void {
-    if ( ! is_singular( 'tribe_events' ) ) {
-        return;
-    }
-
-    // TEC hooks related events at priority 10 or 20 on various actions
-    remove_action( 'tribe_events_single_event_after_the_content', [ 'Tribe__Events__Pro__Main', 'register_related_events_view' ], 10 );
-    remove_action( 'tribe_events_single_event_after_the_content', 'tribe_single_related_events', 10 );
-
-    // Also try removing via the Pro class instance
-    if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
-        $pro = Tribe__Events__Pro__Main::instance();
-        remove_action( 'tribe_events_single_event_after_the_content', [ $pro, 'register_related_events_view' ], 10 );
-    }
-}
 
