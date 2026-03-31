@@ -13,7 +13,7 @@
  *  - Prev/next styled consistently
  *
  * @package PLGC
- * @since   1.7.6
+ * @since   1.7.7
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
