@@ -1,17 +1,12 @@
 <?php
 /**
- * Single Event Template — PLGC Custom Override
+ * Single Event Template — PLGC Custom Override v2
  *
- * Two-column hero: image left, details right (Ace Hotel style).
- * Full-width description + venue/meta below.
- *
- * Override of the default TEC V1 single-event.php.
- * Preserves all TEC action hooks for plugin compatibility.
- *
- * WCAG 2.1 AA: logical heading hierarchy, landmark regions, 44px targets.
+ * Two-column hero: image left, details + description right.
+ * Full-width venue/map, related events, and navigation below.
  *
  * @package PLGC
- * @since   1.7.0
+ * @since   1.7.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +20,6 @@ $event_id     = get_the_ID();
 
 <div id="tribe-events-content" class="tribe-events-single">
 
-	<!-- Back link -->
 	<p class="tribe-events-back">
 		<a href="<?php echo esc_url( $events_url ); ?>">
 			&laquo; All <?php echo esc_html( $events_label ); ?>
@@ -38,7 +32,7 @@ $event_id     = get_the_ID();
 
 			<?php do_action( 'tribe_events_single_event_before_the_meta' ); ?>
 
-			<!-- ═══ Two-column hero ═══ -->
+			<!-- Two-column hero -->
 			<div class="plgc-event-hero">
 
 				<!-- Left: featured image -->
@@ -48,7 +42,7 @@ $event_id     = get_the_ID();
 					</div>
 				<?php endif; ?>
 
-				<!-- Right: details stack -->
+				<!-- Right: details + description -->
 				<div class="plgc-event-hero__details">
 
 					<h1 class="tribe-events-single-event-title">
@@ -61,62 +55,52 @@ $event_id     = get_the_ID();
 
 					<?php if ( tribe_has_venue() ) : ?>
 						<div class="plgc-event-hero__venue">
-							<span class="plgc-event-hero__venue-icon" aria-hidden="true">📍</span>
+							<svg class="plgc-event-hero__venue-svg" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+								<path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 6.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="#567915"/>
+							</svg>
 							<?php echo tribe_get_venue(); ?>
 						</div>
 					<?php endif; ?>
 
-					<!-- Add to calendar — rendered here, JS no longer needs to move it -->
-					<div class="plgc-event-hero__actions">
-						<?php
-						// TEC Subscribe links (add to calendar dropdown)
-						if ( class_exists( 'Tribe\Events\Views\V2\iCalendar\Links\Link_Abstract' ) || function_exists( 'tribe_get_single_option' ) ) {
-							// The subscribe block is rendered via TEC's action hooks below
-						}
-						?>
-					</div>
+					<!-- Add to calendar container -->
+					<div class="plgc-event-hero__actions"></div>
 
 					<?php do_action( 'tribe_events_single_event_after_the_meta' ); ?>
 
-					<!-- Ticket form (ETP) — if tickets exist they render here -->
+					<!-- Ticket form (ETP) -->
 					<?php
 					if ( function_exists( 'tribe_events_ticket_form' ) ) {
 						tribe_events_ticket_form();
 					}
 					?>
 
+					<!-- Description -->
+					<?php if ( get_the_content() ) : ?>
+						<div class="tribe-events-single-event-description tribe-events-content">
+							<?php the_content(); ?>
+						</div>
+					<?php endif; ?>
+
 				</div>
 			</div>
 
-			<!-- ═══ Description — full width ═══ -->
-			<?php if ( get_the_content() ) : ?>
-				<div class="tribe-events-single-event-description tribe-events-content">
-					<?php the_content(); ?>
-				</div>
-			<?php endif; ?>
-
-			<!-- ═══ Event meta (venue/map, organizer) ═══ -->
+			<!-- Venue / Map meta — full width -->
 			<?php do_action( 'tribe_events_single_event_before_the_content' ); ?>
 
-			<div class="tribe-events-single-section tribe-events-event-meta secondary">
-				<?php
-				// Venue
-				if ( tribe_has_venue() ) {
-					tribe_get_template_part( 'modules/meta/venue' );
-				}
-
-				// Organizer
-				if ( tribe_has_organizer() ) {
-					tribe_get_template_part( 'modules/meta/organizer' );
-				}
-				?>
-			</div>
+			<?php if ( tribe_has_venue() ) : ?>
+				<div class="tribe-events-single-section tribe-events-event-meta secondary">
+					<?php tribe_get_template_part( 'modules/meta/venue' ); ?>
+					<?php if ( tribe_has_organizer() ) {
+						tribe_get_template_part( 'modules/meta/organizer' );
+					} ?>
+				</div>
+			<?php endif; ?>
 
 			<?php do_action( 'tribe_events_single_event_after_the_content' ); ?>
 
 		</article>
 
-		<!-- Related events -->
+		<!-- Related events — full width, bottom -->
 		<?php tribe_get_template_part( 'modules/related-events' ); ?>
 
 		<!-- Event navigation -->
