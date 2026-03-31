@@ -252,10 +252,11 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 }
 .tribe-events-c-subscribe-dropdown__export-icon{color:var(--g);width:1rem;height:1rem;flex-shrink:0}
 .tribe-events-c-subscribe-dropdown__button-icon .tribe-common-c-svgicon__svg-fill{fill:var(--bk)!important}
-/* Dropdown panel — remove top:100% override, let TEC position it naturally */
+/* Dropdown panel — absolute so it overlays, container is position:relative */
 .tribe-events-c-subscribe-dropdown__content{
   background:var(--wh);border:1px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.08);
   padding:0;min-width:12rem;z-index:200;overflow:hidden;
+  position:absolute!important;left:auto;right:0;margin-top:.125rem;
 }
 .tribe-events-c-subscribe-dropdown__list{list-style:none;padding:0;margin:0}
 .tribe-events-c-subscribe-dropdown__list-item-link,
