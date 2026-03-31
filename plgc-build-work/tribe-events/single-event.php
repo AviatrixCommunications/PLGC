@@ -1,12 +1,19 @@
 <?php
 /**
- * Single Event Template — PLGC Custom Override v2
+ * Single Event Template — PLGC Custom Override v3
  *
  * Two-column hero: image left, details + description right.
- * Full-width venue/map, related events, and navigation below.
+ * Full-width venue/organizer/map, related events, and navigation below.
+ *
+ * v3 changes:
+ *  - Venue/organizer/map built manually (not TEC template parts) to fix
+ *    phone/email HTML escaping issue
+ *  - Google Map embedded in the venue/organizer section
+ *  - Related events full-width at bottom
+ *  - Prev/next styled consistently
  *
  * @package PLGC
- * @since   1.7.3
+ * @since   1.7.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -84,15 +91,85 @@ $event_id     = get_the_ID();
 				</div>
 			</div>
 
-			<!-- Venue / Map meta — full width -->
+			<!-- Venue / Organizer / Map — full width -->
 			<?php do_action( 'tribe_events_single_event_before_the_content' ); ?>
 
 			<?php if ( tribe_has_venue() ) : ?>
-				<div class="tribe-events-single-section tribe-events-event-meta secondary">
-					<?php tribe_get_template_part( 'modules/meta/venue' ); ?>
-					<?php if ( tribe_has_organizer() ) {
-						tribe_get_template_part( 'modules/meta/organizer' );
-					} ?>
+				<div class="plgc-meta-grid">
+
+					<!-- Venue -->
+					<div class="plgc-meta-grid__venue">
+						<h3 class="plgc-meta-grid__title">Venue</h3>
+						<?php
+						$venue_address = tribe_get_address( $event_id );
+						$venue_city    = tribe_get_city( $event_id );
+						$venue_state   = tribe_get_stateprovince( $event_id );
+						$venue_zip     = tribe_get_zip( $event_id );
+						$venue_phone   = tribe_get_phone( $event_id );
+						?>
+						<address class="plgc-meta-grid__address">
+							<?php if ( $venue_address ) : ?>
+								<span class="plgc-meta-grid__street"><?php echo esc_html( $venue_address ); ?></span><br>
+							<?php endif; ?>
+							<?php if ( $venue_city || $venue_state || $venue_zip ) : ?>
+								<span class="plgc-meta-grid__locality">
+									<?php
+									$parts = array_filter( [ $venue_city, $venue_state ] );
+									echo esc_html( implode( ', ', $parts ) );
+									if ( $venue_zip ) {
+										echo ' ' . esc_html( $venue_zip );
+									}
+									?>
+								</span>
+							<?php endif; ?>
+						</address>
+						<?php if ( tribe_show_google_map_link( $event_id ) ) : ?>
+							<a href="<?php echo esc_url( tribe_get_map_link( $event_id ) ); ?>" class="plgc-meta-grid__map-link" target="_blank" rel="noopener noreferrer">
+								+ Google Map <span class="screen-reader-text">(opens in new tab)</span>
+							</a>
+						<?php endif; ?>
+						<?php if ( $venue_phone ) : ?>
+							<div class="plgc-meta-grid__field">
+								<strong>Phone</strong><br>
+								<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $venue_phone ) ); ?>"><?php echo esc_html( $venue_phone ); ?></a>
+							</div>
+						<?php endif; ?>
+					</div>
+
+					<!-- Organizer -->
+					<?php if ( tribe_has_organizer() ) : ?>
+						<div class="plgc-meta-grid__organizer">
+							<h3 class="plgc-meta-grid__title">Organizer</h3>
+							<?php
+							$organizer_name  = tribe_get_organizer();
+							$organizer_phone = tribe_get_organizer_phone();
+							$organizer_email = tribe_get_organizer_email();
+							?>
+							<?php if ( $organizer_name ) : ?>
+								<span class="plgc-meta-grid__org-name"><?php echo esc_html( $organizer_name ); ?></span>
+							<?php endif; ?>
+							<?php if ( $organizer_phone ) : ?>
+								<div class="plgc-meta-grid__field">
+									<strong>Phone</strong><br>
+									<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $organizer_phone ) ); ?>"><?php echo esc_html( $organizer_phone ); ?></a>
+								</div>
+							<?php endif; ?>
+							<?php if ( $organizer_email ) : ?>
+								<div class="plgc-meta-grid__field">
+									<strong>Email</strong><br>
+									<a href="mailto:<?php echo esc_attr( $organizer_email ); ?>"><?php echo esc_html( $organizer_email ); ?></a>
+								</div>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+
+					<!-- Map -->
+					<?php if ( tribe_embed_google_map( $event_id ) ) : ?>
+						<div class="plgc-meta-grid__map">
+							<?php echo tribe_get_embedded_map( $event_id ); ?>
+						</div>
+					<?php endif; ?>
+
 				</div>
 			<?php endif; ?>
 
