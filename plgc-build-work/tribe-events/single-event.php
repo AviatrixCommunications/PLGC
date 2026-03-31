@@ -18,7 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
-$events_label = tribe_get_events_label_plural();
+$events_label = function_exists( 'tribe_get_events_label_plural' ) ? tribe_get_events_label_plural() : 'Events';
+$events_url   = function_exists( 'tribe_get_events_link' ) ? tribe_get_events_link() : home_url( '/calendar/' );
 $event_id     = get_the_ID();
 ?>
 
@@ -26,7 +27,7 @@ $event_id     = get_the_ID();
 
 	<!-- Back link -->
 	<p class="tribe-events-back">
-		<a href="<?php echo esc_url( tribe_get_events_link() ); ?>">
+		<a href="<?php echo esc_url( $events_url ); ?>">
 			&laquo; All <?php echo esc_html( $events_label ); ?>
 		</a>
 	</p>
