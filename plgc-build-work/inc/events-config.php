@@ -501,105 +501,11 @@ function plgc_events_card_action_links(): void {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 13. CATEGORY FILTER — dropdown <select> inside the events bar
+// 13. CATEGORY FILTER — REMOVED
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Renders a category filter <select> dropdown and injects it into the events
- * bar (between search input and the Find Events / List|Month buttons).
- *
- * Fully dynamic — queries tribe_events_cat taxonomy at runtime. Adding a new
- * category in WP Admin automatically adds a new dropdown option.
- *
- * Uses native TEC URL param: ?tribe_events_cat=slug
- * Works with both List and Month views.
- *
- * WCAG 2.1 AA:
- *  - <label> linked to <select> via for/id
- *  - visually-hidden label for screen readers
- *  - ≥ 44px touch target
- *  - Keyboard accessible (native <select>)
- *
- * Only renders on pages with TEC views (not single event pages).
- */
-add_action( 'wp_footer', 'plgc_events_category_filter', 8 );
-
-function plgc_events_category_filter(): void {
-    if ( is_singular( 'tribe_events' ) ) {
-        return;
-    }
-    if ( ! class_exists( 'Tribe__Events__Main' ) ) {
-        return;
-    }
-
-    $terms = get_terms( [
-        'taxonomy'   => 'tribe_events_cat',
-        'hide_empty' => true,
-        'orderby'    => 'name',
-        'order'      => 'ASC',
-    ] );
-
-    if ( is_wp_error( $terms ) || empty( $terms ) ) {
-        return;
-    }
-
-    $current_cat = '';
-    if ( ! empty( $_GET['tribe_events_cat'] ) ) {
-        $current_cat = sanitize_text_field( wp_unslash( $_GET['tribe_events_cat'] ) );
-    } elseif ( ! empty( tribe_get_request_var( 'tribe_events_cat', '' ) ) ) {
-        $current_cat = sanitize_text_field( tribe_get_request_var( 'tribe_events_cat', '' ) );
-    }
-
-    $base_url = home_url( '/calendar/' );
-    ?>
-    <div id="plgc-cat-filter-wrap" style="display:none;">
-        <label for="plgc-cat-filter" class="screen-reader-text">Filter by event category</label>
-        <select id="plgc-cat-filter" class="plgc-cat-filter" aria-label="Filter by event category">
-            <option value="<?php echo esc_url( $base_url ); ?>"<?php echo empty( $current_cat ) ? ' selected' : ''; ?>>All Events</option>
-            <?php foreach ( $terms as $term ) : ?>
-                <option value="<?php echo esc_url( add_query_arg( 'tribe_events_cat', $term->slug, $base_url ) ); ?>"<?php echo ( $current_cat === $term->slug ) ? ' selected' : ''; ?>>
-                    <?php echo esc_html( $term->name ); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
-
-    <script>
-    (function() {
-        function initFilter() {
-            var wrap = document.getElementById('plgc-cat-filter-wrap');
-            var select = document.getElementById('plgc-cat-filter');
-            if (!wrap || !select) return;
-
-            // Insert into the events bar — between search and the Find Events / view buttons
-            var eventsBar = document.querySelector('.tribe-events-c-events-bar');
-            var searchGroup = document.querySelector('.tribe-events-c-events-bar__search');
-            var filterGroup = document.querySelector('.tribe-events-c-events-bar__filters, .tribe-events-c-events-bar__views');
-
-            if (eventsBar) {
-                // Try to insert before the filter/views section
-                if (filterGroup) {
-                    eventsBar.insertBefore(wrap, filterGroup);
-                } else if (searchGroup && searchGroup.nextSibling) {
-                    eventsBar.insertBefore(wrap, searchGroup.nextSibling);
-                } else {
-                    eventsBar.appendChild(wrap);
-                }
-                wrap.style.display = '';
-            }
-
-            // Navigate on change
-            select.addEventListener('change', function() {
-                window.location.href = this.value;
-            });
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFilter);
-        } else {
-            initFilter();
-        }
-    })();
-    </script>
-    <?php
-}
+// TEC V2 views use AJAX for page transitions and don't read URL params on
+// subsequent navigations. Category filtering works via shortcodes:
+//   [tribe_events view="list" category="mcchesneys-pub-grill"]
+//   [tribe_events view="list" category="golf-calendar"]
+// Or use the TEC Filter Bar addon for a built-in dropdown.
+// ─────────────────────────────────────────────────────────────────────────────
