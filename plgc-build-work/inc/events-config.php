@@ -389,34 +389,50 @@ function plgc_events_move_add_to_calendar(): void {
     ?>
     <script>
     (function() {
-        // Single event page — move into hero actions
-        var heroTarget = document.querySelector( '.plgc-event-hero__actions' );
-        if ( heroTarget ) {
-            var subscribe = null;
-            var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
-            allContainers.forEach( function( el ) {
-                if ( el.closest( '#tribe-events-content' ) ) {
-                    subscribe = el;
+        function moveSubscribe() {
+            // Single event page — move into hero actions
+            var heroTarget = document.querySelector( '.plgc-event-hero__actions' );
+            if ( heroTarget ) {
+                var subscribe = null;
+                document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' ).forEach( function( el ) {
+                    if ( el.closest( '#tribe-events-content' ) ) subscribe = el;
+                });
+                if ( subscribe && ! heroTarget.contains( subscribe ) ) {
+                    heroTarget.appendChild( subscribe );
                 }
-            });
-            if ( subscribe && ! heroTarget.contains( subscribe ) ) {
-                heroTarget.appendChild( subscribe );
+                return;
             }
-            return;
+
+            // List/calendar view — move subscribe into the top bar row
+            var topBar = document.querySelector( '.tribe-events-c-top-bar' );
+            if ( ! topBar ) return;
+            var subscribeDropdown = document.querySelector( '.tribe-events-c-subscribe-dropdown' );
+            if ( ! subscribeDropdown ) return;
+            if ( topBar.contains( subscribeDropdown ) ) return;
+            topBar.appendChild( subscribeDropdown );
         }
 
-        // List/calendar view — move subscribe INTO the top bar row (right-aligned via CSS margin-left:auto)
-        var topBar = document.querySelector( '.tribe-events-c-top-bar' );
-        if ( ! topBar ) return;
+        // Run immediately
+        if ( document.readyState === 'loading' ) {
+            document.addEventListener( 'DOMContentLoaded', moveSubscribe );
+        } else {
+            moveSubscribe();
+        }
 
-        var subscribeDropdown = document.querySelector( '.tribe-events-c-subscribe-dropdown' );
-        if ( ! subscribeDropdown ) return;
+        // Re-run after TEC AJAX view changes (list ↔ month toggle)
+        document.addEventListener( 'afterSetup.tribeEvents', function() {
+            setTimeout( moveSubscribe, 150 );
+        });
 
-        // Don't move if it's already inside the top bar
-        if ( topBar.contains( subscribeDropdown ) ) return;
-
-        // Append inside the top bar — CSS margin-left:auto pushes it right
-        topBar.appendChild( subscribeDropdown );
+        // MutationObserver fallback — watches for TEC rebuilding the views container
+        var container = document.querySelector( '.tribe-events' );
+        if ( container ) {
+            var obs = new MutationObserver( function() {
+                clearTimeout( obs._t );
+                obs._t = setTimeout( moveSubscribe, 200 );
+            });
+            obs.observe( container, { childList: true, subtree: true } );
+        }
     })();
     </script>
     <?php
