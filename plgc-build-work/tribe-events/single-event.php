@@ -1,19 +1,16 @@
 <?php
 /**
- * Single Event Template — PLGC Custom Override v3
+ * Single Event Template — PLGC Custom Override v4
  *
- * Two-column hero: image left, details + description right.
- * Full-width venue/organizer/map, related events, and navigation below.
- *
- * v3 changes:
- *  - Venue/organizer/map built manually (not TEC template parts) to fix
- *    phone/email HTML escaping issue
- *  - Google Map embedded in the venue/organizer section
- *  - Related events full-width at bottom
- *  - Prev/next styled consistently
+ * Layout:
+ *   1. Back link
+ *   2. Two-column hero: image left, details + description right
+ *   3. Venue / Organizer / Map (3-col grid)
+ *   4. Related events (full-width row at bottom with flyer images)
+ *   5. Prev/Next event navigation
  *
  * @package PLGC
- * @since   1.7.7
+ * @since   1.7.8
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,7 +66,7 @@ $event_id     = get_the_ID();
 						</div>
 					<?php endif; ?>
 
-					<!-- Add to calendar container -->
+					<!-- Add to calendar — left aligned under venue -->
 					<div class="plgc-event-hero__actions"></div>
 
 					<?php do_action( 'tribe_events_single_event_after_the_meta' ); ?>
@@ -109,16 +106,14 @@ $event_id     = get_the_ID();
 						?>
 						<address class="plgc-meta-grid__address">
 							<?php if ( $venue_address ) : ?>
-								<span class="plgc-meta-grid__street"><?php echo esc_html( $venue_address ); ?></span><br>
+								<span><?php echo esc_html( $venue_address ); ?></span><br>
 							<?php endif; ?>
 							<?php if ( $venue_city || $venue_state || $venue_zip ) : ?>
-								<span class="plgc-meta-grid__locality">
+								<span>
 									<?php
 									$parts = array_filter( [ $venue_city, $venue_state ] );
 									echo esc_html( implode( ', ', $parts ) );
-									if ( $venue_zip ) {
-										echo ' ' . esc_html( $venue_zip );
-									}
+									if ( $venue_zip ) echo ' ' . esc_html( $venue_zip );
 									?>
 								</span>
 							<?php endif; ?>
@@ -177,8 +172,10 @@ $event_id     = get_the_ID();
 
 		</article>
 
-		<!-- Related events — full width, bottom -->
-		<?php tribe_get_template_part( 'modules/related-events' ); ?>
+		<!-- Related events — FULL WIDTH at bottom, below venue/organizer -->
+		<div class="plgc-related-events-full">
+			<?php tribe_get_template_part( 'modules/related-events' ); ?>
+		</div>
 
 		<!-- Event navigation -->
 		<div id="tribe-events-footer">
