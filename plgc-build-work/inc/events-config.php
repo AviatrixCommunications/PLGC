@@ -196,6 +196,22 @@ function plgc_events_dequeue_facebook_sdk(): void {
     wp_deregister_script( 'tribe-events-facebook-sdk' );
 }
 
+// Also catch it at print time in case it's re-enqueued after priority 20
+add_action( 'wp_print_scripts', 'plgc_events_dequeue_facebook_sdk', 99 );
+
+/**
+ * Belt-and-suspenders: if the SDK still makes it through via script_loader_tag,
+ * block any script tag pointing to connect.facebook.net.
+ */
+add_filter( 'script_loader_tag', 'plgc_events_block_facebook_script_tag', 10, 2 );
+
+function plgc_events_block_facebook_script_tag( string $tag, string $handle ): string {
+    if ( stripos( $tag, 'connect.facebook.net' ) !== false ) {
+        return '<!-- Facebook SDK blocked by PLGC theme (CSP) -->';
+    }
+    return $tag;
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 6. ALT TEXT ENFORCEMENT — COVERAGE REMINDER
@@ -389,21 +405,18 @@ function plgc_events_move_add_to_calendar(): void {
             return;
         }
 
-        // List/calendar view — move subscribe to just after the top bar
+        // List/calendar view — move subscribe INTO the top bar row (right-aligned via CSS margin-left:auto)
         var topBar = document.querySelector( '.tribe-events-c-top-bar' );
         if ( ! topBar ) return;
 
         var subscribeDropdown = document.querySelector( '.tribe-events-c-subscribe-dropdown' );
         if ( ! subscribeDropdown ) return;
 
-        // Don't move if it's already near the top bar
-        if ( subscribeDropdown.closest( '.tribe-events-header' ) ||
-             subscribeDropdown.previousElementSibling === topBar ) {
-            return;
-        }
+        // Don't move if it's already inside the top bar
+        if ( topBar.contains( subscribeDropdown ) ) return;
 
-        // Insert after the top bar
-        topBar.parentNode.insertBefore( subscribeDropdown, topBar.nextSibling );
+        // Append inside the top bar — CSS margin-left:auto pushes it right
+        topBar.appendChild( subscribeDropdown );
     })();
     </script>
     <?php
