@@ -168,10 +168,7 @@ $event_id     = get_the_ID();
 
 		</article>
 
-		<!-- Related events — FULL WIDTH, at bottom, below everything -->
-		<div class="plgc-related-events-full">
-			<?php tribe_get_template_part( 'modules/related-events' ); ?>
-		</div>
+		<!-- Related events rendered by TEC via tribe_events_single_event_after_the_content -->
 
 		<!-- Event navigation — use TEC default styling -->
 		<div id="tribe-events-footer">
