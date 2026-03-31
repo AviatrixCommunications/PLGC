@@ -1,13 +1,13 @@
 /**
  * Elementor Editor Overrides
  *
- * Styles that appear inside the Elementor visual editor
- * to reinforce the design system while building pages.
+ * Minimal styles for the Elementor visual editor.
+ * Avoids targeting internal Elementor class names that change between versions.
  */
 
-/* Show a subtle reminder banner for non-admins */
+/* Design system reminder banner in the panel header */
 #elementor-panel-header::after {
-    content: 'Aviatrix Design System Active';
+    content: 'PLGC Design System Active';
     display: block;
     background: #567915;
     color: #fff;
