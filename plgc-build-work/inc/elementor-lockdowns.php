@@ -5,9 +5,15 @@
  * Restricts Elementor's editing capabilities for non-admin users
  * to maintain WCAG 2.1 AA compliance and brand consistency.
  *
- * Supports both Elementor V3 widgets and V4 atomic elements.
+ * APPROACH: This file uses ONLY server-side PHP hooks and Elementor's
+ * official APIs (filters, Kit settings, Role Manager, widget registry).
+ * No client-side CSS/JS injection into the editor UI — those hacks are
+ * fragile and break with Elementor updates (e.g. the V3→V4 transition).
  *
  * @package PLGC
+ * @since 1.7.12  Removed fragile client-side editor CSS/JS injections
+ *                (color picker hiding, global class button hiding).
+ *                Retained all server-side restrictions.
  */
 
 defined('ABSPATH') || exit;
@@ -79,53 +85,6 @@ function plgc_set_elementor_kit_colors() {
     $kit->update_settings($settings);
 }
 add_action('after_switch_theme', 'plgc_set_elementor_kit_colors');
-
-/**
- * Disable the custom color picker for non-admin users.
- * V3: Hides the hex/rgb input so they can only use swatches.
- * V4: Hides the free-pick color area in the new picker UI.
- *     Non-admins can only select from Global Colors.
- */
-function plgc_disable_color_picker_for_editors() {
-    if (current_user_can('administrator')) {
-        return;
-    }
-
-    add_action('elementor/editor/after_enqueue_scripts', function () {
-        wp_add_inline_script('elementor-editor', "
-            jQuery(window).on('elementor:init', function() {
-                var style = document.createElement('style');
-                style.textContent = `
-                    /* === V3 color picker restrictions === */
-                    .pcr-app .pcr-interaction input[type='text'] {
-                        display: none !important;
-                    }
-                    .pcr-app .pcr-interaction .pcr-save {
-                        display: none !important;
-                    }
-
-                    /* === V4 color picker restrictions === */
-                    /* Hide the custom color area in V4's picker */
-                    .e-global__color-picker-custom,
-                    .e-global__color-add-custom,
-                    [class*='color-picker'] .pcr-color-area,
-                    [class*='color-picker'] .pcr-color-chooser,
-                    [class*='color-picker'] .pcr-color-opacity {
-                        display: none !important;
-                    }
-
-                    /* Hide 'Add Color' button that lets editors create new globals */
-                    .e-global__add-color-button,
-                    .e-global__popover-toggle--add {
-                        display: none !important;
-                    }
-                `;
-                document.head.appendChild(style);
-            });
-        ");
-    });
-}
-add_action('init', 'plgc_disable_color_picker_for_editors');
 
 /**
  * ============================================================
@@ -233,44 +192,6 @@ add_action('elementor/widgets/register', 'plgc_restrict_elementor_widgets', 100)
 
 /**
  * ============================================================
- * V4 GLOBAL CLASS RESTRICTIONS
- * ============================================================
- * Prevent non-admin users from creating/editing/deleting
- * Global Classes. They can apply existing classes but not
- * modify the design system.
- */
-function plgc_restrict_v4_global_classes() {
-    if (current_user_can('administrator')) {
-        return;
-    }
-
-    add_action('elementor/editor/after_enqueue_scripts', function () {
-        wp_add_inline_script('elementor-editor', "
-            jQuery(window).on('elementor:init', function() {
-                var style = document.createElement('style');
-                style.textContent = `
-                    /* Hide Global Class creation/edit/delete for non-admins */
-                    .e-global__create-class,
-                    .e-global__add-class-button,
-                    .e-class-context-menu__delete,
-                    .e-class-context-menu__edit,
-                    .e-global__popover-toggle--add-class,
-                    /* Hide Variables Manager (design token editing) */
-                    .e-global__variables-manager-add,
-                    .e-global__variables-create,
-                    [class*='variables-manager'] .e-global__add-button {
-                        display: none !important;
-                    }
-                `;
-                document.head.appendChild(style);
-            });
-        ");
-    });
-}
-add_action('init', 'plgc_restrict_v4_global_classes');
-
-/**
- * ============================================================
  * ELEMENTOR ROLE MANAGER ENFORCEMENT
  * ============================================================
  */
@@ -336,6 +257,9 @@ function plgc_set_elementor_defaults() {
 
     // Enable optimized markup (V4 prerequisite — removes unnecessary wrappers)
     update_option('elementor_experiment-e_optimized_markup', 'active');
+
+    // Disable Elementor usage tracking (prevents Mixpanel SDK load attempts)
+    update_option('elementor_allow_tracking', '');
 }
 add_action('after_switch_theme', 'plgc_set_elementor_defaults');
 

@@ -86,27 +86,6 @@ function plgc_disable_gutenberg_for_pages($use_block_editor, $post) {
 add_filter('use_block_editor_for_post', 'plgc_disable_gutenberg_for_pages', 10, 2);
 
 /**
- * Hide the "Back to WordPress Editor" button inside Elementor for Pages.
- * Non-admins should never need to leave the Elementor canvas on pages.
- */
-function plgc_hide_back_to_wp_button() {
-    if (current_user_can('administrator')) {
-        return;
-    }
-
-    add_action('elementor/editor/after_enqueue_scripts', function () {
-        wp_add_inline_style('elementor-editor', '
-            /* Hide Back to WordPress Editor button for non-admins */
-            #elementor-switch-mode-button,
-            .elementor-switch-mode-button {
-                display: none !important;
-            }
-        ');
-    });
-}
-add_action('init', 'plgc_hide_back_to_wp_button');
-
-/**
  * For Pages: default "Edit" link goes to Elementor, not classic editor.
  * Posts keep both Gutenberg and Elementor as options.
  */
