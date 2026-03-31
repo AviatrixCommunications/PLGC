@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.7');
+define('PLGC_VERSION', '1.7.8');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
