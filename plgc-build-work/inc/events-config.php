@@ -353,40 +353,57 @@ function plgc_events_full_day_names( string $title, int $day_num ): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 11. MOVE "ADD TO CALENDAR" INTO HERO DETAILS ON SINGLE EVENT PAGES
+// 11. MOVE "SUBSCRIBE TO CALENDAR" — to hero on single, to top bar on list
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * The custom single-event.php template places the subscribe block via TEC's
- * action hooks, but TEC may render it outside the hero area depending on
- * the version. This script ensures it lands in .plgc-event-hero__actions.
+ * On single event pages: moves the subscribe dropdown into .plgc-event-hero__actions.
+ * On list/calendar views: moves it from the footer area to just after the top bar
+ * so it doesn't get lost at the bottom of the page.
  *
  * Falls back gracefully if JS is disabled (element stays in original position).
  */
 add_action( 'wp_footer', 'plgc_events_move_add_to_calendar', 5 );
 
 function plgc_events_move_add_to_calendar(): void {
-    if ( ! is_singular( 'tribe_events' ) ) {
+    // Only run if TEC is active — the JS handles element detection
+    if ( ! class_exists( 'Tribe__Events__Main' ) ) {
         return;
     }
     ?>
     <script>
     (function() {
-        var target = document.querySelector( '.plgc-event-hero__actions' );
-        if ( ! target ) return;
-
-        // Find the subscribe dropdown wherever TEC rendered it
-        var subscribe = null;
-        var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
-        allContainers.forEach( function( el ) {
-            if ( el.closest( '#tribe-events-content' ) ) {
-                subscribe = el;
+        // Single event page — move into hero actions
+        var heroTarget = document.querySelector( '.plgc-event-hero__actions' );
+        if ( heroTarget ) {
+            var subscribe = null;
+            var allContainers = document.querySelectorAll( '.tribe-events-c-subscribe-dropdown__container' );
+            allContainers.forEach( function( el ) {
+                if ( el.closest( '#tribe-events-content' ) ) {
+                    subscribe = el;
+                }
+            });
+            if ( subscribe && ! heroTarget.contains( subscribe ) ) {
+                heroTarget.appendChild( subscribe );
             }
-        });
-
-        if ( subscribe && ! target.contains( subscribe ) ) {
-            target.appendChild( subscribe );
+            return;
         }
+
+        // List/calendar view — move subscribe to just after the top bar
+        var topBar = document.querySelector( '.tribe-events-c-top-bar' );
+        if ( ! topBar ) return;
+
+        var subscribeDropdown = document.querySelector( '.tribe-events-c-subscribe-dropdown' );
+        if ( ! subscribeDropdown ) return;
+
+        // Don't move if it's already near the top bar
+        if ( subscribeDropdown.closest( '.tribe-events-header' ) ||
+             subscribeDropdown.previousElementSibling === topBar ) {
+            return;
+        }
+
+        // Insert after the top bar
+        topBar.parentNode.insertBefore( subscribeDropdown, topBar.nextSibling );
     })();
     </script>
     <?php
@@ -512,53 +529,21 @@ function plgc_events_card_action_links(): void {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 14. ORGANIZER META CLEANUP — hide website link, auto-link phone/email
+// 14. ORGANIZER META CLEANUP — hide website link
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Hide the "View Organizer Website" link from organizer meta on single events.
- * TEC renders this from the organizer record's "Website" field. CSS also hides
- * it as a belt-and-suspenders approach, but removing it from the HTML is cleaner
- * for accessibility (screen readers won't encounter a hidden link).
+ * TEC renders this from the organizer record's "Website" field.
  *
- * Also ensures phone numbers and email addresses in the organizer block are
- * wrapped in proper <a href="tel:"> and <a href="mailto:"> links. TEC sometimes
- * outputs these as plain text depending on how the organizer record is configured.
+ * Phone and email linking is handled directly in the custom
+ * tribe-events/single-event.php template (v3) using raw PHP output with
+ * proper <a href="tel:"> and <a href="mailto:"> tags. The previous approach
+ * of using filters on tribe_get_organizer_phone/email didn't work because
+ * TEC's organizer template runs esc_html() on the output, which escaped the
+ * HTML tags into visible text.
  *
  * @since 1.7.4
  */
 add_filter( 'tribe_get_organizer_website_link', '__return_empty_string' );
 
-/**
- * Ensure organizer phone is a clickable tel: link.
- * TEC's tribe_get_organizer_phone() returns plain text by default.
- */
-add_filter( 'tribe_get_organizer_phone', 'plgc_events_linkify_phone' );
-
-function plgc_events_linkify_phone( string $phone ): string {
-    if ( empty( $phone ) ) {
-        return $phone;
-    }
-    // If it's already wrapped in a link, leave it alone
-    if ( str_contains( $phone, '<a' ) ) {
-        return $phone;
-    }
-    $clean = preg_replace( '/[^0-9+]/', '', $phone );
-    return '<a href="tel:' . esc_attr( $clean ) . '">' . esc_html( $phone ) . '</a>';
-}
-
-/**
- * Ensure organizer email is a clickable mailto: link.
- * TEC's tribe_get_organizer_email() returns plain text by default.
- */
-add_filter( 'tribe_get_organizer_email', 'plgc_events_linkify_email' );
-
-function plgc_events_linkify_email( string $email ): string {
-    if ( empty( $email ) ) {
-        return $email;
-    }
-    if ( str_contains( $email, '<a' ) ) {
-        return $email;
-    }
-    return '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>';
-}
