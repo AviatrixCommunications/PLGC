@@ -509,3 +509,56 @@ function plgc_events_card_action_links(): void {
 //   [tribe_events view="list" category="golf-calendar"]
 // Or use the TEC Filter Bar addon for a built-in dropdown.
 // ─────────────────────────────────────────────────────────────────────────────
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 14. ORGANIZER META CLEANUP — hide website link, auto-link phone/email
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Hide the "View Organizer Website" link from organizer meta on single events.
+ * TEC renders this from the organizer record's "Website" field. CSS also hides
+ * it as a belt-and-suspenders approach, but removing it from the HTML is cleaner
+ * for accessibility (screen readers won't encounter a hidden link).
+ *
+ * Also ensures phone numbers and email addresses in the organizer block are
+ * wrapped in proper <a href="tel:"> and <a href="mailto:"> links. TEC sometimes
+ * outputs these as plain text depending on how the organizer record is configured.
+ *
+ * @since 1.7.4
+ */
+add_filter( 'tribe_get_organizer_website_link', '__return_empty_string' );
+
+/**
+ * Ensure organizer phone is a clickable tel: link.
+ * TEC's tribe_get_organizer_phone() returns plain text by default.
+ */
+add_filter( 'tribe_get_organizer_phone', 'plgc_events_linkify_phone' );
+
+function plgc_events_linkify_phone( string $phone ): string {
+    if ( empty( $phone ) ) {
+        return $phone;
+    }
+    // If it's already wrapped in a link, leave it alone
+    if ( str_contains( $phone, '<a' ) ) {
+        return $phone;
+    }
+    $clean = preg_replace( '/[^0-9+]/', '', $phone );
+    return '<a href="tel:' . esc_attr( $clean ) . '">' . esc_html( $phone ) . '</a>';
+}
+
+/**
+ * Ensure organizer email is a clickable mailto: link.
+ * TEC's tribe_get_organizer_email() returns plain text by default.
+ */
+add_filter( 'tribe_get_organizer_email', 'plgc_events_linkify_email' );
+
+function plgc_events_linkify_email( string $email ): string {
+    if ( empty( $email ) ) {
+        return $email;
+    }
+    if ( str_contains( $email, '<a' ) ) {
+        return $email;
+    }
+    return '<a href="mailto:' . esc_attr( $email ) . '">' . esc_html( $email ) . '</a>';
+}
