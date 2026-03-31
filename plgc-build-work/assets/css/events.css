@@ -1,6 +1,6 @@
 /**
- * PLGC Events Calendar & Tickets — v10 (production)
- * WCAG 2.1 AA compliant. @since 1.7.8
+ * PLGC Events Calendar & Tickets — v11 (production)
+ * WCAG 2.1 AA compliant. @since 1.7.9
  */
 
 /* === 1. TOKENS === */
@@ -62,7 +62,7 @@
 .tribe-events-c-events-bar__search-button:hover{background:var(--gl)}
 .tribe-events-c-events-bar__search-button:focus-visible{outline:none;box-shadow:var(--focus)}
 
-/* === 5. VIEW SELECTOR TABS === */
+/* === 5. VIEW SELECTOR TABS — grey active, solid line, NO border-radius === */
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__content{
   position:static!important;background:transparent!important;border:none!important;
   box-shadow:none!important;padding:0!important;min-width:0!important;display:block!important;
@@ -70,45 +70,40 @@
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list{
   display:flex!important;gap:0;list-style:none;padding:0;margin:0;align-items:stretch;
 }
-.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item{
-  border-radius:0!important;transition:background .15s ease;position:relative;
-}
+.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item{border-radius:0!important;transition:background .15s ease;position:relative}
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item:hover{background:var(--fl)}
+/* Link — force border-radius:0 to kill the rounded bottom line */
+.tribe-events .tribe-events-c-view-selector__list-item-link,
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link{
-  font-family:var(--ff);font-size:.9375rem;font-weight:600;color:var(--bk);
-  padding:.5rem 1rem;min-height:2.75rem;min-width:44px;display:inline-flex;align-items:center;
-  justify-content:center;text-decoration:none!important;background:transparent!important;
-  border:none!important;border-bottom:2px solid transparent!important;position:relative;
+  font-family:var(--ff)!important;font-size:.9375rem!important;font-weight:600!important;color:var(--bk)!important;
+  padding:.5rem 1rem!important;min-height:2.75rem!important;min-width:44px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  text-decoration:none!important;background:transparent!important;
+  border:none!important;border-bottom:2px solid transparent!important;
+  border-radius:0!important;position:relative;
 }
-.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link:hover{color:var(--gd)}
-/* Active tab — grey bg, solid black bottom line */
+.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link:hover{color:var(--gd)!important}
+/* Active tab */
 .tribe-events .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active,
-.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active{
-  background:var(--fl)!important;border-radius:0!important;
-}
-.tribe-events .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active .tribe-events-c-view-selector__list-item-link,
+.tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active{background:var(--fl)!important;border-radius:0!important}
+.tribe-events .tribe-events-c-view-selector__list-item--active .tribe-events-c-view-selector__list-item-link,
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item--active .tribe-events-c-view-selector__list-item-link{
-  color:var(--bk)!important;border-bottom:2px solid var(--bk)!important;background:transparent!important;
+  color:var(--bk)!important;border-bottom:2px solid var(--bk)!important;border-radius:0!important;
 }
-/* KILL ALL TEC pseudo-element indicators on tabs — these create the rounded pill underline */
+/* Kill ALL TEC pseudo-element pill indicators */
 .tribe-events-c-view-selector__list-item-link::after,
 .tribe-events-c-view-selector__list-item-link::before,
 .tribe-events-c-view-selector__list-item::after,
 .tribe-events-c-view-selector__list-item::before,
 .tribe-events .tribe-events-c-view-selector__list-item-link::after,
-.tribe-events .tribe-events-c-view-selector__list-item-link::before,
-.tribe-events .tribe-events-c-view-selector__list-item::after,
-.tribe-events .tribe-events-c-view-selector__list-item::before{
-  display:none!important;content:''!important;width:0!important;height:0!important;
-  background:none!important;border:none!important;opacity:0!important;
+.tribe-events .tribe-events-c-view-selector__list-item-link::before{
+  display:none!important;content:''!important;width:0!important;height:0!important;background:none!important;border:none!important;opacity:0!important;
 }
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link:focus-visible{outline:none;box-shadow:var(--focus);background:var(--fl)}
 .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-icon{display:none}
 
 /* === 6. TOP BAR + SUBSCRIBE INLINE === */
-.tribe-events-c-top-bar{
-  display:flex;align-items:center;gap:.75rem;margin-top:.5rem;margin-bottom:.75rem;flex-wrap:wrap;
-}
+.tribe-events-c-top-bar{display:flex;align-items:center;gap:.75rem;margin-top:.5rem;margin-bottom:.75rem;flex-wrap:wrap}
 .tribe-events-c-top-bar__datepicker-button{
   font-family:var(--fh);font-weight:400;font-size:1.5rem;color:var(--bk);
   background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:.375rem;min-height:44px;
@@ -128,7 +123,6 @@
 .tribe-events-c-top-bar__nav-link:focus-visible{outline:none;box-shadow:var(--focus);border-color:var(--g)}
 .tribe-events-c-top-bar__nav-link-icon-svg path{fill:currentColor}
 .tribe-events-c-top-bar__nav-list{display:flex;gap:.25rem;list-style:none;padding:0;margin:0;align-items:center}
-/* Subscribe — push to right end of top bar */
 .tribe-events-c-subscribe-dropdown{margin-left:auto!important}
 
 /* === 7. LIST VIEW — 3-COL CARD GRID === */
@@ -141,15 +135,13 @@
   letter-spacing:.12em!important;text-transform:uppercase!important;color:var(--g)!important;
   display:flex!important;align-items:center;gap:.625rem;padding-bottom:.5rem;border-bottom:2px solid var(--gl);
 }
-.tribe-events-calendar-list__month-separator-text::before{
-  content:'';display:inline-block;width:1.25rem;height:2px;background:var(--g);flex-shrink:0;
-}
+.tribe-events-calendar-list__month-separator-text::before{content:'';display:inline-block;width:1.25rem;height:2px;background:var(--g);flex-shrink:0}
 /* Grid */
 .tribe-events .tribe-events-calendar-list,.tribe-events-calendar-list{
   display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:1.25rem!important;align-items:start!important;
 }
 .tribe-events-calendar-list__month-separator{grid-column:1/-1}
-/* Kill ALL TEC margins on event rows — these are the 48px/40px culprits */
+/* Kill TEC row margins */
 .tribe-events-calendar-list__event-row,
 .tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-row,
 .tribe-common--breakpoint-medium .tribe-events-calendar-list__event-row,
@@ -165,18 +157,14 @@
 .tribe-events-calendar-list__event,
 .tribe-common--breakpoint-medium .tribe-events-calendar-list__event{
   background:var(--wh)!important;border:1px solid var(--bd)!important;overflow:hidden!important;
-  position:relative!important;height:100%!important;
-  display:flex!important;flex-direction:column!important;border-radius:0!important;
-  transition:box-shadow .2s ease,border-color .2s ease;
-  margin:0!important;padding:0!important;
+  position:relative!important;height:100%!important;display:flex!important;flex-direction:column!important;
+  border-radius:0!important;transition:box-shadow .2s ease,border-color .2s ease;margin:0!important;padding:0!important;
 }
 .tribe-events-calendar-list__event.tribe-common-g-row,
 .tribe-events-calendar-list__event.tribe-common-g-row--gutters{
   display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;margin:0!important;
 }
-.tribe-events-calendar-list__event .tribe-common-g-col{
-  flex:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;
-}
+.tribe-events-calendar-list__event .tribe-common-g-col{flex:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important}
 .tribe-events-calendar-list__event:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--gm)!important}
 .tribe-events-calendar-list__event-title-link::after{content:'';position:absolute;inset:0;z-index:1}
 /* Image */
@@ -188,82 +176,58 @@
 .tribe-events-calendar-list__event-featured-image,
 .tribe-events .tribe-events-calendar-list__event-featured-image,
 .tribe-events-calendar-list__event-featured-image-wrapper img{
-  display:block!important;width:100%!important;height:auto!important;
-  transition:transform .3s ease;border-radius:0!important;margin:0!important;
+  display:block!important;width:100%!important;height:auto!important;transition:transform .3s ease;border-radius:0!important;margin:0!important;
 }
 .tribe-events-calendar-list__event:hover .tribe-events-calendar-list__event-featured-image{transform:scale(1.02)}
-/* Card details — override TEC breakpoint-medium padding */
+/* Card details — padded */
 .tribe-events-calendar-list__event-details,
 .tribe-events-calendar-list__event-details.tribe-common-g-col,
 .tribe-common--breakpoint-medium .tribe-events-calendar-list__event-details,
 .tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-details{
   padding:1.25rem 1rem!important;display:flex!important;flex-direction:column!important;
-  gap:.5rem!important;flex:1!important;background:var(--fl)!important;text-align:center!important;
-  margin:0!important;
+  gap:.5rem!important;flex:1!important;background:var(--fl)!important;text-align:center!important;margin:0!important;
 }
 .tribe-events-calendar-list__event-header{display:flex;flex-direction:column;gap:.375rem;align-items:center}
 .tribe-events-calendar-list__event-datetime-wrapper{margin:0!important;padding:0!important;order:-1}
-.tribe-events-calendar-list__event-datetime,
-.tribe-events-calendar-list__event-datetime *{
-  font-family:var(--ff)!important;font-size:.8125rem!important;font-weight:700!important;
-  color:var(--g)!important;line-height:1.3!important;
+.tribe-events-calendar-list__event-datetime,.tribe-events-calendar-list__event-datetime *{
+  font-family:var(--ff)!important;font-size:.8125rem!important;font-weight:700!important;color:var(--g)!important;line-height:1.3!important;
 }
-.tribe-events-calendar-list__event-title{
-  font-family:var(--ff)!important;font-size:1rem!important;font-weight:600!important;
-  line-height:1.35!important;margin:0!important;color:var(--bk)!important;
-}
+.tribe-events-calendar-list__event-title{font-family:var(--ff)!important;font-size:1rem!important;font-weight:600!important;line-height:1.35!important;margin:0!important;color:var(--bk)!important}
 .tribe-events-calendar-list__event-title-link{color:var(--bk)!important;text-decoration:none!important}
 .tribe-events-calendar-list__event-title-link:hover{color:var(--g)!important}
 .tribe-events-calendar-list__event-title-link:focus-visible{outline:none;text-decoration:underline!important;color:var(--g)!important}
 /* Hide excerpts, series, venue */
-.tribe-events-calendar-list__event-description,
-.tribe-events .tribe-events-calendar-list__event-description{
+.tribe-events-calendar-list__event-description,.tribe-events .tribe-events-calendar-list__event-description{
   display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;margin:0!important;padding:0!important;
 }
-.tribe-events-calendar-list .tribe-events-calendar-series-archive__container,
-.tribe-events-calendar-list .tec_series_marker__title{display:none!important}
+.tribe-events-calendar-list .tribe-events-calendar-series-archive__container,.tribe-events-calendar-list .tec_series_marker__title{display:none!important}
 .tribe-events-calendar-list__event-venue{display:none!important}
 /* Card action link */
-.plgc-card-action{
-  font-family:var(--ff);font-size:.8125rem;font-weight:700;letter-spacing:.04em;
-  text-transform:none;color:var(--bk);text-decoration:none;
-  display:flex;align-items:center;justify-content:center;gap:.25rem;
-  margin-top:auto;padding-top:.375rem;transition:color .15s ease;position:relative;z-index:2;
-}
+.plgc-card-action{font-family:var(--ff);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:none;color:var(--bk);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:.25rem;margin-top:auto;padding-top:.375rem;transition:color .15s ease;position:relative;z-index:2}
 .plgc-card-action:hover{color:var(--g);text-decoration:underline}
 .plgc-card-action:focus-visible{outline:none;box-shadow:var(--focus);border-radius:.125rem}
 .plgc-card-action--tickets{color:var(--g)}
 
-/* === 8. LIST PAGINATION — yellow pills, same row === */
+/* === 8. LIST PAGINATION — yellow pills === */
 .tribe-events-c-nav{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--bd)}
-.tribe-events-c-nav__list{
-  list-style:none;padding:0;margin:0;
-  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
-  align-items:center;justify-content:center;gap:1rem;
-}
+.tribe-events-c-nav__list{list-style:none;padding:0;margin:0;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center;justify-content:center;gap:1rem}
 .tribe-events-c-nav__list-item{display:inline-flex!important}
 .tribe-events-c-nav__prev,.tribe-events-c-nav__next{
   font-family:var(--ff)!important;font-weight:600!important;font-size:.9375rem!important;
   color:var(--bk)!important;background:var(--y)!important;border:none!important;
   border-radius:6.25rem!important;padding:.75rem 1.75rem!important;
-  min-height:2.75rem;min-width:44px;cursor:pointer;
-  display:inline-flex!important;align-items:center;gap:.375rem;
+  min-height:2.75rem;min-width:44px;cursor:pointer;display:inline-flex!important;align-items:center;gap:.375rem;
   transition:background .15s ease!important;text-decoration:none!important;
 }
-.tribe-events-c-nav__prev:hover:not([disabled]),.tribe-events-c-nav__next:hover:not([disabled]){
-  background:var(--yl)!important;text-decoration:underline!important;
-}
+.tribe-events-c-nav__prev:hover:not([disabled]),.tribe-events-c-nav__next:hover:not([disabled]){background:var(--yl)!important;text-decoration:underline!important}
 .tribe-events-c-nav__prev[disabled],.tribe-events-c-nav__next[disabled]{opacity:.35;cursor:not-allowed;background:var(--bd)!important;color:#888!important}
 .tribe-events-c-nav__prev:focus-visible,.tribe-events-c-nav__next:focus-visible{outline:none;box-shadow:var(--focus)}
 .tribe-events-c-nav__prev-icon-svg path,.tribe-events-c-nav__next-icon-svg path{fill:var(--bk)!important}
-.tribe-events-c-nav__today{
-  font-family:var(--ff);font-size:.875rem;font-weight:600;color:var(--bk);text-decoration:underline;
-  min-height:44px;display:inline-flex;align-items:center;padding:.375rem .75rem;background:none;border:none;cursor:pointer;
-}
+.tribe-events-c-nav__today{font-family:var(--ff);font-size:.875rem;font-weight:600;color:var(--bk);text-decoration:underline;min-height:44px;display:inline-flex;align-items:center;padding:.375rem .75rem;background:none;border:none;cursor:pointer}
 .tribe-events-c-nav__today:hover{color:var(--g)}
 .tribe-events-c-nav__today:focus-visible{outline:none;box-shadow:var(--focus)}
 
-/* === 9. SUBSCRIBE TO CALENDAR === */
+/* === 9. SUBSCRIBE TO CALENDAR — dropdown position fix === */
 .tribe-events-c-subscribe-dropdown__container{position:relative}
 .tribe-common .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border,
 .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border{
@@ -272,6 +236,7 @@
   padding:0 .75rem 0 .875rem!important;min-height:2.75rem!important;
 }
 .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:hover{border-color:var(--g)!important}
+/* Focus — outline on the BUTTON CONTAINER only, not the text */
 .tribe-events-c-subscribe-dropdown .tribe-common-c-btn-border:focus-visible{
   outline:3px solid rgba(86,121,21,.5)!important;outline-offset:2px!important;box-shadow:none!important;
 }
@@ -279,14 +244,18 @@
 button.tribe-events-c-subscribe-dropdown__button-text{
   background:none!important;color:var(--bk)!important;border:none!important;
   font-family:var(--ff)!important;font-size:.875rem!important;font-weight:600!important;
-  padding:0!important;cursor:pointer;display:inline;white-space:nowrap;
+  padding:0!important;cursor:pointer;display:inline;white-space:nowrap;outline:none!important;
 }
-.tribe-events-c-subscribe-dropdown__button-text:focus-visible{outline:3px solid rgba(86,121,21,.5)!important;outline-offset:2px!important}
+/* Remove focus from text element — parent button handles it */
+.tribe-events-c-subscribe-dropdown__button-text:focus,.tribe-events-c-subscribe-dropdown__button-text:focus-visible{
+  outline:none!important;box-shadow:none!important;
+}
 .tribe-events-c-subscribe-dropdown__export-icon{color:var(--g);width:1rem;height:1rem;flex-shrink:0}
 .tribe-events-c-subscribe-dropdown__button-icon .tribe-common-c-svgicon__svg-fill{fill:var(--bk)!important}
+/* Dropdown panel — remove top:100% override, let TEC position it naturally */
 .tribe-events-c-subscribe-dropdown__content{
   background:var(--wh);border:1px solid var(--bd);box-shadow:0 2px 8px rgba(0,0,0,.08);
-  padding:0;min-width:12rem;z-index:200;position:absolute!important;top:100%!important;right:0;left:auto;margin-top:.125rem;overflow:hidden;
+  padding:0;min-width:12rem;z-index:200;overflow:hidden;
 }
 .tribe-events-c-subscribe-dropdown__list{list-style:none;padding:0;margin:0}
 .tribe-events-c-subscribe-dropdown__list-item-link,
@@ -299,9 +268,7 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 .tribe-events-c-subscribe-dropdown__list-item-link:focus-visible{outline:none;box-shadow:inset 0 0 0 3px rgba(86,121,21,.4)}
 
 /* === 10. DATEPICKER === */
-.tribe-events .datepicker .day.active,.tribe-events .datepicker .month.active,.tribe-events .datepicker .year.active{
-  background:var(--g)!important;color:var(--wh)!important;font-weight:700!important;
-}
+.tribe-events .datepicker .day.active,.tribe-events .datepicker .month.active,.tribe-events .datepicker .year.active{background:var(--g)!important;color:var(--wh)!important;font-weight:700!important}
 
 /* === 11. MONTH VIEW === */
 .tribe-events-calendar-month__header-column{font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g);padding:.75rem .5rem;text-align:center;border-bottom:2px solid var(--gl)}
@@ -336,29 +303,20 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 .plgc-event-hero__image{overflow:hidden;background:var(--fl)}
 .plgc-event-hero__image img{display:block;width:100%;height:auto}
 .plgc-event-hero__details{display:flex;flex-direction:column;gap:.625rem;padding-top:.25rem}
-.plgc-event-hero .tribe-events-single-event-title,.tribe-events-single-event-title{
-  font-family:var(--fh)!important;font-size:2rem!important;font-weight:400!important;
-  line-height:1.25!important;color:var(--bk)!important;margin:0!important;padding:0!important;
-}
-.plgc-event-hero__schedule,.plgc-event-hero .tribe-events-schedule,.tribe-events-schedule{
-  font-family:var(--ff)!important;font-size:1rem!important;font-weight:600!important;
-  color:var(--g)!important;margin:0!important;padding:0!important;border:none!important;display:block!important;
-}
+.plgc-event-hero .tribe-events-single-event-title,.tribe-events-single-event-title{font-family:var(--fh)!important;font-size:2rem!important;font-weight:400!important;line-height:1.25!important;color:var(--bk)!important;margin:0!important;padding:0!important}
+.plgc-event-hero__schedule,.plgc-event-hero .tribe-events-schedule,.tribe-events-schedule{font-family:var(--ff)!important;font-size:1rem!important;font-weight:600!important;color:var(--g)!important;margin:0!important;padding:0!important;border:none!important;display:block!important}
 .tribe-events-schedule h2{display:none!important}
-/* Venue text — BLACK not grey */
 .plgc-event-hero__venue{font-family:var(--ff);font-size:.9375rem;color:var(--bk);line-height:1.4;display:flex;align-items:center;gap:.375rem}
 .plgc-event-hero__venue-svg{flex-shrink:0}
-/* Add to calendar — left aligned */
 .plgc-event-hero__actions{margin-top:.25rem;display:flex;justify-content:flex-start}
-.plgc-event-hero__details .tribe-events-single-event-description{
-  font-family:var(--ff);font-size:.9375rem;line-height:1.8;color:var(--bk);margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--bd);
-}
+.plgc-event-hero__details .tribe-events-single-event-description{font-family:var(--ff);font-size:.9375rem;line-height:1.8;color:var(--bk);margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--bd)}
 .plgc-event-hero__details .tribe-tickets{margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--bd)}
 .tribe-events-event-image{margin-bottom:1.5rem;overflow:hidden;background:var(--fl)}
 .tribe-events-event-image img{display:block;width:100%;height:auto}
 .tribe-events-content [class*="font-feature-"],.tribe-events-content [class*="a_GcMg"],.tribe-events-content [class*="cvGsUA"],.tribe-events-content [class*="direction-ltr"],.tribe-events-content [class*="para-style"]{font-family:inherit!important;font-size:inherit!important;color:inherit!important;display:inline}
-/* Hide TEC default meta */
+/* Hide TEC default meta + any auto-rendered related events inside article */
 .tribe-events-single-section.tribe-events-event-meta.primary,.tribe-events-single-section.tribe-events-event-meta.secondary{display:none!important}
+.plgc-single-event .tribe-events-related-events-title,.plgc-single-event .tribe-related-events{display:none!important}
 
 /* === 12b. VENUE/ORGANIZER/MAP GRID === */
 .plgc-meta-grid{background:var(--fl);padding:1.5rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;align-items:start}
@@ -376,63 +334,50 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 .plgc-meta-grid__map{min-width:0;overflow:hidden}
 .plgc-meta-grid__map iframe{width:100%;height:100%;min-height:12rem;border:0;display:block}
 
-/* Single event prev/next — yellow pills + OVERRIDE TEC's SVG background arrows */
+/* Single event prev/next — TEC default styling, just brand the colors */
 #tribe-events-footer{margin:1.5rem 0}
 .tribe-events-sub-nav{list-style:none;padding:0;margin:0;display:flex;justify-content:space-between;align-items:center;gap:1rem}
 .tribe-events-nav-previous a,.tribe-events-nav-next a{
-  font-family:var(--ff)!important;font-size:.875rem!important;font-weight:600!important;
-  color:var(--bk)!important;background:var(--y)!important;border:none!important;
-  border-radius:6.25rem!important;padding:.625rem 1.25rem!important;min-height:2.75rem;
-  display:inline-flex!important;align-items:center;gap:.375rem;text-decoration:none!important;transition:background .15s ease;
+  font-family:var(--ff);font-size:.875rem;font-weight:600;color:var(--bk);
+  display:inline-flex;align-items:center;gap:.375rem;min-height:44px;padding:.5rem 0;
+  text-decoration:none;transition:color .15s ease;
 }
-.tribe-events-nav-previous a:hover,.tribe-events-nav-next a:hover{background:var(--yl)!important;text-decoration:underline!important}
+.tribe-events-nav-previous a:hover,.tribe-events-nav-next a:hover{color:var(--g);text-decoration:underline}
 .tribe-events-nav-previous a:focus-visible,.tribe-events-nav-next a:focus-visible{outline:none;box-shadow:var(--focus)}
-/* Kill TEC's grey SVG background arrows on ::before and ::after */
-.tribe-events-single .tribe-events-sub-nav a::before,
-.tribe-events-single .tribe-events-sub-nav a::after,
-.tribe-events-sub-nav .tribe-events-nav-previous a::before,
-.tribe-events-sub-nav .tribe-events-nav-previous a::after,
-.tribe-events-sub-nav .tribe-events-nav-next a::before,
-.tribe-events-sub-nav .tribe-events-nav-next a::after{
-  background:none!important;background-image:none!important;content:''!important;
-  width:0!important;height:0!important;display:none!important;
-}
-.tribe-events-nav-previous a span[aria-hidden],.tribe-events-nav-next a span[aria-hidden]{color:var(--bk)!important}
 .tribe-events-meta-item:has(.tribe-events-event-categories-label){display:none!important}
 
-/* === 13. RELATED EVENTS — full width wrapper at bottom === */
+/* === 13. RELATED EVENTS — ONLY in .plgc-related-events-full wrapper === */
 .plgc-related-events-full{width:100%;max-width:72rem;margin:0 auto;padding:0 1.5rem}
-.tribe-events-related-events-title{
+.plgc-related-events-full .tribe-events-related-events-title{
   font-family:var(--fh);font-size:1.5rem;font-weight:400;color:var(--bk);
   margin:2rem 0 1rem;padding-top:1.5rem;border-top:1px solid var(--bd);line-height:1.3;
 }
-.tribe-related-events{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.tribe-related-events>li{background:var(--fl);border:1px solid var(--bd);overflow:hidden;position:relative;transition:box-shadow .2s ease;display:flex;flex-direction:column}
-.tribe-related-events>li:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--gm)}
-/* Thumbnail — kill TEC margin-bottom (the white gap) */
-.tribe-related-events-thumbnail,
-.tribe-events-single ul.tribe-related-events li .tribe-related-events-thumbnail{
+.plgc-related-events-full .tribe-related-events{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.plgc-related-events-full .tribe-related-events>li{background:var(--fl);border:1px solid var(--bd);overflow:hidden;position:relative;transition:box-shadow .2s ease;display:flex;flex-direction:column}
+.plgc-related-events-full .tribe-related-events>li:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--gm)}
+/* Thumbnail — kill TEC margin-bottom */
+.plgc-related-events-full .tribe-related-events-thumbnail,
+.plgc-related-events-full ul.tribe-related-events li .tribe-related-events-thumbnail{
   overflow:hidden!important;background:var(--fl)!important;line-height:0!important;font-size:0!important;
   margin:0!important;margin-bottom:0!important;padding:0!important;width:100%!important;
 }
-.tribe-related-events-thumbnail a{display:block;line-height:0;font-size:0}
-.tribe-related-events-thumbnail img,
-.tribe-events-single ul.tribe-related-events .tribe-related-events-thumbnail img,
-.tribe-events-single ul.tribe-related-events li .tribe-related-events-thumbnail img{
+.plgc-related-events-full .tribe-related-events-thumbnail a{display:block;line-height:0;font-size:0}
+.plgc-related-events-full .tribe-related-events-thumbnail img,
+.plgc-related-events-full ul.tribe-related-events li .tribe-related-events-thumbnail img{
   width:100%!important;height:auto!important;display:block!important;transition:transform .3s ease;
   margin:0!important;margin-bottom:0!important;padding:0!important;vertical-align:top!important;
 }
-.tribe-related-events>li:hover .tribe-related-events-thumbnail img{transform:scale(1.02)}
-.tribe-related-event-info,
-.tribe-events-single ul.tribe-related-events li .tribe-related-event-info{
+.plgc-related-events-full .tribe-related-events>li:hover .tribe-related-events-thumbnail img{transform:scale(1.02)}
+.plgc-related-events-full .tribe-related-event-info,
+.plgc-related-events-full ul.tribe-related-events li .tribe-related-event-info{
   padding:.75rem!important;background:var(--fl);flex:1;display:flex;flex-direction:column;gap:.25rem;margin:0!important;
 }
-.tribe-related-events .tribe-related-events-title{font-family:var(--ff);font-size:.875rem;font-weight:600;line-height:1.35;margin:0;border:none;padding:0;color:var(--bk)!important;text-transform:none}
-.tribe-related-events .tribe-related-events-title a{color:var(--bk)!important;text-decoration:none;border-bottom:none!important}
-.tribe-related-events .tribe-related-events-title a::after{content:'';position:absolute;inset:0;z-index:1}
-.tribe-related-events .tribe-related-events-title a:hover{color:var(--g)!important}
-.tribe-related-event-info .tribe-event-date-start,.tribe-related-event-info .tribe-event-time{font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g)}
-.tribe-related-event-info .tribe-events-calendar-series-archive__container,.tribe-related-event-info .tribe-common-c-svgicon--series{display:none!important}
+.plgc-related-events-full .tribe-related-events .tribe-related-events-title{font-family:var(--ff);font-size:.875rem;font-weight:600;line-height:1.35;margin:0;border:none;padding:0;color:var(--bk)!important;text-transform:none}
+.plgc-related-events-full .tribe-related-events .tribe-related-events-title a{color:var(--bk)!important;text-decoration:none;border-bottom:none!important}
+.plgc-related-events-full .tribe-related-events .tribe-related-events-title a::after{content:'';position:absolute;inset:0;z-index:1}
+.plgc-related-events-full .tribe-related-events .tribe-related-events-title a:hover{color:var(--g)!important}
+.plgc-related-events-full .tribe-related-event-info .tribe-event-date-start,.plgc-related-events-full .tribe-related-event-info .tribe-event-time{font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g)}
+.plgc-related-events-full .tribe-related-event-info .tribe-events-calendar-series-archive__container,.plgc-related-events-full .tribe-related-event-info .tribe-common-c-svgicon--series{display:none!important}
 
 /* === 14. EVENT TICKETS PLUS === */
 .tribe-tickets{margin-top:1rem;padding-top:1rem;border-top:2px solid var(--gl)}
@@ -457,12 +402,12 @@ button.tribe-events-c-subscribe-dropdown__button-text{
   .tribe-events .tribe-events-calendar-list,.tribe-events-calendar-list{grid-template-columns:repeat(2,1fr)!important;gap:1.25rem!important}
   .tribe-events-single-event-title{font-size:1.75rem!important}
   .plgc-event-hero{grid-template-columns:1fr 1fr;gap:1.5rem}
-  .tribe-related-events{grid-template-columns:repeat(3,1fr)!important}
+  .plgc-related-events-full .tribe-related-events{grid-template-columns:repeat(3,1fr)!important}
   .plgc-meta-grid{grid-template-columns:1fr 1fr;gap:1rem}
 }
 @media(max-width:48rem){
   .plgc-event-hero{grid-template-columns:1fr;gap:1rem}
-  .tribe-related-events{grid-template-columns:repeat(2,1fr)!important}
+  .plgc-related-events-full .tribe-related-events{grid-template-columns:repeat(2,1fr)!important}
   .plgc-meta-grid{grid-template-columns:1fr;gap:1rem}
   .plgc-related-events-full{padding:0 1rem}
 }
@@ -472,13 +417,11 @@ button.tribe-events-c-subscribe-dropdown__button-text{
   .tribe-events-single-event-title{font-size:1.375rem!important}
   .tribe-events-c-nav__prev,.tribe-events-c-nav__next{font-size:.875rem!important;padding:.625rem 1.25rem!important}
   .tribe-events-c-subscribe-dropdown__content{min-width:10rem}
-  .tribe-related-events{grid-template-columns:1fr!important}
-  .tribe-events-nav-previous a,.tribe-events-nav-next a{font-size:.8125rem!important;padding:.5rem 1rem!important}
+  .plgc-related-events-full .tribe-related-events{grid-template-columns:1fr!important}
 }
 @media(prefers-reduced-motion:reduce){
   .tribe-events-calendar-list__event,.tribe-events-calendar-list__event-featured-image,
-  .tribe-related-events>li,.tribe-related-events-thumbnail img,
+  .plgc-related-events-full .tribe-related-events>li,.plgc-related-events-full .tribe-related-events-thumbnail img,
   .tribe-events-c-nav__prev,.tribe-events-c-nav__next,.tribe-common-c-btn{transition:none!important}
 }
-.tribe-events-view.plgc-filtered .tribe-events-c-events-bar__views,
-.tribe-events-view.plgc-filtered .tribe-events-c-view-selector{display:none!important}
+.tribe-events-view.plgc-filtered .tribe-events-c-events-bar__views,.tribe-events-view.plgc-filtered .tribe-events-c-view-selector{display:none!important}
