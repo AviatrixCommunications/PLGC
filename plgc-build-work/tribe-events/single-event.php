@@ -1,16 +1,19 @@
 <?php
 /**
- * Single Event Template — PLGC Custom Override v4
+ * Single Event Template — PLGC Custom Override v5
  *
  * Layout:
  *   1. Back link
  *   2. Two-column hero: image left, details + description right
- *   3. Venue / Organizer / Map (3-col grid)
- *   4. Related events (full-width row at bottom with flyer images)
- *   5. Prev/Next event navigation
+ *   3. Venue / Organizer / Map (3-col grid, full width)
+ *   4. Related events (full-width row, below everything)
+ *   5. Prev/Next event navigation (TEC default styling)
+ *
+ * Related events are removed from TEC's hook in events-config.php
+ * and rendered explicitly here in a full-width wrapper.
  *
  * @package PLGC
- * @since   1.7.8
+ * @since   1.7.9
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,7 +69,7 @@ $event_id     = get_the_ID();
 						</div>
 					<?php endif; ?>
 
-					<!-- Add to calendar — left aligned under venue -->
+					<!-- Add to calendar — left aligned -->
 					<div class="plgc-event-hero__actions"></div>
 
 					<?php do_action( 'tribe_events_single_event_after_the_meta' ); ?>
@@ -88,13 +91,15 @@ $event_id     = get_the_ID();
 				</div>
 			</div>
 
-			<!-- Venue / Organizer / Map — full width -->
-			<?php do_action( 'tribe_events_single_event_before_the_content' ); ?>
+			<?php
+			// Fire the hook but related events have been removed from it
+			// (see events-config.php section 15)
+			do_action( 'tribe_events_single_event_before_the_content' );
+			?>
 
+			<!-- Venue / Organizer / Map -->
 			<?php if ( tribe_has_venue() ) : ?>
 				<div class="plgc-meta-grid">
-
-					<!-- Venue -->
 					<div class="plgc-meta-grid__venue">
 						<h3 class="plgc-meta-grid__title">Venue</h3>
 						<?php
@@ -109,19 +114,15 @@ $event_id     = get_the_ID();
 								<span><?php echo esc_html( $venue_address ); ?></span><br>
 							<?php endif; ?>
 							<?php if ( $venue_city || $venue_state || $venue_zip ) : ?>
-								<span>
-									<?php
+								<span><?php
 									$parts = array_filter( [ $venue_city, $venue_state ] );
 									echo esc_html( implode( ', ', $parts ) );
 									if ( $venue_zip ) echo ' ' . esc_html( $venue_zip );
-									?>
-								</span>
+								?></span>
 							<?php endif; ?>
 						</address>
 						<?php if ( tribe_show_google_map_link( $event_id ) ) : ?>
-							<a href="<?php echo esc_url( tribe_get_map_link( $event_id ) ); ?>" class="plgc-meta-grid__map-link" target="_blank" rel="noopener noreferrer">
-								+ Google Map <span class="screen-reader-text">(opens in new tab)</span>
-							</a>
+							<a href="<?php echo esc_url( tribe_get_map_link( $event_id ) ); ?>" class="plgc-meta-grid__map-link" target="_blank" rel="noopener noreferrer">+ Google Map <span class="screen-reader-text">(opens in new tab)</span></a>
 						<?php endif; ?>
 						<?php if ( $venue_phone ) : ?>
 							<div class="plgc-meta-grid__field">
@@ -130,41 +131,36 @@ $event_id     = get_the_ID();
 							</div>
 						<?php endif; ?>
 					</div>
-
-					<!-- Organizer -->
 					<?php if ( tribe_has_organizer() ) : ?>
 						<div class="plgc-meta-grid__organizer">
 							<h3 class="plgc-meta-grid__title">Organizer</h3>
 							<?php
-							$organizer_name  = tribe_get_organizer();
-							$organizer_phone = tribe_get_organizer_phone();
-							$organizer_email = tribe_get_organizer_email();
+							$org_name  = tribe_get_organizer();
+							$org_phone = tribe_get_organizer_phone();
+							$org_email = tribe_get_organizer_email();
 							?>
-							<?php if ( $organizer_name ) : ?>
-								<span class="plgc-meta-grid__org-name"><?php echo esc_html( $organizer_name ); ?></span>
+							<?php if ( $org_name ) : ?>
+								<span class="plgc-meta-grid__org-name"><?php echo esc_html( $org_name ); ?></span>
 							<?php endif; ?>
-							<?php if ( $organizer_phone ) : ?>
+							<?php if ( $org_phone ) : ?>
 								<div class="plgc-meta-grid__field">
 									<strong>Phone</strong><br>
-									<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $organizer_phone ) ); ?>"><?php echo esc_html( $organizer_phone ); ?></a>
+									<a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $org_phone ) ); ?>"><?php echo esc_html( $org_phone ); ?></a>
 								</div>
 							<?php endif; ?>
-							<?php if ( $organizer_email ) : ?>
+							<?php if ( $org_email ) : ?>
 								<div class="plgc-meta-grid__field">
 									<strong>Email</strong><br>
-									<a href="mailto:<?php echo esc_attr( $organizer_email ); ?>"><?php echo esc_html( $organizer_email ); ?></a>
+									<a href="mailto:<?php echo esc_attr( $org_email ); ?>"><?php echo esc_html( $org_email ); ?></a>
 								</div>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
-
-					<!-- Map -->
 					<?php if ( tribe_embed_google_map( $event_id ) ) : ?>
 						<div class="plgc-meta-grid__map">
 							<?php echo tribe_get_embedded_map( $event_id ); ?>
 						</div>
 					<?php endif; ?>
-
 				</div>
 			<?php endif; ?>
 
@@ -172,12 +168,12 @@ $event_id     = get_the_ID();
 
 		</article>
 
-		<!-- Related events — FULL WIDTH at bottom, below venue/organizer -->
+		<!-- Related events — FULL WIDTH, at bottom, below everything -->
 		<div class="plgc-related-events-full">
 			<?php tribe_get_template_part( 'modules/related-events' ); ?>
 		</div>
 
-		<!-- Event navigation -->
+		<!-- Event navigation — use TEC default styling -->
 		<div id="tribe-events-footer">
 			<nav class="tribe-events-cal-links" aria-label="Event navigation">
 				<ul class="tribe-events-sub-nav">
