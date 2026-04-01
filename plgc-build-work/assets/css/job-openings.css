@@ -17,7 +17,7 @@
  *   SC 2.1.1  — all interactive elements keyboard accessible ✅
  *
  * @package PLGC
- * @since   1.7.18
+ * @since   1.7.23
  */
 
 /* ============================================================
@@ -42,8 +42,15 @@ main.awsm_job_openings {
     padding: 0 1.5rem;
 }
 
-/* Back to all jobs link */
-.plgc-job-back-link {
+/* Plugin native "Back to listings" link
+   Rendered at bottom in: .awsm-jobs-pro-listings-link-container a */
+.awsm-jobs-pro-listings-link-container {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--plgc-medium-grey, #E7E4E4);
+}
+
+.awsm-jobs-pro-listings-link-container a.awsm-jobs-pro-listings-link {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
@@ -52,68 +59,70 @@ main.awsm_job_openings {
     font-weight: 600;
     color: var(--plgc-dark-green, #567915);
     text-decoration: underline;
-    margin-bottom: 1rem;
     transition: color var(--plgc-transition-fast, 150ms ease-in-out);
-    /* Ensure it sits on its own line even inside the_content flow */
-    width: fit-content;
-    clear: both;
 }
 
-/* Force a line break after the back link since it's injected
-   inside the_content before the H1 */
-.plgc-job-back-link + .awsm-job-page-title {
-    clear: both;
-}
-
-.plgc-job-back-link:hover {
+.awsm-jobs-pro-listings-link-container a.awsm-jobs-pro-listings-link:hover {
     color: var(--plgc-black, #000000);
 }
 
-.plgc-job-back-link:focus-visible {
+.awsm-jobs-pro-listings-link-container a.awsm-jobs-pro-listings-link:focus-visible {
     outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
     outline-offset: var(--plgc-focus-offset, 0.125rem);
 }
 
 /* Page title (H1) — injected via the_content filter in functions.php */
-.awsm-job-page-title,
-.single-awsm_job_openings .entry-title,
-.single_awsm_job_openings .entry-title,
-.single-awsm_job_openings .awsm-job-post-title,
-.single_awsm_job_openings .awsm-job-post-title {
+.awsm-job-page-title {
     font-family: var(--plgc-font-heading, 'Libre Baskerville', serif);
     font-size: 2.25rem;
     font-weight: 700;
     line-height: 1.333;
     color: var(--plgc-black, #000000);
-    margin: 0 0 1rem;
+    margin: 0 0 1.25rem;
+    padding-bottom: 1rem;
     display: block !important;
+    position: relative;
 }
 
-/* Injected specs bar — sits between H1 and content */
-.plgc-job-specs-bar {
+/* Yellow accent bar under H1 — matches Elementor page title treatment */
+.awsm-job-page-title::after {
+    content: '';
+    display: block;
+    width: 8rem;
+    height: 3px;
+    background: var(--plgc-yellow, #FFAE40);
+    margin-top: 0.75rem;
+    border-radius: 2px;
+}
+
+/* Plugin native specs bar — above content
+   .awsm-job-specifications-container.awsm_job_spec_above_content */
+.awsm-job-specifications-container.awsm_job_spec_above_content {
+    margin-bottom: 1.5rem;
+}
+
+.awsm-job-specifications-container .awsm-job-specification-wrapper {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem 1.5rem;
     padding: 0.75rem 0;
-    margin: 0 0 1.5rem;
     border-top: 1px solid var(--plgc-medium-grey, #E7E4E4);
     border-bottom: 1px solid var(--plgc-medium-grey, #E7E4E4);
 }
 
-.plgc-job-spec-item {
+.awsm-job-specification-item {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--plgc-black, #000000);
 }
 
-.plgc-job-spec-item strong {
+.awsm-job-specification-item .awsm-job-specification-label strong {
     font-weight: 700;
 }
 
-/* Hide the plugin's native specs container at the bottom of content */
-.awsm-job-specifications-container.awsm_job_spec_below_content {
-    display: none !important;
+.awsm-job-specification-item .awsm-job-specification-term {
+    font-weight: 400;
 }
 
 /* Job content area — body copy */
@@ -180,8 +189,7 @@ main.awsm_job_openings {
 
 /* ============================================================
    2. JOB SPECIFICATIONS
-   Native plugin specs (.awsm-job-specifications-container) are hidden.
-   Our custom .plgc-job-specs-bar is styled above in section 1.
+   Styled above in section 1 — native plugin markup is used.
    ============================================================ */
 
 /* ============================================================
@@ -644,88 +652,182 @@ main.awsm_job_openings {
 
 /* ============================================================
    4. JOB LISTINGS PAGE (archive / shortcode output)
+
+   Actual markup structure:
+   .awsm-job-listing-item.awsm-list-item
+     └─ .awsm-job-item
+         ├─ .awsm-list-left-col
+         │   └─ h2.awsm-job-post-title > a
+         └─ .awsm-list-right-col
+             ├─ .awsm-job-specification-wrapper
+             │   └─ .awsm-job-specification-item
+             │       ├─ i.awsm-job-icon-*
+             │       └─ span.awsm-job-specification-term
+             └─ .awsm-job-more-container
+                 └─ a.awsm-job-more
    ============================================================ */
 
 /* Listing wrapper */
-.awsm-job-listings,
-.awsm-jobs-listing-wrapper {
+.awsm-job-wrap,
+.awsm-job-listings.awsm-lists {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
 }
 
-/* Individual job listing card */
-.awsm-job-listing-item,
-.awsm-job-listing .awsm-list-item,
-.awsm-job-listing .awsm-grid-item {
-    background: var(--plgc-white, #FFFFFF);
-    border: 1px solid var(--plgc-medium-grey, #E7E4E4);
-    border-radius: 0.5rem;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 0.75rem;
+/* Listing container — inherits page width from Elementor */
+.awsm-job-wrap {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+}
+
+/* Individual job listing card — compact rows */
+.awsm-job-listings .awsm-job-listing-item.awsm-list-item {
+    background: var(--plgc-white, #FFFFFF) !important;
+    border: 1px solid var(--plgc-medium-grey, #E7E4E4) !important;
+    border-radius: 0.375rem !important;
+    padding: 0 !important;
+    margin-bottom: 0.5rem !important;
+    overflow: hidden;
     transition: border-color var(--plgc-transition-fast, 150ms ease-in-out),
                 box-shadow var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
-.awsm-job-listing-item:hover,
-.awsm-job-listing .awsm-list-item:hover,
-.awsm-job-listing .awsm-grid-item:hover {
-    border-color: var(--plgc-dark-green, #567915);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.awsm-job-listings .awsm-job-listing-item.awsm-list-item:hover {
+    border-color: var(--plgc-dark-green, #567915) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Job title link in listings — SC 1.4.1 underline for link identification */
-.awsm-job-listing-item .awsm-job-post-title a,
-.awsm-job-listing .awsm-list-item a.awsm-job-post-title,
-.awsm-job-listing a.awsm-job-post-title {
-    font-family: var(--plgc-font-heading, 'Libre Baskerville', serif);
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--plgc-black, #000000);
-    text-decoration: underline;
-    text-underline-offset: 0.1875rem;
-    transition: color var(--plgc-transition-fast, 150ms ease-in-out);
+/* Inner wrapper — this is where the actual layout lives */
+.awsm-job-listings .awsm-list-item .awsm-job-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.875rem 1.25rem !important;
+    gap: 1rem !important;
+    border: none !important;
+    border-bottom: none !important;
 }
 
-.awsm-job-listing-item .awsm-job-post-title a:hover,
-.awsm-job-listing .awsm-list-item a.awsm-job-post-title:hover,
-.awsm-job-listing a.awsm-job-post-title:hover {
-    color: var(--plgc-dark-green, #567915);
+/* Remove any inner dividers — borders, hrs, pseudo-elements */
+.awsm-job-listings .awsm-list-item .awsm-job-item::after,
+.awsm-job-listings .awsm-list-item .awsm-job-item::before,
+.awsm-job-listings .awsm-list-item::after,
+.awsm-job-listings .awsm-list-item::before {
+    display: none !important;
 }
 
-.awsm-job-listing-item .awsm-job-post-title a:focus-visible,
-.awsm-job-listing .awsm-list-item a.awsm-job-post-title:focus-visible,
-.awsm-job-listing a.awsm-job-post-title:focus-visible {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
+/* Left column — title takes up available space */
+.awsm-job-listings .awsm-list-item .awsm-list-left-col {
+    flex: 1 1 auto;
+    min-width: 0; /* allow text truncation */
 }
 
-/* Spec badges in listing cards */
-.awsm-job-listing-item .awsm-job-specification-value,
-.awsm-job-listing .awsm-list-item .awsm-job-specification-value {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 0.875rem;
-    color: #374151; /* 8.6:1 on white ✅ */
+/* Right column — specs + CTA button */
+.awsm-job-listings .awsm-list-item .awsm-list-right-col {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex-shrink: 0;
 }
 
-/* "More info" / "View Details" links in listings */
-.awsm-job-listing-item .awsm-jobs-more a,
-.awsm-job-listing .awsm-list-item .awsm-jobs-more a {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--plgc-dark-green, #567915);
-    text-decoration: underline;
-    transition: color var(--plgc-transition-fast, 150ms ease-in-out);
+/* Job title link */
+.awsm-job-listings .awsm-list-item h2.awsm-job-post-title {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.awsm-job-listing-item .awsm-jobs-more a:hover,
-.awsm-job-listing .awsm-list-item .awsm-jobs-more a:hover {
-    color: var(--plgc-black, #000000);
+.awsm-job-listings .awsm-list-item h2.awsm-job-post-title a {
+    font-family: var(--plgc-font-heading, 'Libre Baskerville', serif) !important;
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    color: var(--plgc-black, #000000) !important;
+    text-decoration: underline !important;
+    text-decoration-color: var(--plgc-yellow, #FFAE40) !important;
+    text-underline-offset: 0.1875rem !important;
+    text-decoration-thickness: 2px !important;
+    transition: color var(--plgc-transition-fast, 150ms ease-in-out),
+                text-decoration-color var(--plgc-transition-fast, 150ms ease-in-out);
 }
 
-.awsm-job-listing-item .awsm-jobs-more a:focus-visible,
-.awsm-job-listing .awsm-list-item .awsm-jobs-more a:focus-visible {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
+.awsm-job-listings .awsm-list-item h2.awsm-job-post-title a:hover {
+    color: var(--plgc-dark-green, #567915) !important;
+    text-decoration-color: var(--plgc-dark-green, #567915) !important;
+}
+
+.awsm-job-listings .awsm-list-item h2.awsm-job-post-title a:focus-visible {
+    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915) !important;
+    outline-offset: var(--plgc-focus-offset, 0.125rem) !important;
+}
+
+/* Spec value as pill badge — black text on light green for WCAG SC 1.4.3
+   #000000 on #E5F0D0 = 15.5:1 ✅ */
+.awsm-job-listings .awsm-list-item .awsm-job-specification-term {
+    display: inline-block !important;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+    padding: 0.1875rem 0.625rem !important;
+    border-radius: 6.25rem !important;
+    background: var(--plgc-very-light-green, #E5F0D0) !important;
+    color: var(--plgc-black, #000000) !important;
+    white-space: nowrap !important;
+}
+
+/* Spec icon — keep visible, tint green */
+.awsm-job-listings .awsm-list-item .awsm-job-specification-item i {
+    color: var(--plgc-dark-green, #567915) !important;
+    font-size: 0.875rem !important;
+    margin-right: 0.25rem !important;
+}
+
+/* Hide the "Job Category:" label text — just show the pill */
+.awsm-job-listings .awsm-list-item .awsm-job-specification-label {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* "View & Apply →" — yellow pill button
+   Actual class: a.awsm-job-more (no 's') */
+.awsm-job-listings .awsm-list-item a.awsm-job-more,
+.awsm-job-more-container a.awsm-job-more {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    color: var(--plgc-black, #000000) !important;
+    background: var(--plgc-yellow, #FFAE40) !important;
+    text-decoration: none !important;
+    padding: 0.375rem 1rem !important;
+    border-radius: 6.25rem !important;
+    white-space: nowrap !important;
+    min-height: 2.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    transition: background-color var(--plgc-transition-fast, 150ms ease-in-out);
+}
+
+.awsm-job-listings .awsm-list-item a.awsm-job-more:hover,
+.awsm-job-more-container a.awsm-job-more:hover {
+    background: var(--plgc-light-yellow, #FDBC69) !important;
+    text-decoration: underline !important;
+}
+
+.awsm-job-listings .awsm-list-item a.awsm-job-more:focus-visible,
+.awsm-job-more-container a.awsm-job-more:focus-visible {
+    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915) !important;
+    outline-offset: var(--plgc-focus-offset, 0.125rem) !important;
+    background: var(--plgc-light-yellow, #FDBC69) !important;
+}
+
+/* Hide the arrow span inside View & Apply if empty */
+.awsm-job-listings .awsm-list-item a.awsm-job-more span:empty {
+    display: none !important;
 }
 
 /* "No job openings" message */
@@ -739,31 +841,60 @@ main.awsm_job_openings {
 }
 
 /* ============================================================
-   5. FILTERS (search + dropdowns on listing page)
+   5. FILTERS (listing page — .awsm-filter-wrap)
    ============================================================ */
 
-.awsm-jobs-filter-wrapper {
-    margin-bottom: 1.5rem;
+.awsm-filter-wrap {
+    margin-bottom: 1.5rem !important;
 }
 
-.awsm-jobs-filter-wrapper select,
-.awsm-jobs-filter-wrapper .awsm-job-form-control,
-.awsm-filter-item-search .awsm-job-form-control {
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 1rem;
-    color: var(--plgc-black, #000000);
-    background: var(--plgc-white, #FFFFFF);
-    border: 1px solid var(--plgc-medium-green-tone, #2D5032);
-    border-radius: 0.25rem;
-    padding: 0.625rem 0.75rem;
-    min-height: 2.875rem;
+/* Filter items row — tighter layout */
+.awsm-filter-wrap .awsm-filter-items {
+    display: flex !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
 }
 
-.awsm-jobs-filter-wrapper select:focus,
-.awsm-jobs-filter-wrapper .awsm-job-form-control:focus {
-    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
-    outline-offset: var(--plgc-focus-offset, 0.125rem);
-    border-color: var(--plgc-dark-green, #567915);
+/* Selectric filter dropdowns — compact trigger */
+.awsm-filter-wrap .awsm-selectric-wrapper {
+    max-width: 16rem !important;
+}
+
+.awsm-filter-wrap .awsm-selectric {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.875rem !important;
+    color: var(--plgc-black, #000000) !important;
+    background: var(--plgc-white, #FFFFFF) !important;
+    border: 1px solid var(--plgc-medium-green-tone, #2D5032) !important;
+    border-radius: 0.25rem !important;
+    padding: 0.25rem 2rem 0.25rem 0.625rem !important;
+    min-height: 2.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.awsm-filter-wrap .awsm-selectric:hover {
+    border-color: var(--plgc-dark-green, #567915) !important;
+}
+
+.awsm-filter-wrap .awsm-selectric-items li {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+    min-height: 2.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.awsm-filter-wrap .awsm-selectric-items li:hover,
+.awsm-filter-wrap .awsm-selectric-items li.highlighted {
+    background: var(--plgc-very-light-green, #E5F0D0) !important;
+}
+
+.awsm-filter-wrap .awsm-selectric-items li.selected {
+    background: var(--plgc-very-light-green, #E5F0D0) !important;
+    font-weight: 600 !important;
 }
 
 /* ============================================================
@@ -771,13 +902,14 @@ main.awsm_job_openings {
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-    .awsm-job-listing-item,
+    .awsm-job-listings .awsm-job-listing-item,
     .awsm-job-form-inner input,
     .awsm-job-form-inner select,
     .awsm-job-form-inner textarea,
     #awsm-application-submit-btn,
     .awsm-application-form .awsm-job-form-options-container > span,
-    .awsm-job-entry-content a {
+    .awsm-job-entry-content a,
+    .awsm-job-listings .awsm-list-item a.awsm-job-more {
         transition: none !important;
     }
 }
@@ -858,21 +990,25 @@ main.awsm_job_openings {
         width: 100% !important;
     }
 
-    .plgc-job-specs-bar {
+    .awsm-job-specifications-container .awsm-job-specification-wrapper {
         flex-direction: column;
         gap: 0.375rem;
     }
 
-    /* Listing cards — tighter padding */
-    .awsm-job-listing-item,
-    .awsm-job-listing .awsm-list-item,
-    .awsm-job-listing .awsm-grid-item {
-        padding: 1rem;
+    /* Listing cards — stack on mobile */
+    .awsm-job-listings .awsm-list-item .awsm-job-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
     }
 
-    .awsm-job-listing-item .awsm-job-post-title a,
-    .awsm-job-listing a.awsm-job-post-title {
-        font-size: 1.125rem;
+    .awsm-job-listings .awsm-list-item .awsm-list-right-col {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+
+    .awsm-job-listings .awsm-list-item h2.awsm-job-post-title a {
+        font-size: 1rem !important;
     }
 
     /* Prevent form inputs from overflowing on small screens */
@@ -892,7 +1028,7 @@ main.awsm_job_openings {
     }
 
     /* Back link */
-    .plgc-job-back-link {
+    .awsm-jobs-pro-listings-link-container a {
         font-size: 0.875rem;
     }
 }
