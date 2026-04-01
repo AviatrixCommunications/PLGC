@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.13');
+define('PLGC_VERSION', '1.7.18');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -424,3 +424,79 @@ add_action( 'wp_enqueue_scripts', function () {
         PLGC_VERSION
     );
 }, 20 );
+
+/**
+ * WP Job Openings — Brand Stylesheet
+ *
+ * Loaded at priority 20 so it enqueues after the plugin's own stylesheets,
+ * ensuring our overrides win without needing excessive !important usage.
+ * Gated on the plugin's post type being registered so it doesn't load
+ * when the plugin is deactivated.
+ */
+add_action( 'wp_enqueue_scripts', function () {
+    if ( ! post_type_exists( 'awsm_job_openings' ) ) {
+        return;
+    }
+
+    wp_enqueue_style(
+        'plgc-job-openings',
+        PLGC_URI . '/assets/css/job-openings.css',
+        [ 'plgc-theme' ],
+        PLGC_VERSION
+    );
+}, 20 );
+
+/**
+ * WP Job Openings — Inject H1 Title + Specs Bar on Single Job Pages
+ *
+ * Hello Elementor's single template doesn't output the_title() for
+ * custom post types. The plugin renders job specs AFTER the content,
+ * but visually it's better to show them right under the title.
+ *
+ * This prepends: H1 → Specs Bar → (original content)
+ * The native specs container at the bottom is hidden via CSS.
+ */
+add_filter( 'the_content', function ( $content ) {
+    if ( ! is_singular( 'awsm_job_openings' ) || ! in_the_loop() || ! is_main_query() ) {
+        return $content;
+    }
+
+    $post_id = get_the_ID();
+    $title   = get_the_title();
+    $output  = '';
+
+    // Back to all jobs link
+    $jobs_url = home_url( '/employment-opportunities/' );
+    $output .= '<a href="' . esc_url( $jobs_url ) . '" class="plgc-job-back-link">';
+    $output .= '&larr; All Open Positions';
+    $output .= '</a>';
+
+    // H1 title
+    if ( ! empty( $title ) ) {
+        $output .= '<h1 class="awsm-job-page-title">' . esc_html( $title ) . '</h1>';
+    }
+
+    // Build specs bar from the job's registered taxonomies
+    $taxonomies = get_object_taxonomies( 'awsm_job_openings', 'objects' );
+    if ( ! empty( $taxonomies ) ) {
+        $spec_items = '';
+        foreach ( $taxonomies as $tax_slug => $tax_obj ) {
+            $terms = get_the_terms( $post_id, $tax_slug );
+            if ( is_wp_error( $terms ) || empty( $terms ) ) {
+                continue;
+            }
+            $term_names = wp_list_pluck( $terms, 'name' );
+            $spec_items .= '<span class="plgc-job-spec-item">';
+            $spec_items .= '<strong>' . esc_html( $tax_obj->label ) . ':</strong> ';
+            $spec_items .= esc_html( implode( ', ', $term_names ) );
+            $spec_items .= '</span>';
+        }
+        if ( ! empty( $spec_items ) ) {
+            $output .= '<div class="plgc-job-specs-bar" role="list" aria-label="' . esc_attr__( 'Job specifications', 'plgc' ) . '">';
+            $output .= $spec_items;
+            $output .= '</div>';
+        }
+    }
+
+    return $output . $content;
+}, 5 );
