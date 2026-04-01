@@ -1,7 +1,12 @@
 /**
- * PLGC Gallery Widgets — JS v1.6.15
+ * PLGC Gallery Widgets — JS v1.6.16
  *
- * Root-cause fix: setPointerCapture() was the source of every click/lightbox
+ * v1.6.16 fix: swipe was never attached to Content Slideshow because
+ * slider.querySelector('.plgc-content-slideshow__img-col') returned null —
+ * the slider element IS the img-col (data-plgc-cs-slider lives on that div).
+ * Fix: attach addSwipe() directly to the slider element.
+ *
+ * Root-cause fix (v1.6.15): setPointerCapture() was the source of every click/lightbox
  * failure. When a swipe handler called setPointerCapture() on pointerdown,
  * all subsequent pointer events were re-targeted to the capturing element.
  * Browsers then couldn't match a clean mousedown+mouseup pair on the same
@@ -25,7 +30,7 @@
  *   focus trap + Escape in lightbox
  *
  * @package PLGC
- * @since   1.6.15
+ * @since   1.6.16
  */
 
 ( function () {
@@ -317,11 +322,10 @@
                 if ( e.key === 'ArrowRight' ) { goTo( current + 1, true ); e.preventDefault(); }
             } );
 
-            /* ── Swipe — attached to the image column, not the whole slider ── */
-            var imgCol = slider.querySelector( '.plgc-content-slideshow__img-col' );
-            if ( imgCol ) {
-                addSwipe( imgCol, function ( dir ) { goTo( current + dir, true ); } );
-            }
+            /* ── Swipe — slider IS the .plgc-content-slideshow__img-col
+                  (data-plgc-cs-slider is on the img-col div in PHP),
+                  so we attach directly to it rather than searching for a child. ── */
+            addSwipe( slider, function ( dir ) { goTo( current + dir, true ); } );
 
             /* ── Start ────────────────────────────────────────────────── */
             if ( autoRotate ) { startTimer(); animateProgress(); }

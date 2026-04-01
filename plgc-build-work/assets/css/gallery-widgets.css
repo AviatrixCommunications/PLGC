@@ -193,6 +193,9 @@
     background: #E7E4E4;
     cursor: grab;
     user-select: none;
+    /* Allow native vertical scroll, capture horizontal for swipe detection.
+       Without this, some mobile browsers eat the horizontal pointer events. */
+    touch-action: pan-y;
 }
 .plgc-content-slideshow__img-col:active { cursor: grabbing; }
 /* When lightbox is enabled, the lb-trigger button handles its own cursor */

@@ -449,11 +449,11 @@ function plgc_gs_shortcode( array $atts ): string {
 
 		<?php /* Badge — linked to same URL as CTA (tabindex=-1/aria-hidden so the
 		   link isn't a duplicate keyboard stop; the CTA button is the real stop) */ ?>
-		<?php if ( ! empty( $badge ) ) : ?>
+		<?php if ( ! empty( $badge ) && ! empty( $badge['url'] ) ) : ?>
 		<a
 			href="<?php echo esc_url( $btn_url ); ?>"
 			class="plgc-gs__badge-link"
-			aria-label="<?php echo esc_attr( "McChesney&#8217;s Pub &amp; Grill &#8212; View Our Specials" ); ?>"
+			aria-label="<?php echo esc_attr( wp_strip_all_tags( html_entity_decode( $heading, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) ); ?>"
 			tabindex="-1"
 			aria-hidden="true"
 		>

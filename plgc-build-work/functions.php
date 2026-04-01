@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.25');
+define('PLGC_VERSION', '1.7.27');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -248,6 +248,9 @@ require_once PLGC_DIR . '/inc/events-config.php';
 
 // [plgc_social_icons] shortcode — used in Section 2 and anywhere else needed
 require_once PLGC_DIR . '/inc/social-icons-shortcode.php';
+
+// Restaurant Menu CPT — [plgc_menu] shortcode, CSV importer, Schema.org
+require_once PLGC_DIR . '/inc/menu-cpt.php';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CUSTOM ELEMENTOR GALLERY WIDGETS
