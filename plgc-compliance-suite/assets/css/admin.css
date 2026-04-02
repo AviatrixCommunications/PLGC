@@ -1,0 +1,58 @@
+/**
+ * Aviatrix Compliance Suite - Admin Styles
+ */
+
+/* Settings page sections */
+.plgc-docmgr-section {
+    margin-top: 20px;
+}
+
+/* Categories table */
+.plgc-categories-table input {
+    width: 100%;
+}
+
+.plgc-categories-table .plgc-remove-category {
+    color: #d63638;
+    border-color: #d63638;
+}
+
+.plgc-categories-table .plgc-remove-category:hover {
+    background: #d63638;
+    color: #fff;
+}
+
+.plgc-category-row td {
+    vertical-align: middle;
+}
+
+/* Media library custom columns */
+.column-plgc_a11y {
+    width: 40px;
+    text-align: center;
+}
+
+.column-plgc_lifecycle {
+    width: 100px;
+}
+
+.column-plgc_retention {
+    width: 110px;
+}
+
+.column-plgc_category {
+    width: 120px;
+}
+
+.column-plgc_exception {
+    width: 110px;
+}
+
+/* Clarity scan status in attachment details */
+.plgc-clarity-status {
+    padding: 8px 0;
+}
+
+.plgc-clarity-status .button {
+    margin: 2px 4px 2px 0;
+}
