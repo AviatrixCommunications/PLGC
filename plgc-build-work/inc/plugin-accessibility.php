@@ -161,21 +161,18 @@ if ( class_exists( 'WooCommerce' ) ) {
         }
 
         $product_name = $cart_item['data']->get_name();
-        $new_label    = sprintf(
+        $new_label    = esc_attr( sprintf(
             /* translators: %s: product name */
-            esc_attr__( 'Remove %s from cart', 'plgc' ),
+            __( 'Remove %s from cart', 'plgc' ),
             $product_name
-        );
+        ) );
 
-        // Replace existing aria-label (WooCommerce sets "Remove this item")
-        if ( preg_match( '/aria-label="[^"]*"/', $link ) ) {
-            $link = preg_replace(
-                '/aria-label="[^"]*"/',
-                'aria-label="' . $new_label . '"',
-                $link
-            );
+        // Find existing aria-label and swap it via str_replace (not preg_replace,
+        // which treats $N in the replacement as backreferences — product names
+        // like "Gift Card - $200" would get mangled).
+        if ( preg_match( '/aria-label="[^"]*"/', $link, $match ) ) {
+            $link = str_replace( $match[0], 'aria-label="' . $new_label . '"', $link );
         } else {
-            // No aria-label present — add one
             $link = str_replace( '<a ', '<a aria-label="' . $new_label . '" ', $link );
         }
 
