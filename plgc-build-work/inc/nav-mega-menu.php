@@ -183,20 +183,46 @@ function plgc_render_primary_nav() {
 
         if ($has_children) {
             // ── Mega Panel Trigger ──────────────────────────────────────
-            $panel_id = 'plgc-mega-' . $item->ID;
-            echo '<button class="plgc-nav__trigger"'
-                . ' aria-expanded="false"'
-                . ' aria-haspopup="true"'
-                . ' aria-controls="' . esc_attr($panel_id) . '"'
-                . ($is_current ? ' aria-current="page"' : '')
-                . '>';
-            echo esc_html($item->title);
-            echo '<svg class="plgc-nav__chevron" aria-hidden="true" focusable="false"'
+            $panel_id  = 'plgc-mega-' . $item->ID;
+            $is_hash   = (empty($item->url) || $item->url === '#');
+
+            $chevron = '<svg class="plgc-nav__chevron" aria-hidden="true" focusable="false"'
                 . ' width="12" height="12" viewBox="0 0 12 12" fill="none">'
                 . '<path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8"'
                 . ' stroke-linecap="round" stroke-linejoin="round"/>'
                 . '</svg>';
-            echo '</button>';
+
+            if ($is_hash) {
+                // No page link — single button for label + chevron (Golf, Weddings & Events)
+                echo '<button class="plgc-nav__trigger"'
+                    . ' aria-expanded="false"'
+                    . ' aria-haspopup="true"'
+                    . ' aria-controls="' . esc_attr($panel_id) . '"'
+                    . ($is_ancestor ? ' aria-current="true"' : '')
+                    . '>';
+                echo esc_html($item->title);
+                echo $chevron;
+                echo '</button>';
+            } else {
+                // Real page link — split: <a> navigates, <button> toggles panel
+                // (Contact Us, McChesney's Pub & Grill)
+                echo '<div class="plgc-nav__split">';
+                echo '<a class="plgc-nav__link plgc-nav__link--parent"'
+                    . ' href="' . esc_url($item->url) . '"'
+                    . ($is_current ? ' aria-current="page"' : '')
+                    . '>';
+                echo esc_html($item->title);
+                echo '</a>';
+                echo '<button class="plgc-nav__trigger plgc-nav__trigger--chevron"'
+                    . ' aria-expanded="false"'
+                    . ' aria-haspopup="true"'
+                    . ' aria-controls="' . esc_attr($panel_id) . '"'
+                    . ' aria-label="' . esc_attr(sprintf('Show %s submenu', $item->title)) . '"'
+                    . '>';
+                echo $chevron;
+                echo '</button>';
+                echo '</div>';
+            }
 
             plgc_render_mega_panel($item, $panel_id);
 

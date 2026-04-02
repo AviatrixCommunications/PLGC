@@ -19,9 +19,19 @@
     const header   = document.querySelector('.plgc-header');
     const triggers = header ? Array.from(header.querySelectorAll('.plgc-nav__trigger')) : [];
 
+    // Items that have mega panels (li.plgc-nav__item--has-mega)
+    const megaItems = header ? Array.from(header.querySelectorAll('.plgc-nav__item--has-mega')) : [];
+
     function getPanelForTrigger(trigger) {
         const id = trigger.getAttribute('aria-controls');
         return id ? document.getElementById(id) : null;
+    }
+
+    /**
+     * For a mega <li>, find the trigger <button> inside it.
+     */
+    function getTriggerForItem(li) {
+        return li.querySelector('.plgc-nav__trigger');
     }
 
     // ── State: track which trigger (if any) was explicitly clicked open
@@ -51,9 +61,12 @@
         return trigger.getAttribute('aria-expanded') === 'true';
     }
 
-    // Hover: open only if no panel is locked
-    triggers.forEach(trigger => trigger.addEventListener('mouseenter', () => {
-        if (lockedTrigger && lockedTrigger !== trigger) return; // don't switch when something is locked
+    // Hover: open on mouseenter of the parent <li>, not just the button.
+    // This way hovering the link text in a split trigger also reveals the panel.
+    megaItems.forEach(li => li.addEventListener('mouseenter', () => {
+        const trigger = getTriggerForItem(li);
+        if (!trigger) return;
+        if (lockedTrigger && lockedTrigger !== trigger) return;
         openMega(trigger);
     }));
 
@@ -62,16 +75,14 @@
         if (!lockedTrigger) closeAll();
     });
 
-    // Click: toggle lock state
+    // Click: toggle lock state (on the <button> trigger only)
     triggers.forEach(trigger => {
         trigger.addEventListener('click', e => {
             e.stopPropagation();
             if (isOpen(trigger) && lockedTrigger === trigger) {
-                // Already locked open — click again closes it
                 lockedTrigger = null;
                 closeMega(trigger);
             } else {
-                // Open and lock
                 openMega(trigger);
                 lockedTrigger = trigger;
             }
@@ -147,6 +158,26 @@
             }
         });
     });
+
+    // ── Split-trigger parent links: ArrowDown opens sibling panel ──────
+    // When a user tabs to "Contact Us" (the link) and presses ArrowDown,
+    // open the submenu and move focus into it — mirrors the trigger behaviour.
+    if (header) {
+        header.querySelectorAll('.plgc-nav__link--parent').forEach(link => {
+            link.addEventListener('keydown', e => {
+                if (e.key !== 'ArrowDown') return;
+                const split = link.closest('.plgc-nav__split');
+                const trigger = split ? split.querySelector('.plgc-nav__trigger') : null;
+                if (!trigger) return;
+                e.preventDefault();
+                const panel = getPanelForTrigger(trigger);
+                if (!panel) return;
+                openMega(trigger);
+                const focusable = Array.from(panel.querySelectorAll('a[href], button:not([disabled])'));
+                if (focusable[0]) focusable[0].focus();
+            });
+        });
+    }
 
     // ============================================================
     // SEARCH PANEL — WP ENGINE SMART SEARCH AJAX
