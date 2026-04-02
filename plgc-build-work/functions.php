@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.29');
+define('PLGC_VERSION', '1.7.30');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -247,7 +247,7 @@ function plgc_enqueue_assets() {
         true
     );
     wp_localize_script('plgc-nav', 'plgcNav', [
-        'restUrl' => esc_url_raw(rest_url()),
+        'restUrl' => esc_url_raw(rest_url('wp/v2/')),
     ]);
 }
 add_action('wp_enqueue_scripts', 'plgc_enqueue_assets');
