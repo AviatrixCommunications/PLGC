@@ -938,40 +938,108 @@
     transform: translateY(1px);       /* subtle press-down feedback */
 }
 
-/* Prev/Next on multi-step forms */
+/* Prev/Next on multi-step forms.
+   GF5 adds .gform-theme-button.button to these elements and styles them
+   via #gform_wrapper_N[data-form-index].gform-theme .gform-theme-button
+   which has very high specificity. We chain .gform-theme-button to match
+   and use !important to guarantee brand styles.
+
+   Next button: yellow pill (matches Submit — primary CTA)
+   Previous button: outlined pill (secondary action) */
+
+/* --- NEXT BUTTON — yellow pill (primary CTA) --- */
+.gform_wrapper .gform_next_button,
+.gform_wrapper .gform_next_button.gform-theme-button,
+.gform_wrapper .gform_next_button.gform-theme-button.button,
+.gform_wrapper .gform_page_footer .gform_next_button,
+.gform-theme .gform_next_button.gform-theme-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 2.9375rem !important;
+    min-height: 2.75rem !important;
+    min-width: 6rem !important;
+    padding: 0.9375rem 1.5rem !important;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    color: var(--plgc-black, #000000) !important;
+    background: var(--plgc-yellow, #FFAE40) !important;
+    border: 2px solid transparent !important;
+    border-radius: 6.25rem !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    box-shadow: none !important;
+}
+
+.gform_wrapper .gform_next_button:hover,
+.gform_wrapper .gform_next_button.gform-theme-button:hover,
+.gform-theme .gform_next_button.gform-theme-button:hover {
+    background: var(--plgc-light-yellow, #FDBC69) !important;
+    text-decoration: underline !important;
+}
+
+.gform_wrapper .gform_next_button:focus-visible,
+.gform_wrapper .gform_next_button.gform-theme-button:focus-visible,
+.gform-theme .gform_next_button.gform-theme-button:focus-visible {
+    background: var(--plgc-light-yellow, #FDBC69) !important;
+    outline: 0.125rem solid var(--plgc-focus-color, #567915) !important;
+    outline-offset: 0.125rem !important;
+}
+
+.gform_wrapper .gform_next_button:active,
+.gform_wrapper .gform_next_button.gform-theme-button:active {
+    background: #E89A2A !important;
+    text-decoration: underline !important;
+    transform: translateY(1px);
+}
+
+/* --- PREVIOUS BUTTON — outlined pill (secondary action) --- */
 .gform_wrapper .gform_previous_button,
-.gform_wrapper .gform_next_button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.9375rem;
-    min-height: 2.75rem;
-    padding: 0.9375rem 1.5rem;
-    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--plgc-black, #000000);
-    background: transparent;
-    border: 2px solid var(--plgc-dark-green, #567915);
-    border-radius: 6.25rem;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background var(--plgc-transition-fast, 150ms ease-in-out);
-    -webkit-appearance: none;
-    appearance: none;
+.gform_wrapper .gform_previous_button.gform-theme-button,
+.gform_wrapper .gform_previous_button.gform-theme-button.button,
+.gform_wrapper .gform_page_footer .gform_previous_button,
+.gform-theme .gform_previous_button.gform-theme-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 2.9375rem !important;
+    min-height: 2.75rem !important;
+    padding: 0.9375rem 1.5rem !important;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--plgc-black, #000000) !important;
+    background: transparent !important;
+    border: 2px solid var(--plgc-dark-green, #567915) !important;
+    border-radius: 6.25rem !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    box-shadow: none !important;
 }
 
 .gform_wrapper .gform_previous_button:hover,
-.gform_wrapper .gform_next_button:hover {
-    background: var(--plgc-very-light-green, #E5F0D0);
+.gform_wrapper .gform_previous_button.gform-theme-button:hover,
+.gform-theme .gform_previous_button.gform-theme-button:hover {
+    background: var(--plgc-very-light-green, #E5F0D0) !important;
 }
 
 .gform_wrapper .gform_previous_button:focus-visible,
-.gform_wrapper .gform_next_button:focus-visible {
-    outline: 0.125rem solid var(--plgc-focus-color, #567915);
-    outline-offset: 0.125rem;
+.gform_wrapper .gform_previous_button.gform-theme-button:focus-visible,
+.gform-theme .gform_previous_button.gform-theme-button:focus-visible {
+    outline: 0.125rem solid var(--plgc-focus-color, #567915) !important;
+    outline-offset: 0.125rem !important;
 }
 
+/* --- Page footer container --- */
 .gform_wrapper .gform_footer,
 .gform_wrapper .gform_page_footer {
     margin-top: 1.5rem;
@@ -1055,24 +1123,70 @@
 
 /* ============================================================
    22. PROGRESS BAR (multi-step)
+   GF5 adds .gf_progressbar_blue/.percentbar_blue (or _green, etc.)
+   with built-in colors. We chain those classes to match specificity
+   and use !important on background to guarantee brand colors.
    ============================================================ */
 
-.gform_wrapper .gf_progressbar_wrapper { margin-bottom: 1.5rem; }
-
-.gform_wrapper .gf_progressbar {
-    background: var(--plgc-medium-grey, #E7E4E4);
-    border-radius: 4px;
-    height: 0.75rem;
-    overflow: hidden;
+.gform_wrapper .gf_progressbar_wrapper {
+    margin-bottom: 1.5rem;
 }
 
-.gform_wrapper .gf_progressbar_percentage {
-    background: var(--plgc-dark-green, #567915);
-    height: 100%;
-    border-radius: 4px;
+/* "Step X of Y" title — GF5 renders as <p class="gf_progressbar_title"> */
+.gform_wrapper .gf_progressbar_title {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+    color: var(--plgc-black, #000000) !important;
+    margin: 0 0 0.5rem !important;
+    padding: 0 !important;
+}
+
+/* Progress bar track — override all GF5 color variants */
+.gform_wrapper .gf_progressbar,
+.gform_wrapper .gf_progressbar.gf_progressbar_blue,
+.gform_wrapper .gf_progressbar.gf_progressbar_green,
+.gform_wrapper .gf_progressbar.gf_progressbar_orange,
+.gform_wrapper .gf_progressbar.gf_progressbar_red,
+.gform_wrapper .gf_progressbar.gf_progressbar_custom {
+    background: var(--plgc-medium-grey, #E7E4E4) !important;
+    border-radius: 4px !important;
+    height: 0.75rem !important;
+    overflow: hidden !important;
+    border: none !important;
+}
+
+/* Filled portion — override all GF5 percentbar color variants */
+.gform_wrapper .gf_progressbar_percentage,
+.gform_wrapper .gf_progressbar_percentage.percentbar_blue,
+.gform_wrapper .gf_progressbar_percentage.percentbar_green,
+.gform_wrapper .gf_progressbar_percentage.percentbar_orange,
+.gform_wrapper .gf_progressbar_percentage.percentbar_red,
+.gform_wrapper .gf_progressbar .gf_progressbar_percentage {
+    background: var(--plgc-dark-green, #567915) !important;
+    height: 100% !important;
+    border-radius: 4px !important;
     transition: width var(--plgc-transition-default, 250ms ease-in-out);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
+/* Percentage text ("50%") inside the filled bar — hide visually.
+   The bar itself communicates progress; the Step X of Y title
+   provides the text alternative. aria-hidden is on the bar div. */
+.gform_wrapper .gf_progressbar_percentage span {
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    height: 1px !important;
+    width: 1px !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+}
+
+/* Step indicators (alternative to progress bar) */
 .gform_wrapper .gf_step {
     font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
     font-size: 0.9375rem;
@@ -1109,6 +1223,172 @@
 }
 
 /* ============================================================
+   23a. CHARACTER COUNTER
+   Shown below textarea fields with maxlength — e.g. "0 of 600 max characters"
+   ============================================================ */
+
+.gform_wrapper .ginput_counter,
+.gform_wrapper .charleft,
+.gform_wrapper .ginput_counter_tinymce {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    color: #555555 !important;             /* 7.5:1 on white — SC 1.4.3 ✅ */
+    margin-top: 0.375rem !important;
+    padding: 0 !important;
+}
+
+/* Warning state — near limit (GF adds .warningTextareaInfo at ~75%) */
+.gform_wrapper .ginput_counter.warningTextareaInfo {
+    color: #8B6914 !important;             /* dark gold — 4.7:1 on white ✅ */
+}
+
+/* Over limit (GF adds .ginput_counter_error) */
+.gform_wrapper .ginput_counter.ginput_counter_error {
+    color: #CC0000 !important;
+    font-weight: 600 !important;
+}
+
+/* ============================================================
+   23b. SAVE AND CONTINUE LINK
+   GF multi-page forms can show a "Save and Continue Later" link.
+   ============================================================ */
+
+.gform_wrapper .gform_save_link {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--plgc-dark-green, #567915) !important;
+    text-decoration: underline !important;
+    cursor: pointer;
+    min-height: 2.75rem;                   /* 44px — SC 2.5.5 ✅ */
+    display: inline-flex;
+    align-items: center;
+}
+
+.gform_wrapper .gform_save_link:hover,
+.gform_wrapper .gform_save_link:focus-visible {
+    color: var(--plgc-dark-green-tone, #233C26) !important;
+}
+
+.gform_wrapper .gform_save_link:focus-visible {
+    outline: 0.125rem solid var(--plgc-focus-color, #567915);
+    outline-offset: 0.125rem;
+}
+
+/* ============================================================
+   23c. MULTI-PAGE FORM WRAPPER
+   The .gform_page wrapper and page fields need clean spacing.
+   ============================================================ */
+
+.gform_wrapper .gform_page {
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================================================
+   23d. GF5 THEME FRAMEWORK — CSS VARIABLE OVERRIDES
+   GF5's Orbital theme applies styles via CSS custom properties on
+   .gform-theme--framework. Override the button and control variables
+   at the wrapper level so our brand styles take priority even when
+   GF5 uses high-specificity selectors like
+   #gform_wrapper_N[data-form-index].gform-theme .gform-theme-button
+   ============================================================ */
+
+.gform_wrapper.gform-theme--framework,
+.gform_wrapper.gform-theme--orbital,
+.gform-theme--framework,
+.gform-theme--orbital {
+    /* Button primary — matches our yellow pill */
+    --gf-ctrl-btn-bg-color-primary: var(--plgc-yellow, #FFAE40) !important;
+    --gf-ctrl-btn-bg-color-primary-hover: var(--plgc-light-yellow, #FDBC69) !important;
+    --gf-ctrl-btn-color-primary: var(--plgc-black, #000000) !important;
+    --gf-ctrl-btn-border-color-primary: transparent !important;
+    --gf-ctrl-btn-radius: 6.25rem !important;
+    --gf-ctrl-btn-font-size: 0.9375rem !important;
+    --gf-ctrl-btn-font-weight: 600 !important;
+
+    /* Button secondary — matches our outlined pill */
+    --gf-ctrl-btn-bg-color-secondary: transparent !important;
+    --gf-ctrl-btn-bg-color-secondary-hover: var(--plgc-very-light-green, #E5F0D0) !important;
+    --gf-ctrl-btn-color-secondary: var(--plgc-black, #000000) !important;
+    --gf-ctrl-btn-border-color-secondary: var(--plgc-dark-green, #567915) !important;
+
+    /* Focus ring */
+    --gf-ctrl-focus-shadow: 0 0 0 0.125rem var(--plgc-focus-color, #567915) !important;
+
+    /* Suppress GF5 box shadows on buttons */
+    --gform-theme-box-shadow: none !important;
+    --gform-theme-box-shadow-sm: none !important;
+}
+
+/* ============================================================
+   23e. PLACEHOLDER TEXT
+   ============================================================ */
+
+.gform_wrapper input::placeholder,
+.gform_wrapper textarea::placeholder {
+    color: #767676 !important;             /* 4.6:1 on white — SC 1.4.3 ✅ */
+    opacity: 1;
+    font-style: italic;
+}
+
+/* ============================================================
+   23f. DATE PICKER (calendar popup)
+   GF5 uses the native browser date input by default, but if the
+   jQuery UI datepicker is enabled, these styles apply.
+   ============================================================ */
+
+.gform_wrapper .ui-datepicker {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    background: var(--plgc-white, #FFFFFF);
+    border: 1px solid var(--plgc-medium-green-tone, #2D5032);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    z-index: 9999 !important;
+}
+
+.gform_wrapper .ui-datepicker .ui-datepicker-header {
+    background: var(--plgc-dark-green, #567915);
+    color: var(--plgc-white, #FFFFFF);
+    border: none;
+    border-radius: 4px 4px 0 0;
+    padding: 0.5rem;
+    font-weight: 600;
+}
+
+.gform_wrapper .ui-datepicker .ui-datepicker-prev,
+.gform_wrapper .ui-datepicker .ui-datepicker-next {
+    cursor: pointer;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+}
+
+.gform_wrapper .ui-datepicker td a,
+.gform_wrapper .ui-datepicker td span {
+    padding: 0.375rem;
+    text-align: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gform_wrapper .ui-datepicker td a:hover {
+    background: var(--plgc-very-light-green, #E5F0D0);
+    border-radius: 4px;
+}
+
+.gform_wrapper .ui-datepicker .ui-state-active {
+    background: var(--plgc-dark-green, #567915) !important;
+    color: var(--plgc-white, #FFFFFF) !important;
+    border-radius: 4px;
+}
+
+/* ============================================================
    24. RESPONSIVE — MOBILE  (< 768px)
    ============================================================ */
 
@@ -1126,6 +1406,26 @@
     .gform_wrapper input[type="password"],
     .gform_wrapper select {
         font-size: 1rem;
+    }
+
+    /* Multi-page buttons stack on narrow screens */
+    .gform_wrapper .gform_page_footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gform_wrapper .gform_next_button,
+    .gform_wrapper .gform_next_button.gform-theme-button,
+    .gform_wrapper .gform_previous_button,
+    .gform_wrapper .gform_previous_button.gform-theme-button {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    /* Save and Continue gets full width too */
+    .gform_wrapper .gform_save_link {
+        width: 100%;
+        justify-content: center;
     }
 }
 
