@@ -12,7 +12,7 @@ get_header();
 $query_term = get_search_query();
 ?>
 
-<main id="main-content" class="plgc-search-page" role="main">
+<div class="plgc-search-page">
     <div class="plgc-search-page__header">
         <div class="plgc-search-page__inner">
             <h1 class="plgc-search-page__title">Search Results</h1>
@@ -139,6 +139,6 @@ $query_term = get_search_query();
             </div>
         <?php endif; ?>
     </div>
-</main>
+</div><!-- /.plgc-search-page -->
 
 <?php get_footer(); ?>

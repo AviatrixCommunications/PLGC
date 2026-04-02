@@ -128,6 +128,10 @@ add_filter('attachment_fields_to_save', 'plgc_docmgr_save_version_fields', 10, 2
 function plgc_docmgr_ajax_version_search() {
     check_ajax_referer('plgc_docmgr_actions');
 
+    if (! current_user_can('upload_files')) {
+        wp_send_json_error('Permission denied.');
+    }
+
     $search  = sanitize_text_field($_POST['search'] ?? '');
     $mime    = sanitize_text_field($_POST['mime'] ?? '');
     $exclude = absint($_POST['exclude'] ?? 0);

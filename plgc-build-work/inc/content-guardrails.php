@@ -40,7 +40,7 @@ function plgc_content_guardrails_on_save($post_id) {
     }
 
     $content = $post->post_content;
-    $issues = plgc_scan_content_for_issues($content);
+    $issues = plgc_scan_content_for_issues($content, $post_id);
 
     if (! empty($issues)) {
         update_post_meta($post_id, '_plgc_a11y_issues', $issues);
@@ -56,9 +56,10 @@ add_action('save_post', 'plgc_content_guardrails_on_save', 20);
  * Scan content string for accessibility issues.
  *
  * @param string $content HTML content to scan.
+ * @param int    $post_id Optional post ID for context-aware checks.
  * @return array Array of issue descriptions.
  */
-function plgc_scan_content_for_issues($content) {
+function plgc_scan_content_for_issues($content, $post_id = 0) {
     $issues = [];
 
     // --- Generic Link Text (WCAG 2.4.4 - Link Purpose) ---
@@ -99,13 +100,19 @@ function plgc_scan_content_for_issues($content) {
     if (! empty($heading_matches[1])) {
         $levels = array_map('intval', $heading_matches[1]);
 
-        // Check for H1 in content (should only be in page title)
-        if (in_array(1, $levels, true)) {
+        // Check for H1 in content.
+        // Elementor pages typically render the page title as an H1 widget
+        // inside the content — that's correct and expected. Only flag if:
+        //   - There are multiple H1s (always wrong)
+        //   - The theme outputs a separate H1 outside the_content (not the case here:
+        //     header.php opens <main> and lets Elementor handle the title)
+        $h1_count = count(array_filter($levels, fn($l) => $l === 1));
+        if ($h1_count > 1) {
             $issues[] = [
                 'type'     => 'heading_h1',
-                'severity' => 'warning',
+                'severity' => 'error',
                 'wcag'     => '1.3.1',
-                'message'  => 'H1 heading found in page content. The page title is already H1 — content headings should start at H2.',
+                'message'  => $h1_count . ' H1 headings found. Each page should have exactly one H1 (the page title). Demote extra H1s to H2.',
             ];
         }
 

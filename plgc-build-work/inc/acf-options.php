@@ -349,6 +349,35 @@ window._monsidoConsentManagerConfig = { token: "YOUR-TOKEN", … };
             ],
 
             // ================================================================
+            // TAB: ANALYTICS
+            // ================================================================
+            [
+                'key'   => 'field_plgc_tab_analytics',
+                'label' => 'Analytics',
+                'type'  => 'tab',
+            ],
+            [
+                'key'          => 'field_plgc_ga4_id',
+                'label'        => 'Google Analytics 4 — Measurement ID',
+                'name'         => 'plgc_ga4_id',
+                'type'         => 'text',
+                'instructions' => 'Enter your GA4 Measurement ID (starts with <strong>G-</strong>). The gtag.js script will be output in the <code>&lt;head&gt;</code> on all front-end pages. Leave blank to disable Google Analytics.',
+                'placeholder'  => 'G-XXXXXXXXXX',
+                'maxlength'    => 20,
+                'wrapper'      => [ 'width' => '50' ],
+            ],
+            [
+                'key'     => 'field_plgc_ga4_notes',
+                'label'   => '',
+                'name'    => 'plgc_ga4_notes',
+                'type'    => 'message',
+                'message' => '<p style="color:#666"><strong>How it works:</strong> When a Measurement ID is set, the theme outputs the standard <code>gtag.js</code> snippet in the <code>&lt;head&gt;</code>. The script loads asynchronously and does not affect page speed scores. If you use a consent management tool (e.g., Monsido/Termageddon), configure it to gate the <code>analytics_storage</code> consent type.</p>',
+                'new_lines' => 'wpautop',
+                'esc_html'  => 0,
+                'wrapper'   => [ 'width' => '100' ],
+            ],
+
+            // ================================================================
             // TAB: BRANDING
             // ================================================================
             [

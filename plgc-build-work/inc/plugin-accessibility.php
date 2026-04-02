@@ -140,6 +140,48 @@ if ( class_exists( 'WooCommerce' ) ) {
     }
     add_filter( 'woocommerce_form_field_args', 'plgc_woo_form_field_args', 10, 3 );
 
+    /**
+     * Add unique aria-label to cart remove ("×") links.
+     * (WCAG 2.4.4 - Link Purpose)
+     *
+     * WooCommerce's default remove link uses "×" as the visible text with
+     * an aria-label of "Remove this item" — identical for every line item.
+     * Screen reader users navigating by links can't tell them apart.
+     * This replaces the aria-label with "Remove <Product Name> from cart".
+     */
+    add_filter( 'woocommerce_cart_item_remove_link', function ( $link, $cart_item_key ) {
+        $cart = WC()->cart;
+        if ( ! $cart ) {
+            return $link;
+        }
+
+        $cart_item = $cart->get_cart_item( $cart_item_key );
+        if ( empty( $cart_item['data'] ) ) {
+            return $link;
+        }
+
+        $product_name = $cart_item['data']->get_name();
+        $new_label    = sprintf(
+            /* translators: %s: product name */
+            esc_attr__( 'Remove %s from cart', 'plgc' ),
+            $product_name
+        );
+
+        // Replace existing aria-label (WooCommerce sets "Remove this item")
+        if ( preg_match( '/aria-label="[^"]*"/', $link ) ) {
+            $link = preg_replace(
+                '/aria-label="[^"]*"/',
+                'aria-label="' . $new_label . '"',
+                $link
+            );
+        } else {
+            // No aria-label present — add one
+            $link = str_replace( '<a ', '<a aria-label="' . $new_label . '" ', $link );
+        }
+
+        return $link;
+    }, 10, 2 );
+
 } // end if WooCommerce
 
 

@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.35');
+define('PLGC_VERSION', '1.7.36');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -259,6 +259,16 @@ function plgc_enqueue_assets() {
             PLGC_VERSION
         );
     }
+
+    // 404 page
+    if (is_404()) {
+        wp_enqueue_style(
+            'plgc-404',
+            PLGC_URI . '/assets/css/404.css',
+            ['plgc-theme'],
+            PLGC_VERSION
+        );
+    }
 }
 add_action('wp_enqueue_scripts', 'plgc_enqueue_assets');
 
@@ -352,6 +362,46 @@ function plgc_acquia_script_output() {
 }
 add_action( 'wp_head',      'plgc_acquia_script_output', 5 );
 add_action( 'wp_body_open', 'plgc_acquia_script_output', 5 );
+
+/**
+ * ============================================================
+ * GOOGLE ANALYTICS 4
+ * ============================================================
+ * Outputs the standard gtag.js snippet when a GA4 Measurement ID
+ * is set in PL Settings → Analytics. Loads async in <head> at
+ * priority 2 (early, before other scripts).
+ *
+ * The ID is validated to match the G-XXXXXXXXXX format.
+ * Only loads on the front end (not admin, not login, not previews).
+ */
+function plgc_ga4_output() {
+    if ( is_admin() || is_preview() || wp_doing_ajax() ) {
+        return;
+    }
+
+    if ( ! function_exists( 'plgc_option' ) ) {
+        return;
+    }
+
+    $ga4_id = trim( plgc_option( 'plgc_ga4_id' ) );
+    if ( empty( $ga4_id ) || ! preg_match( '/^G-[A-Z0-9]{4,15}$/i', $ga4_id ) ) {
+        return;
+    }
+
+    // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript -- gtag.js must be inline per Google's spec
+    $id = esc_attr( $ga4_id );
+    echo "\n<!-- Google Analytics 4 -->\n"
+        . '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $id . '"></script>' . "\n"
+        . "<script>\n"
+        . "window.dataLayer = window.dataLayer || [];\n"
+        . "function gtag(){dataLayer.push(arguments);}\n"
+        . "gtag('js', new Date());\n"
+        . "gtag('config', '" . $id . "');\n"
+        . "</script>\n"
+        . "<!-- / GA4 -->\n";
+    // phpcs:enable
+}
+add_action( 'wp_head', 'plgc_ga4_output', 2 );
 
 /**
  * ============================================================

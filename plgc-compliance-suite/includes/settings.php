@@ -58,12 +58,16 @@ function plgc_docmgr_handle_settings() {
     // --- Save General Settings ---
     if ($tab === 'general') {
         $settings = [
-            'compliance_deadline' => sanitize_text_field($_POST['compliance_deadline'] ?? 'April 24, 2026'),
-            'archive_behavior'   => sanitize_text_field($_POST['archive_behavior'] ?? 'redirect'),
-            'archive_page'       => absint($_POST['archive_page'] ?? 0),
-            'notify_email'       => sanitize_email($_POST['notify_email'] ?? ''),
-            'notify_days_before' => absint($_POST['notify_days_before'] ?? 30),
-            'auto_archive'       => isset($_POST['auto_archive']),
+            'compliance_deadline'    => sanitize_text_field($_POST['compliance_deadline'] ?? 'April 24, 2026'),
+            'archive_behavior'       => sanitize_text_field($_POST['archive_behavior'] ?? 'redirect'),
+            'archive_page'           => absint($_POST['archive_page'] ?? 0),
+            'archive_contact_email'  => sanitize_email($_POST['archive_contact_email'] ?? ''),
+            'ada_coordinator_name'   => sanitize_text_field($_POST['ada_coordinator_name'] ?? ''),
+            'ada_coordinator_email'  => sanitize_email($_POST['ada_coordinator_email'] ?? ''),
+            'ada_coordinator_phone'  => sanitize_text_field($_POST['ada_coordinator_phone'] ?? ''),
+            'notify_email'           => sanitize_email($_POST['notify_email'] ?? ''),
+            'notify_days_before'     => absint($_POST['notify_days_before'] ?? 30),
+            'auto_archive'           => isset($_POST['auto_archive']),
         ];
         update_option('plgc_docmgr_settings', $settings);
     }
@@ -82,6 +86,11 @@ function plgc_docmgr_handle_settings() {
         update_option('plgc_clarity_auto_check', isset($_POST['clarity_auto_check']) ? 1 : 0);
         update_option('plgc_clarity_block_upload', sanitize_text_field($_POST['clarity_block_upload'] ?? 'warn'));
         update_option('plgc_clarity_allyant_email', sanitize_email($_POST['clarity_allyant_email'] ?? ''));
+
+        // Only update webhook secret if a new one was entered
+        if (! empty($_POST['clarity_webhook_secret'])) {
+            update_option('plgc_clarity_webhook_secret', sanitize_text_field($_POST['clarity_webhook_secret']));
+        }
 
         $standards = [];
         if (isset($_POST['clarity_standards']) && is_array($_POST['clarity_standards'])) {
@@ -262,6 +271,41 @@ function plgc_docmgr_settings_page() {
                             </td>
                         </tr>
                         <tr>
+                            <th scope="row">Archive Contact Email</th>
+                            <td>
+                                <input type="email" name="archive_contact_email"
+                                       value="<?php echo esc_attr($settings['archive_contact_email'] ?? ''); ?>"
+                                       class="regular-text" placeholder="<?php echo esc_attr(get_option('admin_email')); ?>" />
+                                <p class="description">Email shown on the archive page and used for document request emails. Defaults to admin email if blank.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">ADA Coordinator Name</th>
+                            <td>
+                                <input type="text" name="ada_coordinator_name"
+                                       value="<?php echo esc_attr($settings['ada_coordinator_name'] ?? ''); ?>"
+                                       class="regular-text" />
+                                <p class="description">Displayed on the archive page. Leave blank to hide the ADA Coordinator section.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">ADA Coordinator Email</th>
+                            <td>
+                                <input type="email" name="ada_coordinator_email"
+                                       value="<?php echo esc_attr($settings['ada_coordinator_email'] ?? ''); ?>"
+                                       class="regular-text" />
+                                <p class="description">If set, this overrides the Archive Contact Email for both display and form submissions.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">ADA Coordinator Phone</th>
+                            <td>
+                                <input type="tel" name="ada_coordinator_phone"
+                                       value="<?php echo esc_attr($settings['ada_coordinator_phone'] ?? ''); ?>"
+                                       class="regular-text" />
+                            </td>
+                        </tr>
+                        <tr>
                             <th scope="row">Auto-Archive</th>
                             <td>
                                 <label>
@@ -374,6 +418,13 @@ function plgc_docmgr_settings_page() {
                             <td>
                                 <code style="padding: 6px 10px; background: #f0f0f0; display: inline-block;"><?php echo esc_url(rest_url('plgc/v1/clarity-webhook')); ?></code>
                                 <p class="description">Register this URL with CommonLook Clarity for real-time scan results.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Webhook Secret</th>
+                            <td>
+                                <input type="password" name="clarity_webhook_secret" value="" class="regular-text" placeholder="<?php echo get_option('plgc_clarity_webhook_secret') ? '••••••••' : ''; ?>" autocomplete="new-password" />
+                                <p class="description">Shared secret for webhook signature verification. The webhook endpoint is <strong>disabled</strong> until a secret is set. Enter the same value you configure in CommonLook Clarity's webhook settings.</p>
                             </td>
                         </tr>
                         <tr>

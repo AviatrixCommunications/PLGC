@@ -1,0 +1,188 @@
+/* ============================================================
+   404 PAGE — Page Not Found
+   Styled to match PLGC brand & search results page patterns.
+   ============================================================ */
+
+.plgc-404__header {
+    background: var(--plgc-dark-green-tone, #233C26);
+    padding: 3rem 1.5rem 2.5rem;
+    text-align: center;
+}
+
+.plgc-404__inner {
+    max-width: 50rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.plgc-404__header .plgc-404__inner {
+    padding: 0;
+}
+
+.plgc-404__title {
+    font-family: var(--plgc-font-heading, 'Libre Baskerville', serif);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+}
+
+.plgc-404__subtitle {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── Search Section ── */
+
+.plgc-404__search-section {
+    padding: 2.5rem 0 2rem;
+    text-align: center;
+}
+
+.plgc-404__heading {
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--plgc-black, #000);
+    margin: 0 0 1.25rem;
+}
+
+.plgc-404__form-wrap {
+    display: flex;
+    max-width: 36rem;
+    margin: 0 auto;
+    border-radius: 6.25rem;
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid var(--plgc-medium-grey, #E7E4E4);
+}
+
+.plgc-404__input {
+    flex: 1;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1rem;
+    color: var(--plgc-black, #000);
+    background: transparent;
+    min-height: 2.75rem;
+}
+
+.plgc-404__input::placeholder {
+    color: #666;
+    opacity: 1;
+}
+
+.plgc-404__input:focus {
+    outline: none;
+}
+
+.plgc-404__form-wrap:focus-within {
+    border-color: var(--plgc-dark-green, #567915);
+    box-shadow: 0 0 0 var(--plgc-focus-width, 0.125rem) var(--plgc-dark-green, #567915);
+}
+
+.plgc-404__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.25rem;
+    background: var(--plgc-dark-green, #567915);
+    border: none;
+    cursor: pointer;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    color: #fff;
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out);
+}
+
+.plgc-404__submit:hover {
+    background: var(--plgc-dark-green-tone, #233C26);
+}
+
+.plgc-404__submit:focus-visible {
+    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
+    outline-offset: var(--plgc-focus-offset, 0.125rem);
+}
+
+/* ── Popular Links Grid ── */
+
+.plgc-404__links-section {
+    padding: 0 0 3rem;
+    text-align: center;
+}
+
+.plgc-404__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    text-align: left;
+}
+
+.plgc-404__links a {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    background: var(--plgc-light-grey, #F2F2F2);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: var(--plgc-black, #000);
+    transition: background var(--plgc-transition-fast, 150ms ease-in-out),
+                box-shadow var(--plgc-transition-fast, 150ms ease-in-out);
+}
+
+.plgc-404__links a:hover {
+    background: var(--plgc-very-light-green, #E5F0D0);
+}
+
+.plgc-404__links a:focus-visible {
+    outline: var(--plgc-focus-width, 0.125rem) solid var(--plgc-focus-color, #567915);
+    outline-offset: var(--plgc-focus-offset, 0.125rem);
+}
+
+.plgc-404__link-title {
+    display: block;
+    font-family: var(--plgc-font-body, 'Open Sans', sans-serif);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--plgc-dark-green, #567915);
+    margin-bottom: 0.25rem;
+}
+
+.plgc-404__link-desc {
+    display: block;
+    font-size: 0.875rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 767px) {
+    .plgc-404__header {
+        padding: 2rem 1rem 2rem;
+    }
+
+    .plgc-404__title {
+        font-size: 1.75rem;
+    }
+
+    .plgc-404__links {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+    .plgc-404__links a,
+    .plgc-404__submit {
+        transition: none;
+    }
+}

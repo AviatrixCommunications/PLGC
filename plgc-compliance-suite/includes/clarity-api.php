@@ -342,11 +342,41 @@ add_action('rest_api_init', 'plgc_clarity_register_webhook');
 
 /**
  * Verify webhook signature.
+ *
+ * When a webhook secret is configured in Clarity settings, the incoming
+ * request must carry a matching ms-signature header. When no secret is
+ * set the endpoint is disabled to prevent unauthenticated access.
  */
 function plgc_clarity_webhook_verify($request) {
-    // Verify the webhook signature if secret is set
+    $secret = get_option('plgc_clarity_webhook_secret', '');
+
+    // If no secret is configured, disable the endpoint to prevent open access.
+    if (empty($secret)) {
+        return new WP_Error(
+            'webhook_disabled',
+            'Webhook secret not configured. Set it in Compliance Suite → Clarity API settings.',
+            ['status' => 403]
+        );
+    }
+
     $signature = $request->get_header('ms-signature');
-    // For now, accept all — tighten when secret is configured
+    if (empty($signature)) {
+        return new WP_Error(
+            'missing_signature',
+            'Missing webhook signature header.',
+            ['status' => 401]
+        );
+    }
+
+    // Constant-time comparison to prevent timing attacks.
+    if (! hash_equals($secret, $signature)) {
+        return new WP_Error(
+            'invalid_signature',
+            'Invalid webhook signature.',
+            ['status' => 403]
+        );
+    }
+
     return true;
 }
 
