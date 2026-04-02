@@ -13,9 +13,6 @@ $maps_place_id = plgc_option( 'plgc_maps_place_id' );
 $phone_pro     = plgc_option( 'plgc_phone_pro_shop', '(630) 208-7600' );
 $phone_events  = plgc_option( 'plgc_phone_events',   '(630) 208-7629' );
 $copyright     = plgc_option( 'plgc_copyright_text', 'Prairie Landing Golf Club. All rights reserved.' );
-$privacy_url   = plgc_option( 'plgc_privacy_policy_url' ) ?: get_privacy_policy_url();
-$cookie_url    = plgc_option( 'plgc_cookie_policy_url' );
-$cookie_js     = plgc_option( 'plgc_cookie_js_method', "window.CookieConsent && window.CookieConsent.renew()" );
 
 // Footer logo
 $footer_logo_data = plgc_option( 'plgc_footer_logo' );
@@ -62,8 +59,6 @@ if ( $maps_api_key && $address ) {
 $maps_link = $maps_place_id
     ? 'https://www.google.com/maps/place/?q=place_id:' . rawurlencode( $maps_place_id )
     : 'https://maps.google.com/?q=' . rawurlencode( $address );
-
-$a11y_url = home_url( '/accessibility-statement/' );
 ?>
 </main><!-- /#main-content -->
 
@@ -189,31 +184,15 @@ $a11y_url = home_url( '/accessibility-statement/' );
             </p>
 
             <nav class="plgc-footer__legal-nav" aria-label="Legal links">
-                <ul class="plgc-footer__legal-list" role="list">
-
-                    <?php if ( $privacy_url ) : ?>
-                    <li><a href="<?php echo esc_url( $privacy_url ); ?>" class="plgc-footer__legal-link">Privacy Policy</a></li>
-                    <?php endif; ?>
-
-                    <li><a href="<?php echo esc_url( $a11y_url ); ?>" class="plgc-footer__legal-link">Accessibility Statement</a></li>
-
-                    <li>
-                        <?php if ( $cookie_js ) : ?>
-                        <button type="button"
-                                class="plgc-footer__legal-link plgc-footer__cookie-btn"
-                                onclick="<?php echo esc_attr( $cookie_js ); ?>"
-                                aria-label="Open cookie consent settings">
-                            Manage Cookie Settings
-                        </button>
-                        <?php if ( $cookie_url ) : ?>
-                        <noscript><a href="<?php echo esc_url( $cookie_url ); ?>" class="plgc-footer__legal-link">Cookie Policy</a></noscript>
-                        <?php endif; ?>
-                        <?php elseif ( $cookie_url ) : ?>
-                        <a href="<?php echo esc_url( $cookie_url ); ?>" class="plgc-footer__legal-link">Cookie Policy</a>
-                        <?php endif; ?>
-                    </li>
-
-                </ul>
+                <?php wp_nav_menu( [
+                    'theme_location' => 'footer-legal',
+                    'menu_class'     => 'plgc-footer__legal-list',
+                    'container'      => false,
+                    'depth'          => 1,
+                    'walker'         => new PLGC_Legal_Nav_Walker(),
+                    'fallback_cb'    => 'plgc_legal_nav_fallback',
+                    'items_wrap'     => '<ul id="%1$s" class="%2$s" role="list">%3$s</ul>',
+                ] ); ?>
             </nav>
 
         </div>

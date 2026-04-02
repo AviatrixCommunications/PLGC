@@ -291,21 +291,42 @@ function plgc_register_acf_options_fields() {
                 'type'  => 'tab',
             ],
             [
-                'key'          => 'field_plgc_monsido_script_id',
-                'label'        => 'Monsido / Acquia Cookie Consent Script ID',
-                'name'         => 'plgc_monsido_script_id',
-                'type'         => 'text',
-                'instructions' => 'Your Monsido token/site ID from the cookie consent installation snippet. Used to load the consent SDK if not already loaded globally.',
-                'placeholder'  => 'your-monsido-site-id',
-                'wrapper'      => [ 'width' => '50' ],
+                'key'          => 'field_plgc_acquia_script',
+                'label'        => 'Acquia Web Governance — Script',
+                'name'         => 'plgc_acquia_script',
+                'type'         => 'textarea',
+                'new_lines'    => '',
+                'instructions' => 'Paste the <strong>full script block</strong> from your Acquia / Monsido dashboard (Script Setup Guide → copy script). The theme outputs it verbatim on every page at the location chosen below. Leave empty to disable.<br><em>Requires an admin account with the "unfiltered HTML" capability (standard on single-site WordPress).</em>',
+                'rows'         => 14,
+                'placeholder'  => '<script type="text/javascript">
+window._monsido = window._monsido || { token: "YOUR-TOKEN", … };
+window._monsidoConsentManagerConfig = { token: "YOUR-TOKEN", … };
+</script>
+<script type="text/javascript" async src="https://app-script.monsido.com/v2/monsido-script.js"></script>
+<script type="text/javascript" src="https://monsido-consent.com/v1/mcm.js"></script>',
+                'wrapper'      => [ 'width' => '100' ],
+            ],
+            [
+                'key'           => 'field_plgc_acquia_script_placement',
+                'label'         => 'Script Placement',
+                'name'          => 'plgc_acquia_script_placement',
+                'type'          => 'select',
+                'instructions'  => 'Where to insert the script. Acquia recommends <strong>&lt;body&gt;</strong> for the tracking script. Choose <strong>&lt;head&gt;</strong> only if you enable Consent Manager (it must load before other scripts to block cookies).',
+                'choices'       => [
+                    'body' => '<body> — right after the opening tag (recommended by Acquia)',
+                    'head' => '<head> — before any other scripts (required for Consent Manager)',
+                ],
+                'default_value' => 'body',
+                'return_format' => 'value',
+                'wrapper'       => [ 'width' => '50' ],
             ],
             [
                 'key'          => 'field_plgc_cookie_js_method',
                 'label'        => 'Cookie Settings Button — JS Call',
                 'name'         => 'plgc_cookie_js_method',
                 'type'         => 'text',
-                'instructions' => 'The JavaScript expression that reopens your cookie consent banner. Check your Monsido dashboard under Cookie Consent → Installation for the exact method. Common values: window.CookieConsent && window.CookieConsent.renew() — or check your Acquia/Monsido docs.',
-                'default_value'=> 'window.CookieConsent && window.CookieConsent.renew()',
+                'instructions' => 'JavaScript expression that reopens the consent dialog when the footer "Manage Cookie Settings" button is clicked. Once Monsido is running, right-click the floating cookie icon → Inspect → copy its selector, then update this field to: <code>document.querySelector(\'YOUR_SELECTOR\').click()</code>',
+                'default_value'=> 'var el=document.querySelector(\'[id*=\"mcm\"][role=\"button\"], [class*=\"mcm-consent\"], [id*=\"monsido-consent\"], [aria-label*=\"cookie\"][aria-label*=\"consent\"]\'); if(el) el.click();',
                 'wrapper'      => [ 'width' => '100' ],
             ],
             [

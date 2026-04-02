@@ -569,6 +569,31 @@
     line-height: inherit;
 }
 
+/* Termageddon / Usercentrics privacy-settings shortcode link */
+.plgc-footer__legal-nav #usercentrics-psl {
+    font-size: 0.875rem;
+    color: var(--plgc-footer-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 150ms ease;
+}
+
+.plgc-footer__legal-nav #usercentrics-psl:hover {
+    color: var(--plgc-footer-text);
+}
+
+.plgc-footer__legal-nav #usercentrics-psl:focus-visible {
+    outline: 3px solid var(--plgc-footer-border);
+    outline-offset: 2px;
+    border-radius: 2px;
+    color: var(--plgc-footer-text);
+}
+
 /* ============================================================
    RESPONSIVE — TABLET (≤ 1100px)
    ============================================================ */

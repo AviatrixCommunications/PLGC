@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.27');
+define('PLGC_VERSION', '1.7.29');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -33,12 +33,146 @@ function plgc_setup() {
     add_theme_support('title-tag');
 
     register_nav_menus([
-        'primary' => __('Primary Navigation', 'plgc'),
-        'footer'  => __('Footer Navigation', 'plgc'),
-        'utility' => __('Utility Navigation', 'plgc'),
+        'primary'      => __('Primary Navigation', 'plgc'),
+        'footer'       => __('Footer Navigation', 'plgc'),
+        'footer-legal' => __('Footer Legal / Policy Links', 'plgc'),
+        'utility'      => __('Utility Navigation', 'plgc'),
     ]);
 }
 add_action('after_setup_theme', 'plgc_setup');
+
+/**
+ * ============================================================
+ * FOOTER LEGAL NAV — Custom Walker
+ * ============================================================
+ * Renders the "Footer Legal / Policy Links" menu in the sub-footer.
+ *
+ * Magic URLs:
+ *
+ *   #privacy-settings   (recommended — Termageddon)
+ *     Renders the [uc-privacysettings] shortcode so the Termageddon
+ *     plugin controls SDK readiness, geolocation, and visibility.
+ *     Falls back to a plain Cookie Policy link if the plugin is off.
+ *
+ *   #manage-cookies   (generic fallback)
+ *     Renders a <button> that fires the JS expression from
+ *     PL Settings → Cookie & Legal → "Cookie Settings Button".
+ *     Useful for non-Termageddon consent tools.
+ */
+class PLGC_Legal_Nav_Walker extends Walker_Nav_Menu {
+
+    public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+        $output .= '<li>';
+        $url = trim( $item->url );
+
+        // ── Termageddon / Usercentrics privacy-settings shortcode ──
+        // Menu item URL: #privacy-settings
+        // Renders the [uc-privacysettings] shortcode so the plugin
+        // handles SDK readiness, geolocation, and visibility.
+        if ( $url === '#privacy-settings' ) {
+            if ( shortcode_exists( 'uc-privacysettings' ) ) {
+                $output .= do_shortcode(
+                    '[uc-privacysettings text="' . esc_attr( $item->title ) . '"]'
+                );
+            } else {
+                // Plugin not active — render a plain link to the cookie policy page.
+                $fallback_url = plgc_option( 'plgc_cookie_policy_url' );
+                if ( $fallback_url ) {
+                    $output .= sprintf(
+                        '<a href="%s" class="plgc-footer__legal-link">%s</a>',
+                        esc_url( $fallback_url ),
+                        esc_html( $item->title )
+                    );
+                }
+            }
+            return;
+        }
+
+        // ── Generic cookie-consent button (non-Termageddon) ──
+        // Menu item URL: #manage-cookies
+        // Fires the JS expression from PL Settings → Cookie & Legal.
+        if ( $url === '#manage-cookies' ) {
+            $cookie_js = plgc_option(
+                'plgc_cookie_js_method',
+                "var el=document.querySelector('[id*=\"mcm\"][role=\"button\"], [class*=\"mcm-consent\"], [id*=\"monsido-consent\"], [aria-label*=\"cookie\"][aria-label*=\"consent\"]'); if(el) el.click();"
+            );
+            $output .= sprintf(
+                '<button type="button" class="plgc-footer__legal-link plgc-footer__cookie-btn" onclick="%s" aria-label="%s">%s</button>',
+                esc_attr( $cookie_js ),
+                esc_attr__( 'Open cookie consent settings', 'plgc' ),
+                esc_html( $item->title )
+            );
+
+            $cookie_url = plgc_option( 'plgc_cookie_policy_url' );
+            if ( $cookie_url ) {
+                $output .= sprintf(
+                    '<noscript><a href="%s" class="plgc-footer__legal-link">%s</a></noscript>',
+                    esc_url( $cookie_url ),
+                    esc_html( $item->title )
+                );
+            }
+            return;
+        }
+
+        // ── Regular link ──
+        $atts = '';
+        if ( ! empty( $item->target ) ) {
+            $atts .= ' target="' . esc_attr( $item->target ) . '"';
+            if ( $item->target === '_blank' ) {
+                $atts .= ' rel="noopener noreferrer"';
+            }
+        }
+        $output .= sprintf(
+            '<a href="%s" class="plgc-footer__legal-link"%s>%s</a>',
+            esc_url( $item->url ),
+            $atts,
+            esc_html( $item->title )
+        );
+    }
+
+    public function end_el( &$output, $item, $depth = 0, $args = null ) {
+        $output .= '</li>';
+    }
+}
+
+/**
+ * Fallback for the footer-legal menu when no menu is assigned.
+ * Renders the original hardcoded links so the sub-footer isn't
+ * empty before the menu is set up.
+ */
+function plgc_legal_nav_fallback() {
+    $privacy_url = plgc_option( 'plgc_privacy_policy_url' ) ?: get_privacy_policy_url();
+    $a11y_url    = home_url( '/accessibility-statement/' );
+    $cookie_js   = plgc_option(
+        'plgc_cookie_js_method',
+        "var el=document.querySelector('[id*=\"mcm\"][role=\"button\"], [class*=\"mcm-consent\"], [id*=\"monsido-consent\"], [aria-label*=\"cookie\"][aria-label*=\"consent\"]'); if(el) el.click();"
+    );
+    $cookie_url  = plgc_option( 'plgc_cookie_policy_url' );
+
+    echo '<ul class="plgc-footer__legal-list" role="list">';
+
+    if ( $privacy_url ) {
+        printf( '<li><a href="%s" class="plgc-footer__legal-link">Privacy Policy</a></li>', esc_url( $privacy_url ) );
+    }
+
+    printf( '<li><a href="%s" class="plgc-footer__legal-link">Accessibility Statement</a></li>', esc_url( $a11y_url ) );
+
+    if ( $cookie_js ) {
+        echo '<li>';
+        printf(
+            '<button type="button" class="plgc-footer__legal-link plgc-footer__cookie-btn" onclick="%s" aria-label="Open cookie consent settings">Manage Cookie Settings</button>',
+            esc_attr( $cookie_js )
+        );
+        if ( $cookie_url ) {
+            printf( '<noscript><a href="%s" class="plgc-footer__legal-link">Cookie Policy</a></noscript>', esc_url( $cookie_url ) );
+        }
+        echo '</li>';
+    } elseif ( $cookie_url ) {
+        printf( '<li><a href="%s" class="plgc-footer__legal-link">Cookie Policy</a></li>', esc_url( $cookie_url ) );
+    }
+
+    echo '</ul>';
+}
 
 /**
  * Enqueue Parent + Child Styles & Scripts
@@ -163,6 +297,51 @@ function plgc_a11y_meta() {
     echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . "\n";
 }
 add_action('wp_head', 'plgc_a11y_meta', 1);
+
+/**
+ * ============================================================
+ * ACQUIA WEB GOVERNANCE / MONSIDO
+ * ============================================================
+ * Outputs the full script block pasted into PL Settings →
+ * Cookie & Legal → "Acquia Web Governance — Script".
+ *
+ * Placement is controlled by the "Script Placement" dropdown:
+ *   body  →  wp_body_open  (right after <body>, Acquia default)
+ *   head  →  wp_head       (before other scripts, for Consent Mgr)
+ *
+ * Only administrators can edit the options page, so the
+ * unescaped output is intentional.
+ */
+function plgc_acquia_script_output() {
+    static $done = false;
+    if ( $done ) {
+        return;
+    }
+
+    if ( ! function_exists( 'plgc_option' ) ) {
+        return;
+    }
+
+    // Check placement matches the current hook.
+    $placement = plgc_option( 'plgc_acquia_script_placement', 'body' );
+    $hook      = current_action();
+    if ( ( $placement === 'head' && $hook !== 'wp_head' ) ||
+         ( $placement !== 'head' && $hook !== 'wp_body_open' ) ) {
+        return;
+    }
+
+    $script = trim( plgc_option( 'plgc_acquia_script' ) );
+    if ( empty( $script ) ) {
+        return;
+    }
+
+    $done = true;
+
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- admin-only script block
+    echo "\n<!-- Acquia Web Governance -->\n" . $script . "\n<!-- / Acquia -->\n";
+}
+add_action( 'wp_head',      'plgc_acquia_script_output', 5 );
+add_action( 'wp_body_open', 'plgc_acquia_script_output', 5 );
 
 /**
  * ============================================================
