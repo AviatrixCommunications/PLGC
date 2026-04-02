@@ -544,11 +544,10 @@
     display: block;
     padding: 10px 20px 6px;
     font-family: var(--plgc-font-body, 'Open Sans'), sans-serif;
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #888;
+    letter-spacing: 0.04em;
+    color: #666;
     background: var(--plgc-light-grey, #F2F2F2);
     border-bottom: 1px solid var(--plgc-medium-grey, #E7E4E4);
 }

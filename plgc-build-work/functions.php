@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.30');
+define('PLGC_VERSION', '1.7.33');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -249,6 +249,16 @@ function plgc_enqueue_assets() {
     wp_localize_script('plgc-nav', 'plgcNav', [
         'restUrl' => esc_url_raw(rest_url('wp/v2/')),
     ]);
+
+    // Search results page
+    if (is_search()) {
+        wp_enqueue_style(
+            'plgc-search-results',
+            PLGC_URI . '/assets/css/search-results.css',
+            ['plgc-theme'],
+            PLGC_VERSION
+        );
+    }
 }
 add_action('wp_enqueue_scripts', 'plgc_enqueue_assets');
 
@@ -369,6 +379,78 @@ add_filter('rest_attachment_query', function ($args, $request) {
     }
     return $args;
 }, 10, 2);
+
+/**
+ * Exclude noindexed pages from search results.
+ *
+ * Checks Rank Math's `rank_math_robots` post meta for 'noindex'.
+ * Applies to both the front-end search results page (search.php)
+ * and REST API search queries used by the AJAX nav search.
+ *
+ * Common pages excluded: Cart, Checkout, My Account, Privacy Policy,
+ * Terms of Service, Disclaimer, Shop, Membership Application, etc.
+ */
+add_action('pre_get_posts', function ($query) {
+    // Only filter search queries on the front end
+    if (is_admin()) {
+        return;
+    }
+
+    // Must be a search query (covers both search.php and REST /search endpoint)
+    if (! $query->is_search() && empty($query->get('s'))) {
+        return;
+    }
+
+    $excluded = plgc_get_noindex_post_ids();
+    if (! empty($excluded)) {
+        $existing = $query->get('post__not_in');
+        $query->set('post__not_in', array_merge((array) $existing, $excluded));
+    }
+});
+
+/**
+ * Belt-and-suspenders: also filter via rest_post_query for any
+ * REST endpoints that build their own WP_Query args.
+ */
+add_filter('rest_post_query', function ($args, $request) {
+    if (! empty($request->get_param('search'))) {
+        $excluded = plgc_get_noindex_post_ids();
+        if (! empty($excluded)) {
+            $existing = isset($args['post__not_in']) ? (array) $args['post__not_in'] : [];
+            $args['post__not_in'] = array_merge($existing, $excluded);
+        }
+    }
+    return $args;
+}, 10, 2);
+
+/**
+ * Get all post IDs that have Rank Math noindex set.
+ * Cached per-request via static variable. No transient —
+ * the query is fast and this avoids stale cache issues when
+ * Rank Math updates noindex via post meta (which doesn't
+ * trigger save_post).
+ */
+function plgc_get_noindex_post_ids() {
+    static $ids = null;
+
+    if ($ids !== null) {
+        return $ids;
+    }
+
+    global $wpdb;
+
+    // Rank Math stores robots as a serialized array in post meta.
+    // A noindexed post will have 'noindex' somewhere in the value.
+    $results = $wpdb->get_col(
+        "SELECT post_id FROM {$wpdb->postmeta}
+         WHERE meta_key = 'rank_math_robots'
+         AND meta_value LIKE '%noindex%'"
+    );
+
+    $ids = array_map('intval', $results);
+
+    return $ids;
+}
 
 /**
  * ============================================================

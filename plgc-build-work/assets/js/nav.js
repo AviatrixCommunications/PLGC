@@ -297,7 +297,7 @@
         activeRequest = controller;
 
         const contentParams = new URLSearchParams({
-            search: q, per_page: 6, _fields: 'id,title,link,subtype,type',
+            search: q, per_page: 10, _fields: 'id,title,link,subtype,type',
         });
 
         // Pull documents directly from the media library — no WP Engine
@@ -316,8 +316,32 @@
             fetch(contentUrl, { signal: controller.signal }).then(r => r.ok ? r.json() : []),
             fetch(mediaUrl,   { signal: controller.signal }).then(r => r.ok ? r.json() : []),
         ])
-        .then(([pages, docs]) => {
-            renderResults(q, pages || [], docs || []);
+        .then(([pages, rawDocs]) => {
+            // Filter documents: only keep items that are actual files
+            // (have a real file source_url with an extension, not page URLs
+            // injected by the AI Toolkit Custom Search Results feature)
+            const fileExtPattern = /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip|txt)(\?|$)/i;
+            const validDocs = (rawDocs || []).filter(doc => {
+                // Must have a source_url pointing to an actual file
+                if (!doc.source_url || !fileExtPattern.test(doc.source_url)) return false;
+                // Must have a valid document mime_type
+                if (!doc.mime_type || !doc.mime_type.startsWith('application/')) return false;
+                return true;
+            });
+
+            // Deduplicate: remove docs whose title matches a content result
+            const contentTitles = new Set(
+                (pages || []).map(p => {
+                    const t = p.title && p.title.rendered ? p.title.rendered : (p.title || '');
+                    return stripHtml(t).toLowerCase().trim();
+                })
+            );
+            const docs = validDocs.filter(doc => {
+                const t = doc.title && doc.title.rendered ? doc.title.rendered : (doc.title || '');
+                return !contentTitles.has(stripHtml(t).toLowerCase().trim());
+            });
+
+            renderResults(q, pages || [], docs);
         })
         .catch(err => {
             if (err.name !== 'AbortError') {
@@ -326,27 +350,84 @@
         });
     }
 
+    /**
+     * Post-type → friendly category name mapping.
+     * Order here determines display order in results dropdown.
+     */
+    const CATEGORY_MAP = {
+        page:               'Pages',
+        post:               'News & Updates',
+        tribe_events:       'Events',
+        awsm_job_openings:  'Job Openings',
+        product:            'Products',
+    };
+
+    /** SVG icons for result items */
+    const ICONS = {
+        page:     '<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>',
+        event:    '<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        job:      '<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
+        product:  '<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        document: '<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>',
+    };
+
+    function iconForSubtype(subtype) {
+        if (subtype === 'tribe_events')      return ICONS.event;
+        if (subtype === 'awsm_job_openings') return ICONS.job;
+        if (subtype === 'product')           return ICONS.product;
+        return ICONS.page;
+    }
+
     function renderResults(q, pages, docs) {
         if (!resultsBox) return;
 
         const totalCount = pages.length + docs.length;
 
         if (totalCount === 0) {
-            showStatus('No results found for "' + escHtml(q) + '".');
+            showStatus('No results found for \u201c' + escHtml(q) + '\u201d.');
             return;
         }
 
+        // Group content results by post type
+        const groups = {};
+        const groupOrder = Object.keys(CATEGORY_MAP);
+
+        pages.forEach(item => {
+            const sub = item.subtype || 'page';
+            if (!groups[sub]) groups[sub] = [];
+            groups[sub].push(item);
+        });
+
         let html = '';
 
-        if (pages.length > 0) {
-            html += '<span class="plgc-search-results__group-label">Pages &amp; Content</span>';
+        // Render each category in the defined order
+        groupOrder.forEach(key => {
+            if (!groups[key] || groups[key].length === 0) return;
+            const label = CATEGORY_MAP[key] || capitalise(key);
+
+            html += '<span class="plgc-search-results__group-label">' + escHtml(label) + '</span>';
             html += '<ul class="plgc-search-results__list" role="list">';
-            pages.slice(0, 6).forEach(item => {
-                html += resultItem(item, 'page');
+            groups[key].forEach(item => {
+                html += resultItem(item, 'content');
             });
             html += '</ul>';
-        }
+        });
 
+        // Catch any post types not in CATEGORY_MAP (future-proofing)
+        Object.keys(groups).forEach(key => {
+            if (groupOrder.includes(key)) return;
+            if (groups[key].length === 0) return;
+            const label = capitalise(key.replace(/_/g, ' '));
+
+            html += '<span class="plgc-search-results__group-label">' + escHtml(label) + '</span>';
+            html += '<ul class="plgc-search-results__list" role="list">';
+            groups[key].forEach(item => {
+                html += resultItem(item, 'content');
+            });
+            html += '</ul>';
+        });
+
+        // Documents section (from media library)
         if (docs.length > 0) {
             html += '<span class="plgc-search-results__group-label">Documents</span>';
             html += '<ul class="plgc-search-results__list" role="list">';
@@ -359,7 +440,7 @@
         // "See all results" footer
         const searchPageUrl = '/?s=' + encodeURIComponent(q);
         html += '<div class="plgc-search-results__footer">';
-        html += '<a href="' + escHtml(searchPageUrl) + '">See all results for "' + escHtml(q) + '" →</a>';
+        html += '<a href="' + escHtml(searchPageUrl) + '">See all results for \u201c' + escHtml(q) + '\u201d \u2192</a>';
         html += '</div>';
 
         resultsBox.innerHTML = html;
@@ -377,30 +458,37 @@
         // Media library items use source_url (direct file) or link (attachment page)
         const url = item.source_url || item.url || item.link || '#';
 
-        // Friendly label: use mime type for docs (e.g. "PDF", "Word Document")
-        let label;
+        // For documents, show the file type as a subtle label (PDF, Word, etc.)
+        let label = '';
         if (type === 'document') {
             const mime = item.mime_type || '';
             if (mime.includes('pdf'))   label = 'PDF';
-            else if (mime.includes('word') || mime.includes('document')) label = 'Word Document';
+            else if (mime.includes('word') || mime.includes('document')) label = 'Word';
             else if (mime.includes('excel') || mime.includes('sheet'))   label = 'Spreadsheet';
             else label = 'Document';
-        } else {
-            label = item.subtype || 'Page';
         }
 
         // For documents, link directly to file and signal it opens in new tab
-        const targetAttr = type === 'document' ? ' target="_blank" rel="noopener noreferrer"' : '';
+        const targetAttr = type === 'document'
+            ? ' target="_blank" rel="noopener noreferrer"'
+            : '';
 
-        const pageIcon = `<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>`;
-        const docIcon  = `<svg class="plgc-search-results__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>`;
+        const icon = type === 'document'
+            ? ICONS.document
+            : iconForSubtype(item.subtype || 'page');
+
+        // Document items get a file-type badge; content items don't need a label
+        // since the group header identifies them
+        const labelHtml = label
+            ? '<span class="plgc-search-results__item-type">' + escHtml(label) + '</span>'
+            : '';
 
         return '<li class="plgc-search-results__item">'
             + '<a href="' + escHtml(url) + '"' + targetAttr + '>'
-            + (type === 'document' ? docIcon : pageIcon)
-            + '<span>'
+            + icon
+            + '<span class="plgc-search-results__item-text">'
             + '<span class="plgc-search-results__item-title">' + escHtml(stripHtml(title)) + '</span>'
-            + '<span class="plgc-search-results__item-type">' + escHtml(capitalise(label)) + '</span>'
+            + labelHtml
             + '</span>'
             + '</a>'
             + '</li>';
