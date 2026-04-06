@@ -647,10 +647,12 @@
         });
 
         // Row-level click delegation for real-URL items:
-        // clicking anywhere on the row (but not on the <a> itself) triggers expand
+        // clicking anywhere on the row (but not on the <a> or the expand button) triggers expand.
+        // The expand button already has its own handler above — if we don't bail here,
+        // toggleSub fires twice in the same tick (open → immediate close = appears broken).
         mobileNav.querySelectorAll('[data-expand-row]').forEach(row => {
             row.addEventListener('click', e => {
-                if (e.target.closest('a')) return; // let the link navigate normally
+                if (e.target.closest('a') || e.target.closest('.plgc-mobile-nav__expand')) return;
                 const btn = row.querySelector('.plgc-mobile-nav__expand');
                 if (btn) toggleSub(btn);
             });

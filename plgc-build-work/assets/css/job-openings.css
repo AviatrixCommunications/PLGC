@@ -25,19 +25,25 @@
    ============================================================ */
 
 /* Breathing room from header and footer.
-   Target both possible body class formats and the main element. */
+   Target both possible body class formats, the main element,
+   and the custom single-awsm_job_openings.php template wrapper. */
 .single-awsm_job_openings .site-main,
 .single-awsm_job_openings #content,
 .single_awsm_job_openings .site-main,
 .single_awsm_job_openings #content,
-main.awsm_job_openings {
-    padding-top: 3rem;
-    padding-bottom: 4rem;
+main.awsm_job_openings,
+.plgc-job-single {
+    padding-top: 4rem;
+    padding-bottom: 5rem;
 }
 
-/* Constrain content width + center */
-.awsm-job-single-wrap {
-    max-width: 56rem; /* 896px — wider reading width */
+/* Constrain content width + center — applies to AWSM plugin wrapper
+   AND the custom template's content div.
+   72rem = 1152px — matches single event page and feels proportional
+   to the rest of the site's page widths. */
+.awsm-job-single-wrap,
+.plgc-job-single__content {
+    max-width: 72rem;
     margin: 0 auto;
     padding: 0 1.5rem;
 }
@@ -202,7 +208,7 @@ main.awsm_job_openings {
     border: 1px solid var(--plgc-medium-grey, #E7E4E4);
     border-radius: 0.5rem;
     padding: 2rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 /* "Apply for this position" heading */
@@ -957,6 +963,16 @@ main.awsm_job_openings {
         border-radius: 0.25rem;
     }
 
+    /* Single job page: tighter side padding on mobile so content is fuller */
+    .plgc-job-single__content,
+    .awsm-job-single-wrap {
+        padding: 0 1rem !important;
+    }
+    .plgc-job-single {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
+
     .single-awsm_job_openings .site-main,
     .single_awsm_job_openings .site-main,
     .single-awsm_job_openings #content,
@@ -964,6 +980,24 @@ main.awsm_job_openings {
     main.awsm_job_openings {
         padding-top: 2rem;
         padding-bottom: 3rem;
+    }
+
+    /* Filter dropdowns: side-by-side on mobile (Job Category + Job Type) */
+    .awsm-filter-wrap .awsm-filter-items {
+        flex-wrap: nowrap !important;
+        gap: 0.5rem !important;
+    }
+    .awsm-filter-wrap .awsm-filter-item {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+    }
+    .awsm-filter-wrap .awsm-selectric-wrapper {
+        max-width: none !important;
+        width: 100% !important;
+    }
+    .awsm-filter-wrap .awsm-selectric {
+        font-size: 0.8125rem !important;
+        padding: 0.25rem 1.5rem 0.25rem 0.5rem !important;
     }
 
     .awsm-job-page-title {

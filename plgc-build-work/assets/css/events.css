@@ -398,29 +398,408 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 .tribe-tickets .tribe-common-c-btn:focus-visible{outline:none!important;box-shadow:var(--focus)!important}
 
 /* === 15. RESPONSIVE === */
-@media(max-width:60rem){
-  .tribe-events .tribe-events-calendar-list,.tribe-events-calendar-list{grid-template-columns:repeat(2,1fr)!important;gap:1.25rem!important}
-  .tribe-events-single-event-title{font-size:1.75rem!important}
-  .plgc-event-hero{grid-template-columns:1fr 1fr;gap:1.5rem}
-  .tribe-related-events{grid-template-columns:repeat(3,1fr)!important}
-  .plgc-meta-grid{grid-template-columns:1fr 1fr;gap:1rem}
+
+/* ── 15a. Events container — prevent horizontal overflow at ALL sizes ── */
+.tribe-events,
+.tribe-events-view,
+#tribe-events,
+#tribe-events-content {
+  max-width: 100%;
+  overflow-x: hidden;     /* kill horizontal scroll from any oversized child */
+  box-sizing: border-box;
 }
-@media(max-width:48rem){
-  .plgc-event-hero{grid-template-columns:1fr;gap:1rem}
-  .tribe-related-events{grid-template-columns:repeat(2,1fr)!important}
-  .plgc-meta-grid{grid-template-columns:1fr;gap:1rem}
+
+/* ── 15b. Tablet (≤960px) ── */
+@media (max-width: 60rem) {
+  .tribe-events .tribe-events-calendar-list,
+  .tribe-events-calendar-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+  .tribe-events-single-event-title { font-size: 1.75rem !important; }
+  .plgc-event-hero { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .tribe-related-events { grid-template-columns: repeat(3, 1fr) !important; }
+  .plgc-meta-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
 }
-@media(max-width:31.25rem){
-  .tribe-events .tribe-events-calendar-list,.tribe-events-calendar-list{grid-template-columns:1fr!important;gap:1rem!important}
-  #tribe-events-content.tribe-events-single{padding:0 1rem 2rem}
-  .tribe-events-single-event-title{font-size:1.375rem!important}
-  .tribe-events-c-nav__prev,.tribe-events-c-nav__next{font-size:.875rem!important;padding:.625rem 1.25rem!important}
-  .tribe-events-c-subscribe-dropdown__content{min-width:10rem}
-  .tribe-related-events{grid-template-columns:1fr!important}
+
+/* ── 15c. Small tablet / large mobile (≤768px) ── */
+@media (max-width: 48rem) {
+  .plgc-event-hero { grid-template-columns: 1fr; gap: 1rem; }
+  .tribe-related-events { grid-template-columns: repeat(2, 1fr) !important; }
+  .plgc-meta-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* --- Events header: single flex row on mobile ---
+     With search, datepicker, nav arrows, and today all hidden,
+     the only visible children are:
+     - .tribe-events-c-events-bar (contains List/Month tabs)
+     - .tribe-events-c-top-bar (contains subscribe dropdown)
+     Put them on one row: subscribe left, tabs right. */
+  .tribe-events-header {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: .5rem !important;
+    margin-bottom: .5rem !important;
+  }
+
+  /* H1 screen-reader title and H2 visual-hide — full width so they don't disrupt flex */
+  .tribe-events-header__content-title,
+  .tribe-events-header > h2 {
+    flex-basis: 100% !important;
+    width: 100% !important;
+  }
+
+  /* --- Events bar: inline, just holds the tabs now --- */
+  .tribe-events-c-events-bar {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border: none !important;
+    flex: 0 0 auto !important;
+    order: 1 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide search elements (already hidden, reinforce) */
+  .tribe-events-c-events-bar__search-button { display: none !important; }
+  .tribe-events-c-events-bar__search-container { display: none !important; }
+  .tribe-events-c-view-selector__button { display: none !important; }
+
+  /* Force tabs visible */
+  .tribe-events-c-view-selector__content {
+    display: block !important;
+  }
+
+  /* --- Views wrapper: inline, no extra spacing --- */
+  .tribe-events-c-events-bar__views {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    width: auto !important;
+  }
+  .tribe-events-c-view-selector,
+  .tribe-events-c-view-selector--labels,
+  .tribe-events-c-view-selector--tabs {
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__content {
+    width: auto !important;
+  }
+  .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list {
+    flex-wrap: nowrap !important;
+    width: auto !important;
+  }
+
+  /* --- Top bar: inline, just holds subscribe now --- */
+  .tribe-events-c-top-bar {
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    order: 2 !important;
+  }
+
+  /* Hide everything in top bar except subscribe */
+  .tribe-events-c-top-bar__datepicker { display: none !important; }
+  .tribe-events-c-top-bar__nav { display: none !important; }
+  .tribe-events-c-top-bar__today-button { display: none !important; }
+  .tribe-events-c-top-bar__actions { display: none !important; }
+
+  /* Subscribe: compact, no forced full-width */
+  .tribe-events-c-subscribe-dropdown {
+    margin: 0 !important;
+    flex-basis: auto !important;
+  }
+
+  /* --- Month separator: tighten top gap on mobile --- */
+  .tribe-events-calendar-list__month-separator {
+    margin-top: .5rem !important;
+    margin-bottom: .5rem !important;
+  }
+  .tribe-events-calendar-list__month-separator:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* --- Datepicker dropdown: contain within viewport --- */
+  .tribe-events .datepicker,
+  .tribe-events-c-top-bar .datepicker {
+    max-width: calc(100vw - 2rem) !important;
+    left: 0 !important;
+    right: auto !important;
+    font-size: .875rem !important;
+  }
+  .tribe-events .datepicker table {
+    width: 100% !important;
+  }
+  .tribe-events .datepicker td,
+  .tribe-events .datepicker th {
+    padding: .375rem !important;
+    width: auto !important;
+  }
+
+  /* --- Month view: contain the calendar table --- */
+  .tribe-events-calendar-month {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    overflow-x: hidden !important;
+  }
+  .tribe-events-calendar-month__header-column {
+    padding: .5rem .25rem !important;
+    font-size: .6875rem !important;
+  }
+  .tribe-events-calendar-month__calendar-event-col {
+    padding: .125rem !important;
+    min-height: 3.5rem !important;
+    word-break: break-word;
+    overflow: hidden;
+  }
+  .tribe-events-calendar-month__calendar-event-date {
+    font-size: .75rem !important;
+    padding: .125rem !important;
+  }
+  /* Event pills in month cells: truncate to prevent overflow */
+  .tribe-events-calendar-month__calendar-event-link,
+  a.tribe-events-calendar-month__calendar-event-link {
+    font-size: .625rem !important;
+    padding: .0625rem .25rem !important;
+    line-height: 1.3 !important;
+  }
+  /* Multi-day bars */
+  .tribe-events-calendar-month__multiday-event-bar-inner {
+    font-size: .625rem !important;
+  }
+  .tribe-events-calendar-month__multiday-event-bar-title {
+    font-size: .625rem !important;
+  }
+
+  /* --- Month view mobile event list (below calendar) --- */
+  .tribe-events-calendar-month-mobile-events {
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+  .tribe-events-calendar-month-mobile-events__mobile-event {
+    padding: .75rem !important;
+  }
+
+  /* --- Month/List nav (< Apr / This Month / Jun >) --- */
+  .tribe-events-c-nav__list {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: .5rem !important;
+  }
+  .tribe-events-c-nav__prev,
+  .tribe-events-c-nav__next {
+    font-size: .875rem !important;
+    padding: .625rem 1.25rem !important;
+    white-space: nowrap;
+  }
+  /* Today link sits between prev/next — center in its own row if wrapping */
+  .tribe-events-c-nav__list-item--today {
+    flex-basis: 100% !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+    order: 3 !important;
+  }
+  .tribe-events-c-nav__list-item--prev {
+    order: 1 !important;
+  }
+  .tribe-events-c-nav__list-item--next {
+    order: 2 !important;
+  }
 }
-@media(prefers-reduced-motion:reduce){
-  .tribe-events-calendar-list__event,.tribe-events-calendar-list__event-featured-image,
-  .tribe-related-events>li,.tribe-related-events-thumbnail img,
-  .tribe-events-c-nav__prev,.tribe-events-c-nav__next,.tribe-common-c-btn{transition:none!important}
+
+/* ── 15d. Mobile (≤500px) ── */
+@media (max-width: 31.25rem) {
+  .tribe-events .tribe-events-calendar-list,
+  .tribe-events-calendar-list {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  #tribe-events-content.tribe-events-single { padding: 0 1rem 2rem; }
+  .tribe-events-single-event-title { font-size: 1.375rem !important; }
+  .tribe-related-events { grid-template-columns: 1fr !important; }
+
+  /* --- Events bar: tighten padding --- */
+  .tribe-events-c-events-bar {
+    padding: .375rem !important;
+    border: none !important;
+  }
+
+  /* --- Search input: full width --- */
+  .tribe-events-c-search__input-control {
+    width: 100% !important;
+  }
+  .tribe-common-form-control-text__input {
+    width: 100% !important;
+    min-height: 2.75rem !important;
+  }
+
+  /* --- View selector: compact on small screens --- */
+  .tribe-events-c-view-selector--labels .tribe-events-c-view-selector__list-item-link {
+    padding: .375rem .625rem !important;
+    font-size: .8125rem !important;
+    min-height: 2.75rem !important;
+    min-width: 2.75rem !important;
+  }
+
+  /* --- Top bar date picker --- */
+  .tribe-events-c-top-bar__datepicker-button {
+    font-size: 1.125rem !important;
+  }
+
+  /* --- Subscribe dropdown: center and constrain --- */
+  .tribe-events-c-subscribe-dropdown__content {
+    min-width: 10rem;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+
+  /* --- Month view: even tighter for phones --- */
+  .tribe-events-calendar-month__header-column {
+    padding: .375rem .125rem !important;
+    font-size: .625rem !important;
+  }
+  .tribe-events-calendar-month__calendar-event-col {
+    min-height: 2.75rem !important;
+    padding: .0625rem !important;
+  }
+  .tribe-events-calendar-month__calendar-event-date {
+    font-size: .6875rem !important;
+  }
+  /* Hide individual event text in cells on very small screens — use dots only */
+  .tribe-events-calendar-month__calendar-event-link,
+  a.tribe-events-calendar-month__calendar-event-link {
+    font-size: 0 !important;
+    height: .375rem !important;
+    min-height: .375rem !important;
+    line-height: 0 !important;
+    padding: 0 !important;
+    margin: .0625rem auto !important;
+    width: .375rem !important;
+    border-radius: 50% !important;
+    display: block !important;
+  }
+  /* Multi-day bars: also collapse to dots */
+  .tribe-events-calendar-month__multiday-event-bar {
+    height: .375rem !important;
+    min-height: .375rem !important;
+  }
+  .tribe-events-calendar-month__multiday-event-bar-inner {
+    border-radius: .1875rem !important;
+    height: .375rem !important;
+  }
+  .tribe-events-calendar-month__multiday-event-bar-title {
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  /* --- "More events" count button in month cells --- */
+  .tribe-events-calendar-month__calendar-event-col-count-button {
+    font-size: .625rem !important;
+    min-height: 2rem !important;
+    padding: .125rem !important;
+  }
+
+  /* --- Month view tooltip: full-width overlay on mobile --- */
+  .tribe-events-calendar-month__calendar-event-tooltip {
+    position: fixed !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    top: auto !important;
+    bottom: 1rem !important;
+    max-width: none !important;
+    width: auto !important;
+    z-index: 9999 !important;
+    border-radius: .25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .15) !important;
+  }
+
+  /* --- Event card details: more compact --- */
+  .tribe-events-calendar-list__event-details,
+  .tribe-events-calendar-list__event-details.tribe-common-g-col,
+  .tribe-common--breakpoint-medium .tribe-events-calendar-list__event-details,
+  .tribe-common--breakpoint-medium.tribe-events .tribe-events-calendar-list__event-details {
+    padding: 1rem .75rem !important;
+  }
 }
-.tribe-events-view.plgc-filtered .tribe-events-c-events-bar__views,.tribe-events-view.plgc-filtered .tribe-events-c-view-selector{display:none!important}
+
+/* ── 15e. WCAG contrast enforcement for mobile ──
+   TEC's breakpoint classes can cause color inheritance issues on mobile.
+   Ensure all text/background combos meet 4.5:1 for normal text, 3:1 for large. */
+
+/* Month view: today cell — white text on dark green, not brand green.
+   #567915 on white = 5.07:1 (passes), but black on #567915 = 4.14:1 (fails normal).
+   Force white text when any element sits on the accent green background.
+   TEC V2 uses two different markup patterns for the date number:
+   - Desktop grid: .tribe-events-calendar-month__calendar-event-date
+   - V2 day cells: .tribe-events-calendar-month__day-date-daynum (inside h3.tribe-events-calendar-month__day-date)
+   Both need white text when they're inside the "today" cell. */
+.tribe-events-calendar-month__calendar-event-col--today
+  .tribe-events-calendar-month__calendar-event-date {
+  color: var(--wh, #FFF) !important;
+}
+
+/* V2 month view: today's AND selected day — white text on green background.
+   TEC adds --current for today, --selected when user taps a different date.
+   Both states get the green background circle, both need white text. */
+.tribe-events-calendar-month__day--current .tribe-events-calendar-month__day-date,
+.tribe-events-calendar-month__day--current .tribe-events-calendar-month__day-date-daynum,
+.tribe-events-calendar-month__day--current .tribe-common-h6,
+.tribe-events-calendar-month__day-cell--selected .tribe-events-calendar-month__day-date,
+.tribe-events-calendar-month__day-cell--selected .tribe-events-calendar-month__day-date-daynum,
+.tribe-events-calendar-month__day-cell--selected .tribe-common-h6,
+[data-js="tribe-events-month-grid-cell-header-today"] .tribe-events-calendar-month__day-date-daynum {
+  color: var(--wh, #FFF) !important;
+}
+
+/* Event pills: white on green — already set, reinforce for specificity */
+.tribe-events-calendar-month__calendar-event-link,
+a.tribe-events-calendar-month__calendar-event-link {
+  color: var(--wh, #FFF) !important;
+}
+
+/* Mobile event list under month calendar — ensure black text on white bg */
+.tribe-events-calendar-month-mobile-events__mobile-event-title a {
+  color: var(--bk, #000) !important;
+}
+.tribe-events-calendar-month-mobile-events__mobile-event-date {
+  color: var(--g, #567915) !important;
+}
+
+/* Series icon stroke: ensure it's visible against its background */
+.tribe-events-calendar-series-archive__icon rect,
+.tribe-events-calendar-series-archive__icon path {
+  stroke: var(--g, #567915) !important;
+}
+
+/* Subscribe dropdown button text: black on white — always readable */
+.tribe-events-c-subscribe-dropdown__button-text {
+  color: var(--bk, #000) !important;
+}
+
+/* ── 15f. Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .tribe-events-calendar-list__event,
+  .tribe-events-calendar-list__event-featured-image,
+  .tribe-related-events > li,
+  .tribe-related-events-thumbnail img,
+  .tribe-events-c-nav__prev,
+  .tribe-events-c-nav__next,
+  .tribe-common-c-btn { transition: none !important; }
+}
+
+/* ── 15g. Filtered view (shortcode categories) ── */
+.tribe-events-view.plgc-filtered .tribe-events-c-events-bar__views,
+.tribe-events-view.plgc-filtered .tribe-events-c-view-selector {
+  display: none !important;
+}
+

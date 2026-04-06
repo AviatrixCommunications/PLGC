@@ -377,30 +377,30 @@
 
 /* ─────────────────────────────────────────────────────────────────────────────
    McCHESNEY'S SPECIFIC OVERRIDES
-   The badge is pulled out of flow so it has zero impact on card height, but
-   visually appears exactly 24px to the right of the button (matching Figma
-   node 42551:9344: gap-[24px] items-center).
+   The badge sits next to the button in normal flex flow, vertically centred.
 
-   Technique:
-   - btn-row uses `inline-flex` so its width collapses to the button's natural
-     width (the only in-flow child).
-   - badge-link is position:absolute relative to that btn-row.
-   - `left: calc(100% + 24px)` = btn-row width (= button width) + 24px gap.
-   - `top: 50%; translateY(-50%)` vertically centres the badge with the button.
-   - Card height stays the same as Golf Outings and Weddings cards. ✓
+   Negative margins on the badge-link compensate for the badge being taller
+   than the button (126 px vs 47 px = 79 px difference). Splitting that
+   difference: -39.5 px top and bottom keeps the flex row's layout height
+   at roughly the button height, so the McChesney's card matches the other
+   cards — without needing position:absolute (which gets clipped by
+   overflow:hidden on .plgc-gs and any Elementor wrapper ancestors).
    ───────────────────────────────────────────────────────────────────────────── */
 
 .plgc-gs--mcchesneys .plgc-gs__btn-row {
-    display: inline-flex; /* width shrinks to button content only */
-    position: relative;   /* positioning context for the badge */
+    display: flex;
+    align-items: center;
+    gap: 24px;
     flex-wrap: nowrap;
 }
 
 .plgc-gs--mcchesneys .plgc-gs__badge-link {
-    position: absolute;
-    left: calc(100% + 24px); /* button width + 24px gap — matches Figma */
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    margin-top: -39.5px;
+    margin-bottom: -39.5px;
+    transform: none;
+    left: auto;
+    top: auto;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -462,18 +462,12 @@
         right: auto;
     }
 
-    /* McChesney's badge: revert to normal flex flow on tablet/mobile.
-       The card is full-width here so the badge flowing inline is fine. */
-    .plgc-gs--mcchesneys .plgc-gs__btn-row {
-        display: flex;
-        position: static;
-    }
-
+    /* McChesney's badge: remove the negative margins that were keeping card
+       height compact on desktop. On tablet/mobile the card is full-width,
+       so the badge flowing inline at full height is fine. */
     .plgc-gs--mcchesneys .plgc-gs__badge-link {
-        position: static;
-        transform: none;
-        left: auto;
-        top: auto;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 }
 
