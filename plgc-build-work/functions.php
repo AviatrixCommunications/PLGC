@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.36');
+define('PLGC_VERSION', '1.7.42');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -260,6 +260,16 @@ function plgc_enqueue_assets() {
         );
     }
 
+    // News & Updates — archive listing and single articles
+    if (is_home() || is_archive() || is_singular('post')) {
+        wp_enqueue_style(
+            'plgc-news',
+            PLGC_URI . '/assets/css/news.css',
+            ['plgc-theme'],
+            PLGC_VERSION
+        );
+    }
+
     // 404 page
     if (is_404()) {
         wp_enqueue_style(
@@ -317,6 +327,44 @@ function plgc_a11y_meta() {
     echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . "\n";
 }
 add_action('wp_head', 'plgc_a11y_meta', 1);
+
+/**
+ * Conditional noindex for News & Updates while empty.
+ *
+ * Prevents search engines from indexing the blog archive and single
+ * post pages while there are zero published posts. Automatically
+ * lifts the restriction the moment the first article is published —
+ * no manual action required.
+ *
+ * Uses a transient to avoid a COUNT query on every page load.
+ */
+function plgc_news_conditional_noindex() {
+    if (! is_home() && ! is_singular('post') && ! (is_archive() && ! is_post_type_archive())) {
+        return;
+    }
+
+    // Cache the post count for 1 hour.
+    $count = get_transient('plgc_published_post_count');
+    if ($count === false) {
+        $count = (int) wp_count_posts('post')->publish;
+        set_transient('plgc_published_post_count', $count, HOUR_IN_SECONDS);
+    }
+
+    if ($count < 1) {
+        echo '<meta name="robots" content="noindex, follow">' . "\n";
+    }
+}
+add_action('wp_head', 'plgc_news_conditional_noindex', 2);
+
+/**
+ * Flush the post count transient when a post is published or trashed.
+ */
+function plgc_flush_post_count_transient($new_status, $old_status, $post) {
+    if ($post->post_type === 'post' && ($new_status === 'publish' || $old_status === 'publish')) {
+        delete_transient('plgc_published_post_count');
+    }
+}
+add_action('transition_post_status', 'plgc_flush_post_count_transient', 10, 3);
 
 /**
  * ============================================================

@@ -272,3 +272,26 @@ function plgc_elementor_container_defaults($args) {
     }
     return $args;
 }
+
+/**
+ * ============================================================
+ * DISABLE ELEMENTOR AI ON CONTROLS
+ * ============================================================
+ * Removes the AI button from all Elementor widget controls.
+ * Uses Elementor's official control API (update_control with ai => false).
+ * Works alongside the user-option filter in admin-cleanup.php.
+ */
+function plgc_remove_ai_from_controls($element, $section_id, $args) {
+    $controls = $element->get_controls();
+    if (empty($controls)) {
+        return;
+    }
+    foreach ($controls as $control) {
+        if (! empty($control['ai'])) {
+            $element->update_control($control['name'], [
+                'ai' => false,
+            ]);
+        }
+    }
+}
+add_action('elementor/element/before_section_start', 'plgc_remove_ai_from_controls', 10, 3);

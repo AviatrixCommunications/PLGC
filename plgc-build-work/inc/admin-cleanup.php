@@ -123,10 +123,14 @@ function plgc_add_menu_section_headers() {
     global $menu;
 
     // Section headers: slug => label
+    // Organized by how a golf club staff member thinks about their site.
     $sections = [
         'plgc-section-content'     => 'Content',
+        'plgc-section-events'      => 'Events & Dining',
+        'plgc-section-shop'        => 'Shop',
+        'plgc-section-manage'      => 'Manage',
         'plgc-section-compliance'  => 'Compliance',
-        'plgc-section-admin'       => 'Admin Settings',
+        'plgc-section-admin'       => 'Developer',
     ];
 
     foreach ($sections as $slug => $label) {
@@ -170,28 +174,48 @@ function plgc_custom_menu_order($menu_order) {
         'edit.php?post_type=page',             // Pages
         'upload.php',                          // Media
         'edit.php',                            // News & Updates
-        'edit.php?post_type=tribe_events',     // Events Calendar (if active)
-        'edit.php?post_type=product',          // WooCommerce Products (if active)
-        'woocommerce',                         // WooCommerce Orders (if active)
+
+        // ── Events & Dining ──
+        'plgc-section-events',
+        'edit.php?post_type=tribe_events',     // Events
+        'tec-tickets',                         // Tickets
+        'edit.php?post_type=plgc_menu_item',   // Restaurant Menu
+
+        // ── Shop ──
+        'plgc-section-shop',
+        'edit.php?post_type=product',          // Products
+        'woocommerce',                         // Orders
+
+        // ── Manage ──
+        'plgc-section-manage',
+        'gf_edit_forms',                       // Forms
+        'edit.php?post_type=awsm_job_openings', // Job Openings
+        'alert-bar-settings',                  // Alert Bar
+        'plgc-particles',                      // Particles
+        'plgc-settings',                       // PL Settings
+        'users.php',                           // Users
+        'themes.php',                          // Menus (Appearance)
 
         // ── Compliance ──
         'plgc-section-compliance',
-        'plgc-accessibility',                  // ♿ Accessibility Dashboard (+ Bulk Scanner submenu)
+        'plgc-accessibility',                  // ♿ Accessibility Dashboard
 
-        // ── Admin Settings ──
+        // ── Developer (admin only) ──
         'plgc-section-admin',
-        'users.php',
-        'themes.php',
         'plugins.php',
         'options-general.php',
         'tools.php',
         'wpengine-common',                     // WP Engine
-        'separator-elementor',                 // Elementor separator (hidden via CSS)
-        'elementor',                           // Elementor editor (hidden by Elementor's own CSS)
-        'edit.php?post_type=elementor_library', // Templates (hidden by Elementor's own CSS)
+        'rank-math',                           // Rank Math SEO
+        'edit.php?post_type=acf-field-group',  // ACF
+        'gravitysmtp-dashboard',               // SMTP
+        'wpengine-ai-toolkit',                 // WP Engine AI ToolKit
+        'separator-elementor',                 // Elementor separator
+        'elementor',                           // Elementor
+        'edit.php?post_type=elementor_library', // Templates
         'elementor-home',                      // Elementor Home
-        'separator1',                          // WP separator (hidden via CSS)
-        'hello-elementor',                     // Hello theme
+        'separator1',                          // WP separator
+        'hello-elementor',                     // Hello
     ];
 }
 add_filter('custom_menu_order', 'plgc_custom_menu_order');
@@ -205,31 +229,50 @@ function plgc_cleanup_admin_menu() {
     // For everyone: remove items that aren't needed
     remove_menu_page('edit-comments.php');
 
-    // For non-admins: remove developer/settings items + their section header
+    // WooCommerce Marketing & Payments — disabled features that link to dead pages.
+    // Must be removed for ALL users (including admins) to avoid "not allowed" errors.
+    remove_menu_page('woocommerce-marketing');
+    remove_menu_page('admin.php?page=wc-settings&tab=checkout&from=PAYMENTS_MENU_ITEM');
+
+    // For non-admins: remove developer tools + their section header
     if (! current_user_can('administrator')) {
-        // Core WP
+        // Core WP settings
         remove_menu_page('tools.php');
         remove_menu_page('options-general.php');
         remove_menu_page('plugins.php');
-        remove_menu_page('themes.php');
 
-        // Hide the "Admin Settings" section header
+        // Appearance: keep for Site Managers (they need Menus), hide for others
+        if (! current_user_can('plgc_site_manager')) {
+            remove_menu_page('themes.php');
+        } else {
+            // Site Managers: hide theme/customizer sub-items but keep Menus
+            remove_submenu_page('themes.php', 'themes.php');
+            remove_submenu_page('themes.php', 'customize.php');
+            remove_submenu_page('themes.php', 'theme-editor.php');
+        }
+
+        // Hide the "Developer" section header entirely
         remove_menu_page('plgc-section-admin');
 
-        // Third-party dev tools
+        // Third-party dev tools — admin only
         remove_menu_page('elementor');
         remove_menu_page('elementor-home');
         remove_menu_page('edit.php?post_type=elementor_library');
         remove_menu_page('elementor-app');
         remove_menu_page('wpengine-common');
-
-        // Hello theme
         remove_menu_page('hello-elementor');
+        remove_menu_page('rank-math');
+        remove_menu_page('gravitysmtp-dashboard');
+        remove_menu_page('wpengine-ai-toolkit');
 
-        // WooCommerce sub-items clients don't need
+        // ACF options — dev only (PL Settings uses it but has its own menu)
+        remove_menu_page('edit.php?post_type=acf-field-group');
+
+        // WooCommerce sub-items that are settings/dev-only
         remove_submenu_page('woocommerce', 'wc-settings');
         remove_submenu_page('woocommerce', 'wc-status');
         remove_submenu_page('woocommerce', 'wc-addons');
+        remove_submenu_page('woocommerce', 'wc-admin&path=/marketing');
 
         // Events Calendar settings
         remove_submenu_page('edit.php?post_type=tribe_events', 'tec-events-settings');
@@ -244,8 +287,8 @@ function plgc_cleanup_admin_menu() {
     if (current_user_can('plgc_client') && ! current_user_can('administrator')) {
         remove_menu_page('users.php');
         remove_menu_page('profile.php');
-
-        // Only show relevant WooCommerce items
+        remove_menu_page('themes.php');
+        remove_menu_page('plgc-section-manage'); // hide Manage section entirely for read-only clients
         remove_submenu_page('woocommerce', 'wc-reports');
     }
 }
@@ -258,20 +301,26 @@ add_action('admin_menu', 'plgc_cleanup_admin_menu', 999);
 function plgc_rename_menu_labels() {
     global $menu, $submenu;
 
-    // Rename "Posts" to "News & Updates" (more intuitive for a golf club)
     foreach ($menu as $key => $item) {
-        if ($item[2] === 'edit.php') {
-            $menu[$key][0] = 'News & Updates';
+        switch ($item[2]) {
+            // "Posts" → "News & Updates"
+            case 'edit.php':
+                $menu[$key][0] = 'News & Updates';
+                break;
+
+            // "WooCommerce" → "Orders" (Products is already a separate menu)
+            case 'woocommerce':
+                $menu[$key][0] = 'Orders';
+                break;
+
+            // For Site Managers: "Appearance" → "Menus" since that's all they see
+            case 'themes.php':
+                if (! current_user_can('administrator')) {
+                    $menu[$key][0] = 'Menus';
+                }
+                break;
         }
     }
-
-    // Rename WooCommerce to "Pro Shop" if more intuitive
-    // Uncomment if the client sells merchandise online:
-    // foreach ($menu as $key => $item) {
-    //     if ($item[2] === 'edit.php?post_type=product') {
-    //         $menu[$key][0] = 'Pro Shop';
-    //     }
-    // }
 }
 add_action('admin_menu', 'plgc_rename_menu_labels', 998);
 
@@ -325,13 +374,23 @@ function plgc_remove_dashboard_widgets() {
     if (! current_user_can('administrator')) {
         remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
         remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
+        remove_meta_box('woocommerce_dashboard_setup', 'dashboard', 'normal');
     }
 
     // Elementor dashboard widget
     remove_meta_box('e-dashboard-overview', 'dashboard', 'normal');
 
-    // Yoast / other plugin widgets
+    // Yoast / Rank Math
     remove_meta_box('wpseo-dashboard-overview', 'dashboard', 'normal');
+    remove_meta_box('rank_math_dashboard_widget', 'dashboard', 'normal');
+
+    // Events Calendar news — plugin changelogs, not useful for anyone
+    remove_meta_box('tribe_dashboard_widget', 'dashboard', 'normal');
+    remove_meta_box('tribe_dashboard_widget', 'dashboard', 'side');
+
+    // Gravity Forms dashboard widget — low value on dashboard
+    remove_meta_box('rg_forms_dashboard', 'dashboard', 'normal');
+    remove_meta_box('rg_forms_dashboard', 'dashboard', 'side');
 }
 add_action('wp_dashboard_setup', 'plgc_remove_dashboard_widgets', 999);
 
@@ -391,12 +450,15 @@ function plgc_welcome_widget() {
             <a href="<?php echo admin_url('edit.php?post_type=tribe_events'); ?>" class="button" style="text-align: center;">Manage Events</a>
             <a href="<?php echo admin_url('edit.php'); ?>" class="button" style="text-align: center;">News & Updates</a>
         </div>
-        <?php if (current_user_can('administrator')) : ?>
+        <?php if (current_user_can('plgc_site_manager') || current_user_can('administrator')) : ?>
             <p style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
-                <strong>Admin:</strong>
+                <strong>Management:</strong>
                 <a href="<?php echo admin_url('edit.php?post_type=product'); ?>">Products</a> |
                 <a href="<?php echo admin_url('admin.php?page=wc-orders'); ?>">Orders</a> |
                 <a href="<?php echo admin_url('users.php'); ?>">Users</a>
+                <?php if (current_user_can('administrator')) : ?>
+                    | <a href="<?php echo admin_url('admin.php?page=gf_edit_forms'); ?>">Forms</a>
+                <?php endif; ?>
             </p>
         <?php endif; ?>
     </div>
@@ -599,6 +661,110 @@ function plgc_cleanup_events_calendar() {
 }
 add_action('admin_init', 'plgc_cleanup_events_calendar', 20);
 
+
+/**
+ * ============================================================
+ * ELEMENTOR AI — DISABLE SITE-WIDE
+ * ============================================================
+ * Removes all Elementor AI buttons, prompts, and notifications.
+ * Uses Elementor's official user option filter — update-safe.
+ */
+
+// Disable the AI feature for all users via their user option.
+add_filter('get_user_option_elementor_enable_ai', '__return_zero');
+
+// Hide the AI preference toggle from user profiles so it can't be re-enabled.
+function plgc_hide_elementor_ai_user_pref() {
+    global $pagenow;
+    if ($pagenow === 'profile.php' || $pagenow === 'user-edit.php') {
+        echo '<style>
+            tr:has(+ tr #elementor_enable_ai),
+            tr:has(#elementor_enable_ai) { display: none; }
+        </style>';
+    }
+}
+add_action('admin_head', 'plgc_hide_elementor_ai_user_pref');
+
+// Belt-and-suspenders: also hide AI buttons via editor CSS.
+function plgc_hide_elementor_ai_editor() {
+    echo '<style>
+        .e-ai-button,
+        .e-ai-badge,
+        .elementor-ai-get-started,
+        [class*="ai-promotion"],
+        [class*="ai-excerpt"] { display: none !important; }
+    </style>';
+}
+add_action('elementor/editor/before_enqueue_scripts', 'plgc_hide_elementor_ai_editor');
+
+
+/**
+ * ============================================================
+ * ADMIN NOTIFICATION SUPPRESSION
+ * ============================================================
+ * Non-admin users should not see plugin update nags, WP Engine
+ * notices, Elementor promos, or third-party noise. Admins still
+ * see everything — they need to know about updates.
+ */
+function plgc_suppress_admin_notices_for_non_admins() {
+    if (current_user_can('administrator')) {
+        return;
+    }
+
+    // Remove all third-party admin notices for non-admin users.
+    // Core WP notices (errors, warnings) still display via admin_notices.
+    remove_all_actions('admin_notices');
+    remove_all_actions('all_admin_notices');
+
+    // Re-add only our custom PLGC notices (accessibility guardrails, etc.)
+    add_action('admin_notices', 'plgc_content_guardrails_notices');
+}
+add_action('admin_init', 'plgc_suppress_admin_notices_for_non_admins', 999);
+
+/**
+ * Hide WP update nags and plugin promo banners for non-admins via CSS.
+ * This catches things that slip through the action removal above.
+ */
+function plgc_hide_admin_nags_css() {
+    if (current_user_can('administrator')) {
+        return;
+    }
+    echo '<style>
+        .update-nag,
+        .notice:not(.plgc-notice):not(.notice-error):not(.notice-success):not(.notice-warning),
+        .woocommerce-message,
+        .woocommerce-StoreAlert,
+        .tribe-admin-notice,
+        .rank-math-notice,
+        .rank-math-warning,
+        #rank-math-review-plugin-notice,
+        .shortpixel-notice,
+        .wp-mail-smtp-admin-notice,
+        .yoast-notice,
+        [id*="elementor-notice"],
+        [id*="elementor-pro-notice"],
+        .e-notice,
+        .wpengine-notification,
+        #wpe-ab-test-notice {
+            display: none !important;
+        }
+    </style>';
+}
+add_action('admin_head', 'plgc_hide_admin_nags_css', 999);
+
+/**
+ * Dismiss WooCommerce setup wizard permanently.
+ * Prevents the "Complete store setup" nag from showing.
+ */
+function plgc_dismiss_woo_setup_wizard() {
+    if (class_exists('WooCommerce')) {
+        // Mark setup as complete
+        update_option('woocommerce_task_list_hidden', 'yes');
+        update_option('woocommerce_task_list_complete', 'yes');
+    }
+}
+add_action('admin_init', 'plgc_dismiss_woo_setup_wizard', 5);
+
 /**
  * ============================================================
  * LOGIN PAGE BRANDING
@@ -634,10 +800,23 @@ function plgc_login_logo() {
     ?>
     <style>
 
-        /* ── Page background ── */
+        /* ── Page background — clean, light, modern ── */
         body.login {
-            background-color: #233C26;
+            background-color: #F2F2F2;
             font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* ── Accent bar at top of page ── */
+        body.login::before {
+            content: '';
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #233C26 0%, #567915 50%, #FFAE40 100%);
+            z-index: 9999;
         }
 
         /* ── Logo ── */
@@ -648,14 +827,14 @@ function plgc_login_logo() {
             height: 100px;
             background-repeat: no-repeat;
             background-position: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         /* ── Form card ── */
         .login form {
             border-radius: 10px;
             border: none !important;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
             padding: 26px 24px 34px;
             background: #fff;
         }
@@ -747,7 +926,7 @@ function plgc_login_logo() {
         .login #backtoblog a,
         .login #nav a,
         .login .privacy-policy-page-link a {
-            color: #FFAE40 !important;
+            color: #567915 !important;
             font-family: 'Open Sans', sans-serif;
             font-size: 14px;
             text-decoration: none;
@@ -756,14 +935,14 @@ function plgc_login_logo() {
         .login #backtoblog a:hover,
         .login #nav a:hover,
         .login .privacy-policy-page-link a:hover {
-            color: #FDBC69 !important;
+            color: #233C26 !important;
             text-decoration: underline;
         }
         .login #backtoblog a:focus,
         .login #nav a:focus,
         .login .privacy-policy-page-link a:focus {
-            color: #FDBC69 !important;
-            outline: 2px solid #FFAE40;
+            color: #233C26 !important;
+            outline: 2px solid #567915;
             outline-offset: 2px;
             border-radius: 2px;
         }
@@ -939,12 +1118,27 @@ function plgc_admin_styles() {
             border-radius: 4px !important;
         }
         .wp-core-ui .button-primary {
-            background: <?php echo $brand_dark; ?> !important;
-            border-color: <?php echo $brand_dark; ?> !important;
+            background: #FFAE40 !important;
+            border-color: #FFAE40 !important;
+            color: #000 !important;
+            text-shadow: none !important;
         }
         .wp-core-ui .button-primary:hover {
-            background: #1a2d1d !important;
-            border-color: #1a2d1d !important;
+            background: #FDBC69 !important;
+            border-color: #FDBC69 !important;
+            color: #000 !important;
+        }
+        .wp-core-ui .button-primary:focus {
+            background: #FDBC69 !important;
+            border-color: #FDBC69 !important;
+            color: #000 !important;
+            box-shadow: 0 0 0 1px #fff, 0 0 0 3px #567915 !important;
+        }
+        .wp-core-ui .button-primary:disabled,
+        .wp-core-ui .button-primary[disabled] {
+            background: #E7E4E4 !important;
+            border-color: #E7E4E4 !important;
+            color: #999 !important;
         }
 
         /* ============================================================
