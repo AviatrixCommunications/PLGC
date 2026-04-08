@@ -1,0 +1,162 @@
+/**
+ * Alert Banner 
+ */
+
+.notification-banner {
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow: hidden;
+  height: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+}
+
+@media (min-width: 768px) {
+  .notification-banner {
+    font-size: 1rem;
+  }
+}
+
+.site-banner {
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+.site-banner + .site-banner {
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.site-banner p {
+  margin: 0;
+}
+
+.site-banner a:not(.alert-banner-btn) {
+  text-decoration: underline;
+  transition: 0.3s ease-in-out all;
+  color: #333;
+}
+
+.site-banner a:not(.alert-banner-btn):hover,
+.site-banner a:not(.alert-banner-btn):focus {
+  text-decoration-color: transparent;
+}
+
+.alert-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (min-width: 768px) {
+  .alert-banner-inner {
+    gap: 32px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .alert-banner-inner {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 1099px) {
+  .alert-banner-inner {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .alert-banner-inner {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .alert-banner-inner {
+    padding: 0 12px;
+  }
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+}
+
+.banner-content > div {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .banner-content {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.alert-banner-btn {
+  display: inline-block;
+  text-decoration: none;
+  background-color: #333;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 12px 24px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: 0.2s ease-in-out all;
+}
+
+.alert-banner-btn:hover,
+.alert-banner-btn:focus {
+  background-color: #555;
+  color: #fff;
+  text-decoration: none;
+}
+
+.alert-banner-btn:focus-visible {
+  outline: 2px dotted #333;
+  outline-offset: 2px;
+}
+
+.alert-close {
+  height: 44px;
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.alert-close svg {
+  fill: #333;
+}
+
+.alert-close:hover,
+.alert-close:focus {
+  background-color: transparent;
+  border: 0;
+}
+
+.alert-close:focus-visible {
+  outline: 2px solid #333;
+}
