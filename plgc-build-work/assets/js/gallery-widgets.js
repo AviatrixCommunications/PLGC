@@ -175,20 +175,32 @@
                 var px  = ( autoScrollSpeed * dt ) / 1000;
                 var max = track.scrollWidth - track.clientWidth;
                 if ( track.scrollLeft >= max - 1 ) {
+                    // Wrap around: smooth-scroll back to start, then resume auto-scroll
+                    stopAutoScroll();
+                    track.style.scrollBehavior = 'smooth';
                     track.scrollTo( { left: 0, behavior: 'smooth' } );
-                } else {
-                    track.scrollLeft += px;
+                    setTimeout( function () {
+                        track.style.scrollBehavior = '';
+                        startAutoScroll();
+                    }, 800 );
+                    return; // Don't re-request rAF — startAutoScroll will restart it
                 }
+                track.scrollLeft += px;
                 updateNavButtons();
                 rafId = requestAnimationFrame( autoScrollStep );
             }
             function startAutoScroll() {
                 if ( ! autoScrollActive || isUserPaused ) return;
                 lastTime = null;
+                // Disable CSS smooth scrolling so rAF increments aren't absorbed
+                // by the browser's smooth-scroll interpolation
+                track.style.scrollBehavior = 'auto';
                 rafId = requestAnimationFrame( autoScrollStep );
             }
             function stopAutoScroll() {
                 if ( rafId ) { cancelAnimationFrame( rafId ); rafId = null; lastTime = null; }
+                // Restore CSS smooth scrolling for manual prev/next clicks
+                track.style.scrollBehavior = '';
             }
 
             if ( pauseBtn ) {

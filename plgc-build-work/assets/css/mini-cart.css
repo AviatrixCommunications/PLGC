@@ -1,0 +1,129 @@
+/**
+ * Floating Mini-Cart
+ *
+ * Fixed-position cart icon in the lower-left corner.
+ * Brand colors: dark green tone (#233C26) background, yellow (#FFAE40) badge.
+ * Touch target: 56×56 px (exceeds 44×44 minimum).
+ *
+ * WCAG 2.1 AA:
+ *   - White icon on #233C26 = 12.02:1 contrast ratio ✅
+ *   - Black text on #FFAE40 badge = 11.38:1 contrast ratio ✅
+ *   - Focus ring: 2px solid #567915, 2px offset — 3:1+ against backgrounds ✅
+ *   - prefers-reduced-motion: animations disabled ✅
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CONTAINER
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-mini-cart {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9999;
+    transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+}
+
+.plgc-mini-cart--hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LINK (the clickable circle)
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-mini-cart__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #233C26;
+    color: #FFFFFF;
+    text-decoration: none;
+    position: relative;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: background-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
+}
+
+.plgc-mini-cart__link:hover {
+    background-color: #2D5032;
+    color: #FFFFFF;
+    text-decoration: none;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.plgc-mini-cart__link:focus-visible {
+    outline: 2px solid #567915;
+    outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ICON
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-mini-cart__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COUNT BADGE
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-mini-cart__count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    border-radius: 11px;
+    background-color: #FFAE40;
+    color: #000000;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PULSE ANIMATION — on AJAX cart update
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-mini-cart--pulse .plgc-mini-cart__link {
+    animation: plgc-cart-pulse 400ms ease-out;
+}
+
+@keyframes plgc-cart-pulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+    .plgc-mini-cart {
+        bottom: 16px;
+        left: 16px;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   REDUCED MOTION
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .plgc-mini-cart {
+        transition: none;
+    }
+    .plgc-mini-cart--pulse .plgc-mini-cart__link {
+        animation: none;
+    }
+}

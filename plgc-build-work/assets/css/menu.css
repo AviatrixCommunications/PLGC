@@ -431,3 +431,21 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ============================================================
+   NO-PRICES MODE
+   When "Hide Menu Prices" is toggled on in PL Settings,
+   the PHP adds .plgc-menu--no-prices. This ensures
+   the header row (item name) fills the full width cleanly
+   without orphaned dot leaders or empty space.
+   ============================================================ */
+.plgc-menu--no-prices .plgc-menu-item__header {
+    /* Remove flex layout that spreads name…dots…price */
+    display: block;
+}
+
+.plgc-menu--no-prices .plgc-menu-item__name {
+    /* Remove flex-shrink and let the name fill the row */
+    flex: none;
+    max-width: none;
+}

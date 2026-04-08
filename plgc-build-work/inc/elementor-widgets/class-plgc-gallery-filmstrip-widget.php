@@ -56,6 +56,31 @@ class PLGC_Gallery_Filmstrip_Widget extends Widget_Base {
 			'type'    => Controls_Manager::MEDIA,
 			'default' => [ 'url' => Utils::get_placeholder_image_src() ],
 		] );
+		$repeater->add_control( 'focal_point', [
+			'label'       => 'Crop Focus',
+			'type'        => Controls_Manager::SELECT,
+			'description' => 'Where should the filmstrip card center the crop? Upload full-size originals — this controls what\'s visible in the strip. Lightbox always shows the full image.',
+			'default'     => 'center center',
+			'options'     => [
+				'center center' => 'Center (default)',
+				'center top'    => 'Top',
+				'center bottom' => 'Bottom',
+				'left center'   => 'Left',
+				'right center'  => 'Right',
+				'left top'      => 'Top Left',
+				'right top'     => 'Top Right',
+				'left bottom'   => 'Bottom Left',
+				'right bottom'  => 'Bottom Right',
+			],
+		] );
+		$repeater->add_control( 'focal_point_custom', [
+			'label'       => 'Custom Focus (X% Y%)',
+			'type'        => Controls_Manager::TEXT,
+			'description' => 'Fine-tune: e.g. "30% 20%" positions the crop 30% from left, 20% from top. Leave blank to use the preset above.',
+			'default'     => '',
+			'placeholder' => '50% 50%',
+			'label_block' => true,
+		] );
 		$repeater->add_control( 'caption', [
 			'label'       => 'Caption (shows in lightbox)',
 			'type'        => Controls_Manager::TEXT,
@@ -171,6 +196,14 @@ class PLGC_Gallery_Filmstrip_Widget extends Widget_Base {
 						$alt      = $img_id ? get_post_meta( $img_id, '_wp_attachment_image_alt', true ) : '';
 						if ( ! $alt ) $alt = $item['caption'] ?: sprintf( __( 'Gallery photo %d', 'plgc' ), $idx + 1 );
 						$caption  = $item['caption'] ?? '';
+
+						// Per-image focal point for filmstrip crop control
+						$fp_custom = trim( $item['focal_point_custom'] ?? '' );
+						$fp_preset = $item['focal_point'] ?? 'center center';
+						$focal     = $fp_custom ?: $fp_preset;
+						// Sanitize: only allow values matching CSS object-position patterns
+						$focal     = preg_match( '/^[\d.]+%?\s+[\d.]+%?$|^(?:left|right|center)\s+(?:top|bottom|center)$/', $focal ) ? $focal : 'center center';
+						$fp_style  = $focal !== 'center center' ? 'object-position:' . esc_attr( $focal ) . ';' : '';
 					?>
 					<li class="plgc-filmstrip__item">
 						<?php if ( $lightbox ) : ?>
@@ -189,13 +222,21 @@ class PLGC_Gallery_Filmstrip_Widget extends Widget_Base {
 						<?php endif; ?>
 
 							<?php if ( $img_id ) :
+								// sizes hint tells the browser the actual display width so it
+								// picks the right srcset candidate. Without this, WordPress
+								// defaults to sizes="100vw" and the browser may pick a small
+								// intermediate (e.g. 300px medium) that looks blurry in the
+								// 309px card on retina displays.
+								$sizes_attr = sprintf( '(min-resolution: 2dppx) %dpx, %dpx', $width * 2, $width );
 								echo wp_get_attachment_image( $img_id, $s['image_size'] ?? 'large', false, [
 									'class'    => 'plgc-filmstrip__img',
+									'style'    => $fp_style,
+									'sizes'    => $sizes_attr,
 									'loading'  => $idx < 4 ? 'eager' : 'lazy',
 									'decoding' => 'async',
 								] );
 							else : ?>
-							<img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" class="plgc-filmstrip__img" loading="<?php echo $idx < 4 ? 'eager' : 'lazy'; ?>" decoding="async" draggable="false">
+							<img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( $alt ); ?>" class="plgc-filmstrip__img" <?php if ( $fp_style ) echo 'style="' . esc_attr( $fp_style ) . '"'; ?> loading="<?php echo $idx < 4 ? 'eager' : 'lazy'; ?>" decoding="async" draggable="false">
 							<?php endif; ?>
 
 							<?php if ( $lightbox ) : ?>

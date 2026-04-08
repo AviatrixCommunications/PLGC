@@ -257,7 +257,41 @@ function plgc_register_menu_acf_fields() {
             ],
         ],
     ] );
+
+    // ── Menu Display Settings (PL Settings options page) ─────
+    acf_add_local_field_group( [
+        'key'      => 'group_plgc_menu_display',
+        'title'    => 'Menu Display Settings',
+        'location' => [ [ [
+            'param'    => 'options_page',
+            'operator' => '==',
+            'value'    => 'plgc-settings',
+        ] ] ],
+        'fields'   => [
+            [
+                'key'           => 'field_plgc_menu_hide_prices',
+                'label'         => 'Hide Menu Prices',
+                'name'          => 'plgc_menu_hide_prices',
+                'type'          => 'true_false',
+                'instructions'  => 'When enabled, all prices are hidden from the public menu display. The "Prices include tax" note is also suppressed. Price data is retained — toggle off to restore.',
+                'default_value' => 0,
+                'ui'            => 1,
+                'ui_on_text'    => 'Hidden',
+                'ui_off_text'   => 'Showing',
+            ],
+        ],
+        'menu_order' => 50,
+    ] );
 }
+
+// Flush menu transient cache when PL Settings (ACF options page) is saved
+// so the pricing toggle takes effect immediately.
+add_action( 'acf/save_post', function ( $post_id ) {
+    if ( $post_id !== 'options' ) {
+        return;
+    }
+    plgc_menu_flush_cache();
+}, 20 );
 
 /* ============================================================
    4. ADMIN COLUMNS
@@ -493,8 +527,11 @@ function plgc_menu_shortcode( $atts ) {
         'sections'   => '',
     ], $atts, 'plgc_menu' );
 
-    // Check transient cache
-    $cache_key = 'plgc_menu_' . md5( wp_json_encode( $atts ) );
+    // Check global pricing toggle (PL Settings → Menu Display Settings)
+    $hide_prices = (bool) get_field( 'plgc_menu_hide_prices', 'option' );
+
+    // Check transient cache — include pricing toggle state in key
+    $cache_key = 'plgc_menu_' . md5( wp_json_encode( $atts ) . ( $hide_prices ? '_np' : '' ) );
     $cached    = get_transient( $cache_key );
     if ( $cached !== false ) {
         // Store data for Schema.org output
@@ -526,13 +563,14 @@ function plgc_menu_shortcode( $atts ) {
 
     // Start output
     $col_class = $atts['columns'] === '1' ? 'plgc-menu--single-col' : '';
-    $html  = '<div class="plgc-menu ' . $col_class . '">';
+    $no_price_class = $hide_prices ? ' plgc-menu--no-prices' : '';
+    $html  = '<div class="plgc-menu ' . $col_class . $no_price_class . '">';
 
     // Header
     if ( ! empty( $atts['title'] ) ) {
         $html .= '<div class="plgc-menu__header">';
         $html .= '<p class="plgc-menu__title">' . wp_kses_post( $atts['title'] ) . '</p>';
-        if ( ! empty( $atts['note'] ) ) {
+        if ( ! empty( $atts['note'] ) && ! $hide_prices ) {
             $html .= '<p class="plgc-menu__note">' . esc_html( $atts['note'] ) . '</p>';
         }
         $html .= '</div>';
@@ -589,9 +627,8 @@ function plgc_menu_shortcode( $atts ) {
             $html .= '<article class="plgc-menu-item">';
             $html .= '<div class="plgc-menu-item__header">';
             $html .= '<h3 class="plgc-menu-item__name">' . esc_html( $item_name ) . '</h3>';
-            $html .= '<span class="plgc-menu-item__dots" aria-hidden="true"></span>';
 
-            // Price display
+            // Price display (hidden when "Hide Menu Prices" toggle is on)
             $has_base_price = ( $price !== '' && $price !== null && $price !== false );
             $set_mods       = [];
             $add_mods       = [];
@@ -606,34 +643,38 @@ function plgc_menu_shortcode( $atts ) {
                 }
             }
 
-            if ( $has_base_price ) {
-                // Standard price
-                $formatted = '$' . plgc_format_price( $price );
-                $aria      = plgc_price_aria( $price );
-                if ( $qualifier ) {
-                    $html .= '<span class="plgc-menu-item__price" aria-label="' . esc_attr( $qualifier ) . ', ' . esc_attr( $aria ) . '">';
-                    $html .= '<span class="plgc-menu-item__qualifier">' . esc_html( $qualifier ) . '</span> ';
-                    $html .= esc_html( $formatted );
-                } else {
-                    $html .= '<span class="plgc-menu-item__price" aria-label="' . esc_attr( $aria ) . '">';
-                    $html .= esc_html( $formatted );
+            if ( ! $hide_prices ) {
+                $html .= '<span class="plgc-menu-item__dots" aria-hidden="true"></span>';
+
+                if ( $has_base_price ) {
+                    // Standard price
+                    $formatted = '$' . plgc_format_price( $price );
+                    $aria      = plgc_price_aria( $price );
+                    if ( $qualifier ) {
+                        $html .= '<span class="plgc-menu-item__price" aria-label="' . esc_attr( $qualifier ) . ', ' . esc_attr( $aria ) . '">';
+                        $html .= '<span class="plgc-menu-item__qualifier">' . esc_html( $qualifier ) . '</span> ';
+                        $html .= esc_html( $formatted );
+                    } else {
+                        $html .= '<span class="plgc-menu-item__price" aria-label="' . esc_attr( $aria ) . '">';
+                        $html .= esc_html( $formatted );
+                    }
+                    $html .= '</span>';
+                } elseif ( ! empty( $set_mods ) ) {
+                    // Tiered pricing (e.g. Cup $4 | Bowl $5)
+                    $tier_parts = [];
+                    $aria_parts = [];
+                    foreach ( $set_mods as $m ) {
+                        $tier_parts[] = '<span class="plgc-menu-item__price-tier">'
+                                      . esc_html( $m['modifier_label'] ) . ' $'
+                                      . esc_html( plgc_format_price( $m['modifier_price'] ) )
+                                      . '</span>';
+                        $aria_parts[] = $m['modifier_label'] . ' ' . plgc_price_aria( $m['modifier_price'] );
+                    }
+                    $html .= '<span class="plgc-menu-item__prices" aria-label="' . esc_attr( implode( ', ', $aria_parts ) ) . '">';
+                    $html .= implode( '<span class="plgc-menu-item__price-sep" aria-hidden="true"> | </span>', $tier_parts );
+                    $html .= '</span>';
                 }
-                $html .= '</span>';
-            } elseif ( ! empty( $set_mods ) ) {
-                // Tiered pricing (e.g. Cup $4 | Bowl $5)
-                $tier_parts = [];
-                $aria_parts = [];
-                foreach ( $set_mods as $m ) {
-                    $tier_parts[] = '<span class="plgc-menu-item__price-tier">'
-                                  . esc_html( $m['modifier_label'] ) . ' $'
-                                  . esc_html( plgc_format_price( $m['modifier_price'] ) )
-                                  . '</span>';
-                    $aria_parts[] = $m['modifier_label'] . ' ' . plgc_price_aria( $m['modifier_price'] );
-                }
-                $html .= '<span class="plgc-menu-item__prices" aria-label="' . esc_attr( implode( ', ', $aria_parts ) ) . '">';
-                $html .= implode( '<span class="plgc-menu-item__price-sep" aria-hidden="true"> | </span>', $tier_parts );
-                $html .= '</span>';
-            }
+            } // end if ! $hide_prices
 
             $html .= '</div>'; // end header
 
@@ -642,8 +683,8 @@ function plgc_menu_shortcode( $atts ) {
                 $html .= '<p class="plgc-menu-item__description">' . esc_html( $desc ) . '</p>';
             }
 
-            // Add-on modifiers
-            if ( ! empty( $add_mods ) ) {
+            // Add-on modifiers (also hidden when prices are hidden — they contain prices)
+            if ( ! $hide_prices && ! empty( $add_mods ) ) {
                 $html .= '<ul class="plgc-menu-item__modifiers" aria-label="Add-ons for ' . esc_attr( $item_name ) . '">';
                 foreach ( $add_mods as $m ) {
                     $mod_price = '+$' . plgc_format_price( $m['modifier_price'] );

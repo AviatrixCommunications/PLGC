@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.50');
+define('PLGC_VERSION', '1.7.51');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -610,6 +610,9 @@ require_once PLGC_DIR . '/inc/social-icons-shortcode.php';
 
 // Restaurant Menu CPT — [plgc_menu] shortcode, CSV importer, Schema.org
 require_once PLGC_DIR . '/inc/menu-cpt.php';
+
+// Floating Mini-Cart — sticky cart icon when WooCommerce cart has items
+require_once PLGC_DIR . '/inc/woocommerce-mini-cart.php';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CUSTOM ELEMENTOR GALLERY WIDGETS

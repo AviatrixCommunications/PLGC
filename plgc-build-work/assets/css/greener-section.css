@@ -112,9 +112,14 @@
     flex-direction: row;
     gap: 30px;
     list-style: none;
-    margin: 0 0 73px;
+    margin: 0 auto 73px;
     padding: 0;
     width: 100%;
+    /* Cap grid width so tiles don't stretch into extreme landscape on ultrawide
+       monitors (2560px+). 1800px accommodates growth beyond the 1440px Figma
+       frame without distorting image composition. The green gradient background
+       still fills edge-to-edge behind the capped grid. */
+    max-width: 1800px;
     position: relative;
     z-index: 2;
 }
@@ -125,7 +130,13 @@
 .plgc-greener__tile {
     flex: 1 1 0;
     min-width: 0;
-    height: 453px;
+    /* Use aspect-ratio instead of a fixed height so tiles grow taller as they
+       grow wider — keeps image composition intact on wider viewports.
+       338 × 453 px (Figma) ≈ 3:4 ratio. min-height prevents tiles from
+       collapsing if aspect-ratio isn't supported. */
+    aspect-ratio: 3 / 4;
+    min-height: 400px;
+    max-height: 600px;
     position: relative;
     overflow: hidden;
     border-radius: 5px;
@@ -134,10 +145,19 @@
        Hover scale on the img child still works; browser composites as needed. */
 }
 
-/* Outer corner radius matching Figma */
+/* Outer corner radius matching Figma — flush edges at viewport width */
 .plgc-greener__grid li:first-child { border-radius: 0 5px 5px 0; }
 .plgc-greener__grid li:last-child  { border-radius: 5px 0 0 5px; }
 .plgc-greener__grid li:not(:first-child):not(:last-child) { border-radius: 5px; }
+
+/* When the grid is centered (wider than max-width), tiles no longer touch the
+   viewport edges — give all tiles uniform rounded corners */
+@media (min-width: 1801px) {
+    .plgc-greener__grid li:first-child,
+    .plgc-greener__grid li:last-child {
+        border-radius: 5px;
+    }
+}
 
 .plgc-greener__tile--placeholder {
     background: #2D5032;
@@ -366,6 +386,8 @@
     .plgc-greener__tile {
         flex: 1 1 calc(50% - 15px);
         height: auto;
+        min-height: 0;
+        max-height: none;
         aspect-ratio: 4 / 3;
     }
 
@@ -455,6 +477,8 @@
         flex: none;
         width: 100%;
         height: auto;
+        min-height: 0;
+        max-height: none;
         aspect-ratio: 3 / 4;
         border-radius: 5px !important;
         /* No transform or isolation — these trigger the iOS Safari

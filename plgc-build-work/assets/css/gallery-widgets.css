@@ -70,9 +70,15 @@
     outline-offset: -3px;
 }
 
-.plgc-filmstrip__img,
-.plgc-cs-slide__img {
+/* Base image styles — shared between filmstrip and content slideshow.
+   SPECIFICITY NOTE: Elementor's global reset (.elementor img { height: auto; })
+   has specificity 0,1,1 and loads late in the cascade, overriding our height.
+   Using .parent .child selectors (specificity 0,2,0) beats it cleanly. */
+.plgc-filmstrip__item .plgc-filmstrip__img,
+.plgc-cs-slide .plgc-cs-slide__img {
     display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -397,8 +403,11 @@
     to   { opacity: 1; }
 }
 
-.plgc-cs-slide__img {
+/* Slide image — higher specificity to beat .elementor img { height: auto } */
+.plgc-cs-slide .plgc-cs-slide__img {
     display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -517,6 +526,13 @@
 
 .plgc-lb__prev,
 .plgc-lb__next {
+    /* Fixed to viewport edges so arrows stay in the same spot regardless of
+       image aspect ratio — no hunting for the button when clicking through
+       a mix of portrait and landscape photos. */
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
     width: 2.75rem; height: 2.75rem;
     border-radius: 50%;
     border: 2px solid rgba(255,255,255,0.35);
@@ -527,6 +543,8 @@
     flex-shrink: 0;
     transition: background 150ms ease, border-color 150ms ease;
 }
+.plgc-lb__prev { left: 1rem; }
+.plgc-lb__next { right: 1rem; }
 .plgc-lb__prev:hover, .plgc-lb__next:hover { background: rgba(255,255,255,0.1); border-color: #FFAE40; color: #FFAE40; }
 .plgc-lb__prev:focus-visible, .plgc-lb__next:focus-visible { outline: 3px solid #FFAE40; outline-offset: 2px; }
 .plgc-lb__prev[hidden], .plgc-lb__next[hidden] { display: none; }
@@ -559,8 +577,10 @@
 }
 
 @media (max-width: 600px) {
-    .plgc-lb__inner { gap: 0.4rem; max-width: 98vw; }
-    .plgc-lb__img   { max-width: 70vw; }
+    .plgc-lb__inner { gap: 0; max-width: 98vw; }
+    .plgc-lb__img   { max-width: 90vw; }
+    .plgc-lb__prev  { left: 0.5rem; }
+    .plgc-lb__next  { right: 0.5rem; }
 }
 
 
