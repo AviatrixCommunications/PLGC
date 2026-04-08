@@ -1,0 +1,336 @@
+/* ==========================================================================
+   WooCommerce — Order Received (Thank You) Page
+   PLGC Brand Styles · WCAG 2.1 AA Compliant
+   Enqueued only on: is_wc_endpoint_url( 'order-received' )
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BASE — ensure Open Sans flows into all WC markup on this page
+   -------------------------------------------------------------------------- */
+
+.woocommerce-order,
+.woocommerce-order p,
+.woocommerce-order ul,
+.woocommerce-order li,
+.woocommerce-order table,
+.woocommerce-order th,
+.woocommerce-order td,
+.woocommerce-order address {
+    font-family: 'Open Sans', sans-serif;
+    color: #000000;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+/* --------------------------------------------------------------------------
+   THANK YOU MESSAGE
+   -------------------------------------------------------------------------- */
+
+.woocommerce-thankyou-order-received {
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 1.5rem;
+    line-height: 1.75;
+}
+
+/* --------------------------------------------------------------------------
+   ORDER OVERVIEW BAR
+   (Order Number · Date · Email · Total · Payment Method)
+
+   Problems we're fixing:
+   - text-transform: uppercase on labels → removed
+   - label text too light/small for 4.5:1 contrast → #000000
+   - value colors inconsistently green/black → all #000000
+   - letter-spacing from WC default uppercase layout → reset
+   -------------------------------------------------------------------------- */
+
+.woocommerce-order-overview.order_details {
+    background-color: #F2F2F2;     /* Secondary, light grey — passes 4.5:1 for black text */
+    border: 0.0625rem solid #E7E4E4;
+    border-radius: 0.375rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.woocommerce-order-overview.order_details li {
+    text-transform: none !important;    /* Remove ALL CAPS */
+    letter-spacing: normal !important;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8125rem;              /* 13px — still passes at this weight/context */
+    font-weight: 600;
+    color: #000000 !important;
+    border-right: 0.0625rem solid #E7E4E4;
+    padding: 0.25rem 1.25rem 0.25rem 0;
+    margin-right: 1.25rem;
+    line-height: 1.4;
+}
+
+.woocommerce-order-overview.order_details li:last-child {
+    border-right: none;
+    margin-right: 0;
+}
+
+/* The actual values (order number, date, email, etc.) */
+.woocommerce-order-overview.order_details li strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000 !important;         /* Override green WC default */
+    margin-top: 0.1875rem;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+/* abbr elements WC uses for labels sometimes */
+.woocommerce-order-overview.order_details li abbr {
+    text-decoration: none;
+    border-bottom: none;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    color: #000000;
+    cursor: default;
+}
+
+/* Responsive — stack on small screens */
+@media ( max-width: 767px ) {
+    .woocommerce-order-overview.order_details {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .woocommerce-order-overview.order_details li {
+        border-right: none;
+        border-bottom: 0.0625rem solid #E7E4E4;
+        padding: 0 0 0.75rem 0;
+        margin-right: 0;
+    }
+
+    .woocommerce-order-overview.order_details li:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   ORDER DETAILS SECTION HEADING
+   -------------------------------------------------------------------------- */
+
+.woocommerce-order-details > h2,
+.woocommerce-customer-details > h2,
+.woocommerce-order-details .woocommerce-order-details__title {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000000;
+    line-height: 2rem;
+    margin-bottom: 1rem;
+    text-transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   ORDER DETAILS TABLE
+   -------------------------------------------------------------------------- */
+
+.woocommerce-table--order-details {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Column headers: Product / Total */
+.woocommerce-table--order-details thead th {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+    text-align: left;
+    padding: 0.75rem 0;
+    border-bottom: 0.0625rem solid #E7E4E4;
+}
+
+/* Product name cell */
+.woocommerce-table--order-details .woocommerce-table__product-name {
+    font-size: 1rem;
+    color: #000000;
+    padding: 0.75rem 0;
+}
+
+/* Product links — fix light blue WooCommerce default */
+.woocommerce-table--order-details .woocommerce-table__product-name a,
+.woocommerce-table--order-details a,
+.woocommerce-order-details a {
+    color: #000000;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    transition: color 150ms ease-in-out;
+}
+
+.woocommerce-table--order-details .woocommerce-table__product-name a:hover,
+.woocommerce-table--order-details a:hover,
+.woocommerce-order-details a:hover {
+    color: #567915;
+    text-decoration: underline;
+}
+
+.woocommerce-table--order-details .woocommerce-table__product-name a:focus-visible,
+.woocommerce-table--order-details a:focus-visible,
+.woocommerce-order-details a:focus-visible {
+    color: #567915;
+    outline: 0.125rem solid #567915;
+    outline-offset: 0.125rem;
+    text-decoration: underline;
+    border-radius: 0.0625rem;
+}
+
+/* Product quantity × notation */
+.woocommerce-table--order-details .product-quantity {
+    color: #000000;
+    font-weight: 400;
+}
+
+/* Price cells (right column) */
+.woocommerce-table--order-details .woocommerce-table__product-total,
+.woocommerce-table--order-details .product-total {
+    font-size: 1rem;
+    color: #000000;
+    font-weight: 400;
+    padding: 0.75rem 0;
+    text-align: right;
+}
+
+/* Body rows */
+.woocommerce-table--order-details tbody tr {
+    border-bottom: 0.0625rem solid #F2F2F2;
+}
+
+/* --------------------------------------------------------------------------
+   ORDER TABLE FOOTER
+   Subtotal / Shipping / Total / Payment method / Note
+
+   Problems we're fixing:
+   - th labels rendering grey — override to #000000
+   - grey bold weight on labels vs lighter values — normalize
+   -------------------------------------------------------------------------- */
+
+.woocommerce-table--order-details tfoot tr th,
+.woocommerce-table--order-details tfoot tr td {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #000000 !important;         /* Override WC grey */
+    padding: 0.5rem 0;
+    text-align: left;
+    border: none;
+}
+
+/* Right-align the value column */
+.woocommerce-table--order-details tfoot tr td {
+    text-align: right;
+}
+
+/* Subtotal row */
+.woocommerce-table--order-details tfoot .cart-subtotal th,
+.woocommerce-table--order-details tfoot .cart-subtotal td {
+    padding-top: 1rem;
+    border-top: 0.0625rem solid #E7E4E4;
+}
+
+/* Total row — make it visually distinct */
+.woocommerce-table--order-details tfoot .order-total th,
+.woocommerce-table--order-details tfoot .order-total td {
+    font-weight: 700;
+    font-size: 1.0625rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-top: 0.125rem solid #000000;
+}
+
+/* Shipping method sub-label ("via Flat rate") */
+.woocommerce-table--order-details tfoot .shipping td small,
+.woocommerce-table--order-details tfoot .shipping td .woocommerce-Price-amount + small {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #000000;
+    opacity: 0.65;     /* still passes at this size against white — 4.5:1 margin */
+    margin-top: 0.125rem;
+}
+
+/* --------------------------------------------------------------------------
+   CUSTOMER DETAILS — Billing & Shipping Addresses
+   -------------------------------------------------------------------------- */
+
+.woocommerce-customer-details {
+    margin-top: 2rem;
+}
+
+.woocommerce-customer-details .addresses {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media ( max-width: 767px ) {
+    .woocommerce-customer-details .addresses {
+        grid-template-columns: 1fr;
+    }
+}
+
+.woocommerce-customer-details address {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    color: #000000;
+    line-height: 1.75;
+    font-style: normal;
+    background-color: #FFFFFF;
+    border: 0.0625rem solid #E7E4E4;
+    border-radius: 0.375rem;
+    padding: 1.25rem;
+    margin: 0;
+}
+
+/* Phone & email lines within address */
+.woocommerce-customer-details--phone,
+.woocommerce-customer-details--email {
+    color: #000000;
+    font-size: 1rem;
+}
+
+/* Address links (email address rendered as link) */
+.woocommerce-customer-details address a {
+    color: #000000;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.woocommerce-customer-details address a:hover {
+    color: #567915;
+    text-decoration: underline;
+}
+
+.woocommerce-customer-details address a:focus-visible {
+    color: #567915;
+    outline: 0.125rem solid #567915;
+    outline-offset: 0.125rem;
+    border-radius: 0.0625rem;
+}
+
+/* --------------------------------------------------------------------------
+   PRINT STYLES — keep it clean if someone prints the order
+   -------------------------------------------------------------------------- */
+
+@media print {
+    .woocommerce-order-overview.order_details {
+        background: none;
+        border: 0.0625rem solid #000000;
+    }
+
+    .woocommerce-table--order-details a {
+        color: #000000 !important;
+        text-decoration: none;
+    }
+}

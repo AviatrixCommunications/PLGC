@@ -327,8 +327,12 @@
         const controller = new AbortController();
         activeRequest = controller;
 
+        // NOTE: the /wp/v2/search endpoint uses 'url' for the result link —
+        // NOT 'link' (which is the field name on /wp/v2/posts and /wp/v2/pages).
+        // Requesting 'link' here causes _fields to strip 'url' from the response,
+        // leaving item.url undefined and every result rendering as href="#".
         const contentParams = new URLSearchParams({
-            search: q, per_page: 10, _fields: 'id,title,link,subtype,type',
+            search: q, per_page: 10, _fields: 'id,title,url,subtype,type',
         });
 
         // Pull documents directly from the media library — no WP Engine
@@ -537,6 +541,14 @@
         const links = Array.from(resultsBox.querySelectorAll('a'));
 
         links.forEach((link, idx) => {
+            // Belt-and-suspenders: stop the click from bubbling to any ancestor
+            // handler (document-level mega close, WP admin bar, third-party
+            // scripts) that might interfere before the browser processes the href.
+            // Navigation still proceeds naturally — we never call preventDefault().
+            link.addEventListener('click', e => {
+                e.stopPropagation();
+            });
+
             link.addEventListener('keydown', e => {
                 switch (e.key) {
                     case 'ArrowDown':

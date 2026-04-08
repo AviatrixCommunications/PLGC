@@ -15,6 +15,20 @@
  * @since   1.5.5
  */
 
+/* ── Elementor parent height inheritance ────────────────────────────────── */
+/* The slider's height:100% only works if every parent passes height down.
+   Elementor's widget wrappers don't do this by default, so the slider
+   falls back to min-height:567px even when the column is taller.
+   :has() tells the widget + its inner container to stretch.              */
+.elementor-widget:has(.plgc-es) {
+    height: 100%;
+    align-self: stretch;
+}
+
+.elementor-widget:has(.plgc-es) > .elementor-widget-container {
+    height: 100%;
+}
+
 /* ── Wrapper ─────────────────────────────────────────────────────────────── */
 .plgc-es {
     position: relative;

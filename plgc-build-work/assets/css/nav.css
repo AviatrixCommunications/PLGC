@@ -477,8 +477,14 @@
     right: 0;
     background: rgba(231, 228, 228, 0.95);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-    z-index: 998;
+    /* z-index raised to 1050: above the header (1000), mega menu (999),
+       Elementor floating panels, Monsido/Acquia toolbar, and any
+       third-party widget that creates a stacking context. */
+    z-index: 1050;
     padding: 36px 120px 48px;
+    /* isolation: isolate ensures this element forms its own stacking
+       context so child z-indexes are self-contained. */
+    isolation: isolate;
 }
 
 .plgc-search-panel[hidden] { display: none; }

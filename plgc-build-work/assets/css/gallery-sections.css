@@ -27,7 +27,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;        /* vertically centres the card */
-    min-height: 609px;
+    /* Height tracks 16:9 ratio at the image column's width (77.5vw).
+       77.5vw ÷ (16/9) ≈ 43.6vw. Clamp keeps it sane at extremes.
+       Result: 1600×900 flyer images show with zero crop at most widths. */
+    --gs-height: clamp(500px, 43.6vw, 750px);
+    min-height: var(--gs-height);
     overflow: hidden;           /* prevents the negative-margin card bleeding out */
     position: relative;
     width: 100%;
@@ -42,9 +46,9 @@
 .plgc-gs__image-col {
     flex: 0 0 77.5%;
     width: 77.5%;
-    height: 609px;              /* explicit height so Swiper's height:100% resolves */
-    min-height: 609px;
-    align-self: stretch;        /* image column fills full section height */
+    height: var(--gs-height);       /* matches 16:9 at the column width — zero crop on flyers */
+    min-height: var(--gs-height);
+    align-self: stretch;
     position: relative;
     overflow: hidden;
     /* No transform — see .plgc-gs comment above; same iOS Safari rationale */
@@ -66,19 +70,19 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .plgc-gs__slider {
     width: 100%;
-    height: 609px;              /* fixed height — images must cover, not define */
-    min-height: 609px;
+    height: var(--gs-height);
+    min-height: var(--gs-height);
 }
 
-/* Ensure Swiper's internal wrapper also respects the fixed height */
+/* Ensure Swiper's internal wrapper also respects the height */
 .plgc-gs__slider .swiper-wrapper {
-    height: 609px !important;
+    height: var(--gs-height) !important;
 }
 
 .plgc-gs__slide {
     position: relative;
     overflow: hidden;
-    height: 609px;
+    height: var(--gs-height);
 }
 
 .plgc-gs__slide-img {
@@ -98,7 +102,7 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    min-height: 609px;
+    min-height: var(--gs-height, 609px);
     background: #e7e4e4;
     color: #333;
     font-family: 'Open Sans', sans-serif;

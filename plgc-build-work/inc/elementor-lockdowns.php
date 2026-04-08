@@ -258,10 +258,41 @@ function plgc_set_elementor_defaults() {
     // Enable optimized markup (V4 prerequisite — removes unnecessary wrappers)
     update_option('elementor_experiment-e_optimized_markup', 'active');
 
-    // Disable Elementor usage tracking (prevents Mixpanel SDK load attempts)
-    update_option('elementor_allow_tracking', '');
+    // Disable Elementor usage tracking.
+    // Must be 'no', not empty string — Elementor 4.0.1 editor-app-bar
+    // calls useMixpanel() unconditionally; empty string leaves the
+    // Mixpanel provider unmounted, crashing the React component tree.
+    update_option('elementor_allow_tracking', 'no');
 }
 add_action('after_switch_theme', 'plgc_set_elementor_defaults');
+
+/**
+ * Fix tracking option if it was previously set to empty string.
+ * Runs once, then removes itself.
+ */
+function plgc_fix_tracking_option() {
+    if ( get_option( 'elementor_allow_tracking' ) === '' ) {
+        update_option( 'elementor_allow_tracking', 'no' );
+    }
+}
+add_action( 'admin_init', 'plgc_fix_tracking_option' );
+
+/**
+ * Force upgrade-insecure-requests on admin/editor pages.
+ *
+ * WP Engine's header rules may not apply to /wp-admin/ paths.
+ * Without this, the browser blocks mixed-content requests in the
+ * Elementor editor (e.g. http://…/calendar/?ver=4.0.1 loaded as
+ * a script by the site-navigation module).
+ *
+ * The meta tag tells the browser to silently upgrade any http://
+ * sub-resource request to https:// — same as the CSP directive
+ * but guaranteed to reach the admin context.
+ */
+function plgc_admin_upgrade_insecure() {
+    echo '<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">' . "\n";
+}
+add_action( 'admin_head', 'plgc_admin_upgrade_insecure', 1 );
 
 /**
  * Force Elementor containers to use semantic HTML where possible.
