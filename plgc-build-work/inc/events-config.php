@@ -41,6 +41,23 @@ defined( 'ABSPATH' ) || exit;
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 2b. SUPPRESS TEC'S DEFAULT EVENT WEBSITE LINK
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * TEC renders the Event Website URL as a plain underlined link via
+ * tribe_events_single_event_after_the_meta. Our single-event.php template
+ * already renders it as a branded CTA button (via tribe_get_event_website_url
+ * which returns the raw URL — unaffected by this filter).
+ *
+ * tribe_get_event_website_link returns the HTML <a> tag. Filtering it to
+ * empty suppresses TEC's duplicate plain-text rendering while keeping the
+ * URL available for our template code.
+ */
+add_filter( 'tribe_get_event_website_link', '__return_empty_string' );
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 3. STRUCTURED DATA — ADD VENUE TO LD+JSON
 // ─────────────────────────────────────────────────────────────────────────────
 

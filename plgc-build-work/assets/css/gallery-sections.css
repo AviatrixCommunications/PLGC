@@ -380,148 +380,193 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   GALLERY TOGGLE — "View Full Image" / "Show Details"
-   Desktop-only: on tablet/mobile the layout is stacked (image on top, card
-   below) so the user already sees the full image — no toggle needed.
+   EXPAND BUTTON — opens lightbox with full-size image
+   Sits in the bottom corner of the image column.
 
-   WCAG compliance:
-     SC 4.1.2 — <button> with aria-expanded + aria-controls
-     SC 2.1.1 — Native <button> is keyboard operable (Enter/Space)
-     SC 2.4.7 — Visible focus ring (3px solid #233C26)
-     SC 2.5.5 — 44×44px minimum touch target
-     SC 1.4.3 — Text contrast verified (#567915 on #FFFFFF = 5.07:1)
+   WCAG 2.1 AA:
+     SC 2.5.5 — 44×44px touch target
+     SC 2.4.7 — Visible focus ring
+     SC 1.4.11 — White icon on dark translucent bg > 3:1 against any image
    ───────────────────────────────────────────────────────────────────────────── */
-.plgc-gs__toggle {
-    display: none;  /* Hidden by default — shown only on desktop via media query */
-}
-
-/* Desktop only — show the toggle */
-@media (min-width: 1025px) {
-    .plgc-gs__toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        position: absolute;
-        z-index: 5;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid #E7E4E4;
-        border-radius: 100px;
-        padding: 6px 14px;
-        min-height: 44px;           /* WCAG 2.5.5 touch target */
-        min-width: 44px;
-        cursor: pointer;
-        font-family: 'Open Sans', sans-serif;
-        font-size: 0.8125rem;       /* 13px */
-        font-weight: 600;
-        color: #567915;
-        line-height: 1;
-        white-space: nowrap;
-        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-    }
-
-    /* ── Position varies by layout ─────────────────────────────────────── */
-    /* Image-left (Golf Outings, McChesney's): toggle on the top-left of the card,
-       which is the edge facing the image. */
-    .plgc-gs--image-left .plgc-gs__toggle {
-        top: 16px;
-        left: 16px;
-    }
-
-    /* Image-right (Weddings): toggle on the top-right of the card */
-    .plgc-gs--image-right .plgc-gs__toggle {
-        top: 16px;
-        right: 16px;
-    }
-
-    .plgc-gs__toggle:hover {
-        background: #FFFFFF;
-        color: #233C26;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
-    }
-
-    .plgc-gs__toggle:focus-visible {
-        outline: 3px solid #233C26;
-        outline-offset: 2px;
-    }
-
-    /* Chevron icon */
-    .plgc-gs__toggle-icon {
-        width: 12px;
-        height: 12px;
-        flex-shrink: 0;
-        transition: transform 0.25s ease;
-    }
-
-    /* When collapsed, rotate chevron upward */
-    .plgc-gs__toggle[aria-expanded="false"] .plgc-gs__toggle-icon {
-        transform: rotate(180deg);
-    }
-}
-
-/* ── Collapsible container ────────────────────────────────────────────────
-   Wraps body text + CTA. On desktop, transitions max-height + opacity
-   for a smooth collapse. On tablet/mobile, always visible (no toggle).  */
-.plgc-gs__collapsible {
+.plgc-gs__expand-btn {
+    position: absolute;
+    z-index: 8;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #FFFFFF;
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    /* tablet/mobile: always visible, no transition needed */
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.15s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
-@media (min-width: 1025px) {
-    .plgc-gs__collapsible {
-        overflow: hidden;
-        transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.35s ease;
-        max-height: 600px;       /* large enough to never clip expanded content */
-        opacity: 1;
-        margin-top: 0;
-    }
+.plgc-gs--image-left .plgc-gs__expand-btn { right: 16px; }
+.plgc-gs--image-right .plgc-gs__expand-btn { left: 16px; }
 
-    /* Collapsed state */
-    .plgc-gs__card--collapsed .plgc-gs__collapsible {
-        max-height: 0;
-        opacity: 0;
-        margin-top: 0;
-        /* Hide from assistive tech when collapsed so tab order skips hidden links */
-        visibility: hidden;
-    }
-
-    /* Card padding shrinks when collapsed — heading only needs modest padding */
-    .plgc-gs__card--collapsed {
-        padding-top: 54px;
-        padding-bottom: 32px;
-    }
-
-    /* Weddings (image-right) keeps its right-aligned text alignment when collapsed */
-    .plgc-gs--image-right .plgc-gs__card--collapsed {
-        padding-top: 54px;
-        padding-bottom: 32px;
-    }
+.plgc-gs__expand-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.06);
 }
 
-/* ── Reduced motion — instant toggle, no animation ─────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-    .plgc-gs__collapsible {
-        transition: none !important;
+.plgc-gs__expand-btn:focus-visible {
+    outline: 3px solid #FFAE40;
+    outline-offset: 2px;
+}
+
+.plgc-gs__expand-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHTBOX — Full-screen image viewer
+
+   WCAG 2.1 AA:
+     SC 2.1.1 — All controls keyboard operable (native buttons)
+     SC 2.1.2 — Escape closes, no keyboard trap
+     SC 2.4.3 — Focus trapped inside dialog while open
+     SC 2.4.7 — Visible focus rings on all controls
+     SC 2.5.5 — All buttons ≥ 48×48px
+     SC 4.1.2 — role="dialog" aria-modal="true" aria-label
+     SC 1.1.1 — Image has alt text
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-gs-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.plgc-gs-lightbox--open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.plgc-gs-lightbox__img-wrap {
+    position: relative;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plgc-gs-lightbox__img {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.plgc-gs-lightbox__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.plgc-gs-lightbox__close:hover { background: rgba(255, 255, 255, 0.3); }
+
+.plgc-gs-lightbox__close:focus-visible {
+    outline: 3px solid #FFAE40;
+    outline-offset: 2px;
+}
+
+.plgc-gs-lightbox__prev,
+.plgc-gs-lightbox__next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.plgc-gs-lightbox__prev { left: 16px; }
+.plgc-gs-lightbox__next { right: 16px; }
+
+.plgc-gs-lightbox__prev:hover,
+.plgc-gs-lightbox__next:hover { background: rgba(255, 255, 255, 0.3); }
+
+.plgc-gs-lightbox__prev:focus-visible,
+.plgc-gs-lightbox__next:focus-visible {
+    outline: 3px solid #FFAE40;
+    outline-offset: 2px;
+}
+
+.plgc-gs-lightbox__counter {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.plgc-gs-lightbox--single .plgc-gs-lightbox__prev,
+.plgc-gs-lightbox--single .plgc-gs-lightbox__next,
+.plgc-gs-lightbox--single .plgc-gs-lightbox__counter { display: none; }
+
+@media (max-width: 767px) {
+    .plgc-gs-lightbox__prev,
+    .plgc-gs-lightbox__next {
+        top: auto;
+        bottom: 16px;
+        transform: none;
     }
-    .plgc-gs__toggle-icon {
-        transition: none !important;
-    }
+    .plgc-gs-lightbox__counter { bottom: 68px; }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    McCHESNEY'S SPECIFIC OVERRIDES
    The badge sits next to the button in normal flex flow, vertically centred.
 
-   Negative margins on the badge-link compensate for the badge being taller
-   than the button (126 px vs 47 px = 79 px difference). Splitting that
-   difference: -39.5 px top and bottom keeps the flex row's layout height
-   at roughly the button height, so the McChesney's card matches the other
-   cards — without needing position:absolute (which gets clipped by
-   overflow:hidden on .plgc-gs and any Elementor wrapper ancestors).
+   The badge (126 px) is taller than the button (47 px). A negative bottom
+   margin lets the badge extend below the card edge without increasing the
+   card's visual height. Top margin stays at 0 so the badge never overlaps
+   the body text above — this was a bug when both margins were negative and
+   the text wrapped to extra lines at certain viewport widths.
    ───────────────────────────────────────────────────────────────────────────── */
 
 .plgc-gs--mcchesneys .plgc-gs__btn-row {
@@ -533,7 +578,7 @@
 
 .plgc-gs--mcchesneys .plgc-gs__badge-link {
     position: static;
-    margin-top: -39.5px;
+    margin-top: 0;
     margin-bottom: -39.5px;
     transform: none;
     left: auto;
@@ -678,6 +723,12 @@
     .plgc-gs__btn,
     .plgc-gs__dots .swiper-pagination-bullet,
     .plgc-gs__dots .swiper-pagination-bullet::before {
+        transition: none !important;
+    }
+    .plgc-gs-lightbox {
+        transition: none !important;
+    }
+    .plgc-gs__expand-btn {
         transition: none !important;
     }
 }

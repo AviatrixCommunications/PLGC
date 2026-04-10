@@ -309,7 +309,26 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 .tribe-events-schedule h2{display:none!important}
 .plgc-event-hero__venue{font-family:var(--ff);font-size:.9375rem;color:var(--bk);line-height:1.4;display:flex;align-items:center;gap:.375rem}
 .plgc-event-hero__venue-svg{flex-shrink:0}
-.plgc-event-hero__actions{margin-top:.25rem;display:flex;justify-content:flex-start}
+.plgc-event-hero__actions{margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:flex-start}
+/* Event CTA buttons — yellow pill, matches .plgc-btn brand token */
+.plgc-event-cta{display:inline-flex;align-items:center;justify-content:center;background:#FFAE40;color:#000;font-family:var(--ff);font-size:.875rem;font-weight:600;line-height:1;text-decoration:none;border-radius:6.25rem;padding:.375rem 1.125rem;min-height:44px;min-width:44px;border:2px solid transparent;transition:background .2s ease;white-space:nowrap}
+.plgc-event-cta:hover,.plgc-event-cta:focus-visible{background:#FDBC69;color:#000;text-decoration:underline}
+.plgc-event-cta:focus-visible{outline:3px solid #233C26;outline-offset:3px}
+/* TEC Add to Calendar — left-align within the hero details column, spacing below */
+.plgc-event-hero__details .tribe-events-c-subscribe-dropdown__container,.plgc-event-hero__details .tribe-events-cal-links{text-align:left;display:flex;justify-content:flex-start;margin-top:.25rem;margin-bottom:.25rem}
+/* Add to Calendar — single focus ring on outer wrapper only (WCAG 2.4.7) */
+.tribe-events-c-subscribe-dropdown__button{margin:0}
+.tribe-events-c-subscribe-dropdown__button-text:focus{outline:none!important;box-shadow:none!important}
+.tribe-events-c-subscribe-dropdown__button-text:focus-visible{outline:none!important;box-shadow:none!important}
+.tribe-common-c-btn-border.tribe-events-c-subscribe-dropdown__button:focus-within{outline:3px solid #233C26!important;outline-offset:2px!important;border-radius:4px}
+/* Dropdown — fix clipping. Ensure ALL ancestors allow overflow */
+.tribe-events-c-subscribe-dropdown__container,.tribe-events-c-subscribe-dropdown{position:relative!important;overflow:visible!important}
+.plgc-event-hero__details{overflow:visible!important}
+.tribe-events-c-subscribe-dropdown__content{overflow:visible!important;max-height:none!important;position:absolute!important;z-index:100!important;top:100%!important;left:0!important;background:#fff;border:1px solid var(--bd);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:200px}
+.tribe-events-c-subscribe-dropdown__list{list-style:none;padding:.5rem 0;margin:0}
+.tribe-events-c-subscribe-dropdown__list-item-link{display:block;padding:.5rem 1rem;font-family:var(--ff);font-size:.875rem;color:var(--bk);text-decoration:none;transition:background .15s ease}
+.tribe-events-c-subscribe-dropdown__list-item-link:hover{background:var(--fl);color:var(--g)}
+.tribe-events-c-subscribe-dropdown__list-item-link:focus-visible{outline:2px solid #233C26;outline-offset:-2px}
 .plgc-event-hero__details .tribe-events-single-event-description{font-family:var(--ff);font-size:.9375rem;line-height:1.8;color:var(--bk);margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--bd)}
 .plgc-event-hero__details .tribe-tickets{margin-top:.5rem;padding-top:.75rem;border-top:1px solid var(--bd)}
 .tribe-events-event-image{margin-bottom:1.5rem;overflow:hidden;background:var(--fl)}
@@ -344,40 +363,70 @@ button.tribe-events-c-subscribe-dropdown__button-text{
 }
 .tribe-events-nav-previous a:hover,.tribe-events-nav-next a:hover{color:var(--g);text-decoration:underline}
 .tribe-events-nav-previous a:focus-visible,.tribe-events-nav-next a:focus-visible{outline:none;box-shadow:var(--focus)}
+/* Hide TEC's default document/calendar pseudo-element icons in prev/next nav */
+.tribe-events-nav-previous img,.tribe-events-nav-next img,.tribe-events-nav-previous svg,.tribe-events-nav-next svg{display:none!important}
+.tribe-events-sub-nav li::before,.tribe-events-sub-nav li::after,
+.tribe-events-nav-previous::before,.tribe-events-nav-previous::after,
+.tribe-events-nav-next::before,.tribe-events-nav-next::after,
+.tribe-events-nav-previous a::before,.tribe-events-nav-previous a::after,
+.tribe-events-nav-next a::before,.tribe-events-nav-next a::after{content:none!important;display:none!important;background:none!important}
 .tribe-events-meta-item:has(.tribe-events-event-categories-label){display:none!important}
 
-/* === 13. RELATED EVENTS — rendered by TEC after venue block === */
-.tribe-events-related-events-title{
+/* === 13. RELATED EVENTS — rendered explicitly in full-width section below article === */
+/* Hide any TEC auto-rendered related events inside the article (duplicates of our explicit section) */
+.plgc-single-event .tribe-related-events,
+.plgc-single-event .tribe-events-related-events-title,
+article.plgc-single-event .tribe-related-events-title:not(.plgc-related-events-full .tribe-events-related-events-title){display:none!important}
+
+/* Full-width related events section */
+.plgc-related-events-full{margin:1.5rem 0 2rem;padding-top:1.5rem;border-top:1px solid var(--bd)}
+.plgc-related-events-full .tribe-events-related-events-title{
   font-family:var(--fh);font-size:1.5rem;font-weight:400;color:var(--bk);
-  margin:2rem 0 1rem;padding-top:1.5rem;border-top:1px solid var(--bd);line-height:1.3;
+  margin:0 0 1rem;padding:0;line-height:1.3;border:none;
 }
-.tribe-related-events{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.tribe-related-events>li{background:var(--fl);border:1px solid var(--bd);overflow:hidden;position:relative;transition:box-shadow .2s ease;display:flex;flex-direction:column}
-.tribe-related-events>li:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--gm)}
-/* Thumbnail — kill TEC margin-bottom */
-.tribe-related-events-thumbnail,
-.tribe-events-single ul.tribe-related-events li .tribe-related-events-thumbnail{
-  overflow:hidden!important;background:var(--fl)!important;line-height:0!important;font-size:0!important;
-  margin:0!important;margin-bottom:0!important;padding:0!important;width:100%!important;
+.plgc-related-events-full .tribe-related-events{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.plgc-related-events-full .tribe-related-events>li{background:var(--fl);border:1px solid var(--bd);overflow:hidden;position:relative;transition:box-shadow .2s ease;display:flex;flex-direction:column;border-radius:4px}
+.plgc-related-events-full .tribe-related-events>li:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--gm)}
+/* Thumbnail — fixed aspect ratio, no bad crops */
+.plgc-related-events-full .tribe-related-events-thumbnail{
+  overflow:hidden!important;background:var(--fl)!important;margin:0!important;padding:0!important;width:100%!important;
+  aspect-ratio:1/1;position:relative!important;
 }
-.tribe-related-events-thumbnail a{display:block;line-height:0;font-size:0}
-.tribe-related-events-thumbnail img,
-.tribe-events-single ul.tribe-related-events .tribe-related-events-thumbnail img,
-.tribe-events-single ul.tribe-related-events li .tribe-related-events-thumbnail img{
-  width:100%!important;height:auto!important;display:block!important;transition:transform .3s ease;
-  margin:0!important;margin-bottom:0!important;padding:0!important;vertical-align:top!important;
+.plgc-related-events-full .plgc-related-thumb-link{
+  display:block!important;width:100%!important;height:100%!important;
+  background-size:cover!important;background-position:top center!important;background-repeat:no-repeat!important;
 }
-.tribe-related-events>li:hover .tribe-related-events-thumbnail img{transform:scale(1.02)}
-.tribe-related-event-info,
-.tribe-events-single ul.tribe-related-events li .tribe-related-event-info{
-  padding:.75rem!important;background:var(--fl);flex:1;display:flex;flex-direction:column;gap:.25rem;margin:0!important;
+/* Hide any img that might still sneak in from caching */
+.plgc-related-events-full .tribe-related-events-thumbnail img{display:none!important}
+/* No hover transform — causes rendering bug with aspect-ratio containers */
+/* Info block */
+.plgc-related-events-full .tribe-related-event-info{
+  padding:.75rem!important;background:var(--fl);flex:1;display:block!important;margin:0!important;
+  font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g);line-height:1.4;
 }
-.tribe-related-events .tribe-related-events-title{font-family:var(--ff);font-size:.875rem;font-weight:600;line-height:1.35;margin:0;border:none;padding:0;color:var(--bk)!important;text-transform:none}
-.tribe-related-events .tribe-related-events-title a{color:var(--bk)!important;text-decoration:none;border-bottom:none!important}
-.tribe-related-events .tribe-related-events-title a::after{content:'';position:absolute;inset:0;z-index:1}
-.tribe-related-events .tribe-related-events-title a:hover{color:var(--g)!important}
-.tribe-related-event-info .tribe-event-date-start,.tribe-related-event-info .tribe-event-time{font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g)}
-.tribe-related-event-info .tribe-events-calendar-series-archive__container,.tribe-related-event-info .tribe-common-c-svgicon--series{display:none!important}
+.plgc-related-events-full .tribe-related-events-title{
+  font-family:var(--ff)!important;font-size:.875rem!important;font-weight:600!important;line-height:1.35!important;
+  margin:0 0 .25rem!important;border:none!important;padding:0!important;color:var(--bk)!important;text-transform:none!important;
+  display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important;
+}
+.plgc-related-events-full .tribe-related-events-title a{color:var(--bk)!important;text-decoration:none!important;border-bottom:none!important}
+.plgc-related-events-full .tribe-related-events-title a::after{content:'';position:absolute;inset:0;z-index:1}
+.plgc-related-events-full .tribe-related-events-title a:hover{color:var(--g)!important}
+.plgc-related-events-full .tribe-related-events-title a:focus-visible{outline:3px solid var(--g);outline-offset:2px;border-radius:2px}
+/* Date/time inline */
+.plgc-related-events-full .tribe-event-date-start,.plgc-related-events-full .tribe-event-time{font-family:var(--ff);font-size:.75rem;font-weight:600;color:var(--g);line-height:1.4}
+/* Mobile: 1 column */
+@media(max-width:767px){
+  .plgc-related-events-full .tribe-related-events{grid-template-columns:1fr}
+}
+/* Tablet: 2 columns */
+@media(min-width:768px) and (max-width:1024px){
+  .plgc-related-events-full .tribe-related-events{grid-template-columns:repeat(2,1fr)}
+}
+
+/* (Old unscoped related events rules removed — TEC's auto-rendered duplicates
+   inside the article are hidden via display:none. All styling is now scoped
+   under .plgc-related-events-full above.) */
 
 /* === 14. EVENT TICKETS PLUS === */
 .tribe-tickets{margin-top:1rem;padding-top:1rem;border-top:2px solid var(--gl)}

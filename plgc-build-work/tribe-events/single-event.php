@@ -69,8 +69,61 @@ $event_id     = get_the_ID();
 						</div>
 					<?php endif; ?>
 
-					<!-- Add to calendar — left aligned -->
-					<div class="plgc-event-hero__actions"></div>
+					<!-- CTA buttons — Event Website URL + custom ACF buttons -->
+					<?php
+					$cta_buttons = [];
+
+					// 1. TEC built-in Event Website URL
+					if ( function_exists( 'tribe_get_event_website_url' ) ) {
+						$website_url = tribe_get_event_website_url( $event_id );
+						if ( $website_url ) {
+							// Use the event website link text if set, otherwise generic label
+							$website_label = function_exists( 'tribe_get_event_website_link_label' )
+								? tribe_get_event_website_link_label( $event_id )
+								: '';
+							$cta_buttons[] = [
+								'label'   => $website_label ?: __( 'Visit Event Website', 'plgc' ),
+								'url'     => $website_url,
+								'new_tab' => true,
+							];
+						}
+					}
+
+					// 2. Custom ACF CTA buttons
+					if ( function_exists( 'get_field' ) ) {
+						$custom_ctas = get_field( 'plgc_event_cta_buttons', $event_id );
+						if ( is_array( $custom_ctas ) ) {
+							foreach ( $custom_ctas as $cta ) {
+								if ( ! empty( $cta['label'] ) && ! empty( $cta['url'] ) ) {
+									$cta_buttons[] = [
+										'label'   => $cta['label'],
+										'url'     => $cta['url'],
+										'new_tab' => ! empty( $cta['new_tab'] ),
+									];
+								}
+							}
+						}
+					}
+					?>
+
+					<?php if ( ! empty( $cta_buttons ) ) : ?>
+					<div class="plgc-event-hero__actions">
+						<?php foreach ( $cta_buttons as $cta ) :
+							$target_attr = $cta['new_tab']
+								? ' target="_blank" rel="noopener noreferrer"'
+								: '';
+							$new_tab_text = $cta['new_tab']
+								? ' <span class="screen-reader-text">' . esc_html__( '(opens in new tab)', 'plgc' ) . '</span>'
+								: '';
+						?>
+						<a
+							href="<?php echo esc_url( $cta['url'] ); ?>"
+							class="plgc-event-cta plgc-btn"
+							<?php echo $target_attr; ?>
+						><?php echo esc_html( $cta['label'] ); ?><?php echo $new_tab_text; ?></a>
+						<?php endforeach; ?>
+					</div>
+					<?php endif; ?>
 
 					<?php do_action( 'tribe_events_single_event_after_the_meta' ); ?>
 
@@ -168,7 +221,58 @@ $event_id     = get_the_ID();
 
 		</article>
 
-		<!-- Related events rendered by TEC via tribe_events_single_event_after_the_content -->
+		<?php /* ── Related Events — full-width, below the article ──────── */
+		// Render explicitly here so they span the full content width,
+		// not inside the two-column hero grid where TEC's hooks place them.
+		$related = tribe_get_related_posts();
+		if ( is_array( $related ) && count( $related ) ) : ?>
+		<section class="plgc-related-events-full" aria-label="<?php esc_attr_e( 'Related Events', 'plgc' ); ?>">
+			<h2 class="tribe-events-related-events-title"><?php esc_html_e( 'Related Events', 'plgc' ); ?></h2>
+			<ul class="tribe-related-events tribe-clearfix">
+				<?php foreach ( $related as $rel_post ) :
+					$rel_id    = $rel_post->ID;
+					$rel_title = get_the_title( $rel_id );
+					$rel_url   = get_permalink( $rel_id );
+					$rel_start = function_exists( 'tribe_get_start_date' )
+						? tribe_get_start_date( $rel_id, false, 'M j @ g:i a' ) : '';
+					$rel_end   = function_exists( 'tribe_get_end_date' )
+						? tribe_get_end_date( $rel_id, false, 'g:i a' ) : '';
+				?>
+				<?php
+					$rel_thumb_url = get_the_post_thumbnail_url( $rel_id, 'large' );
+					$rel_thumb_alt = get_post_meta( get_post_thumbnail_id( $rel_id ), '_wp_attachment_image_alt', true );
+					if ( ! $rel_thumb_alt ) {
+						$rel_thumb_alt = $rel_title;
+					}
+				?>
+				<li>
+					<?php if ( $rel_thumb_url ) : ?>
+					<div class="tribe-related-events-thumbnail">
+						<a
+							href="<?php echo esc_url( $rel_url ); ?>"
+							class="plgc-related-thumb-link"
+							style="background-image: url('<?php echo esc_url( $rel_thumb_url ); ?>');"
+							tabindex="-1"
+							aria-hidden="true"
+							role="presentation"
+						>
+							<span class="screen-reader-text"><?php echo esc_html( $rel_thumb_alt ); ?></span>
+						</a>
+					</div>
+					<?php endif; ?>
+					<div class="tribe-related-event-info">
+						<h3 class="tribe-related-events-title">
+							<a href="<?php echo esc_url( $rel_url ); ?>" class="tribe-event-url" rel="bookmark"><?php echo esc_html( $rel_title ); ?></a>
+						</h3>
+						<?php if ( $rel_start ) : ?>
+						<span class="tribe-event-date-start"><?php echo esc_html( $rel_start ); ?></span><?php if ( $rel_end ) : ?> - <span class="tribe-event-time"><?php echo esc_html( $rel_end ); ?></span><?php endif; ?>
+						<?php endif; ?>
+					</div>
+				</li>
+				<?php endforeach; ?>
+			</ul>
+		</section>
+		<?php endif; ?>
 
 		<!-- Event navigation — use TEC default styling -->
 		<div id="tribe-events-footer">

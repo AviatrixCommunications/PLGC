@@ -337,7 +337,18 @@ function plgc_gs_shortcode( array $atts ): string {
 	$dot_position = $config['dot_position']; // 'left' or 'right'
 	$section_id      = 'plgc-gs-' . $section_key;
 	$heading_id      = $section_id . '-heading';
-	$collapsible_id  = $section_id . '-details';
+
+	// Build gallery data for lightbox (JSON for JS to read)
+	$lightbox_data = [];
+	if ( ! empty( $images ) ) {
+		foreach ( $images as $idx => $img ) {
+			$lightbox_data[] = [
+				'url' => $img['url'] ?? '',
+				'alt' => $img['alt']
+					?: sprintf( __( '%1$s — image %2$d', 'plgc' ), wp_strip_all_tags( $config['label'] ), $idx + 1 ),
+			];
+		}
+	}
 
 	ob_start();
 	?>
@@ -348,7 +359,12 @@ function plgc_gs_shortcode( array $atts ): string {
 >
 
 	<?php /* ── Image / Slider column ──────────────────────────────────── */ ?>
-	<div class="plgc-gs__image-col plgc-gs__image-col--dots-<?php echo esc_attr( $dot_position ); ?>">
+	<div
+		class="plgc-gs__image-col plgc-gs__image-col--dots-<?php echo esc_attr( $dot_position ); ?>"
+		<?php if ( ! empty( $lightbox_data ) ) : ?>
+		data-gallery="<?php echo esc_attr( wp_json_encode( $lightbox_data ) ); ?>"
+		<?php endif; ?>
+	>
 
 		<?php if ( ! empty( $images ) ) : ?>
 
@@ -419,6 +435,16 @@ function plgc_gs_shortcode( array $atts ): string {
 			></div>
 			<?php endif; ?>
 
+			<?php /* Expand button — opens current image in lightbox.
+			   SC 2.1.1: native <button>  SC 2.5.5: 44×44px  SC 4.1.2: aria-label */ ?>
+			<button
+				class="plgc-gs__expand-btn"
+				type="button"
+				aria-label="<?php esc_attr_e( 'View full-size image', 'plgc' ); ?>"
+			>
+				<svg class="plgc-gs__expand-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 7V2H7M16 7V2H11M2 11V16H7M16 11V16H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			</button>
+
 		</div>
 
 		<?php else : ?>
@@ -432,69 +458,43 @@ function plgc_gs_shortcode( array $atts ): string {
 
 	<?php /* ── Content card ────────────────────────────────────────────── */ ?>
 	<div class="plgc-gs__card">
-		<?php /* Toggle button — desktop only (hidden on tablet/mobile via CSS).
-		   Collapses the body text + CTA so the user can see more of the gallery image.
-		   WCAG: <button> with aria-expanded, aria-controls pointing to collapsible region.
-		   SC 4.1.2 — name/role/value; SC 2.1.1 — keyboard operable (native button). */ ?>
-		<button
-			class="plgc-gs__toggle"
-			type="button"
-			aria-expanded="true"
-			aria-controls="<?php echo esc_attr( $collapsible_id ); ?>"
-		>
-			<span class="plgc-gs__toggle-label" data-expanded="<?php esc_attr_e( 'View Full Image', 'plgc' ); ?>" data-collapsed="<?php esc_attr_e( 'Show Details', 'plgc' ); ?>"><?php esc_html_e( 'View Full Image', 'plgc' ); ?></span>
-			<svg class="plgc-gs__toggle-icon" aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4.5L6 8.5L10 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-		</button>
-
 		<h2
 			id="<?php echo esc_attr( $heading_id ); ?>"
 			class="plgc-gs__heading"
 		><?php echo wp_kses_post( $heading ); ?></h2>
 
-		<?php /* Collapsible region — body text, CTA, badge.
-		   Wraps everything below the heading so the toggle can show/hide it.
-		   role="region" omitted intentionally — this is supplementary content,
-		   not a landmark. aria-labelledby ties it to the section heading. */ ?>
-		<div
-			class="plgc-gs__collapsible"
-			id="<?php echo esc_attr( $collapsible_id ); ?>"
-			aria-labelledby="<?php echo esc_attr( $heading_id ); ?>"
+		<div class="plgc-gs__body">
+			<?php echo wp_kses_post( $body ); ?>
+		</div>
+
+		<?php if ( $btn_label && $btn_url ) : ?>
+		<div class="plgc-gs__btn-row">
+		<a
+			href="<?php echo esc_url( $btn_url ); ?>"
+			class="plgc-gs__btn plgc-btn"
+		><?php echo esc_html( $btn_label ); ?></a>
+
+		<?php if ( ! empty( $badge ) && ! empty( $badge['url'] ) ) : ?>
+		<a
+			href="<?php echo esc_url( $btn_url ); ?>"
+			class="plgc-gs__badge-link"
+			aria-label="<?php echo esc_attr( wp_strip_all_tags( html_entity_decode( $heading, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) ); ?>"
+			tabindex="-1"
+			aria-hidden="true"
 		>
-			<div class="plgc-gs__body">
-				<?php echo wp_kses_post( $body ); ?>
-			</div>
-
-			<?php if ( $btn_label && $btn_url ) : ?>
-			<div class="plgc-gs__btn-row">
-			<a
-				href="<?php echo esc_url( $btn_url ); ?>"
-				class="plgc-gs__btn plgc-btn"
-			><?php echo esc_html( $btn_label ); ?></a>
-
-			<?php /* Badge — linked to same URL as CTA (tabindex=-1/aria-hidden so the
-			   link isn't a duplicate keyboard stop; the CTA button is the real stop) */ ?>
-			<?php if ( ! empty( $badge ) && ! empty( $badge['url'] ) ) : ?>
-			<a
-				href="<?php echo esc_url( $btn_url ); ?>"
-				class="plgc-gs__badge-link"
-				aria-label="<?php echo esc_attr( wp_strip_all_tags( html_entity_decode( $heading, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) ); ?>"
-				tabindex="-1"
-				aria-hidden="true"
+			<img
+				src="<?php echo esc_url( $badge['url'] ); ?>"
+				alt=""
+				width="126"
+				height="126"
+				class="plgc-gs__badge"
+				loading="lazy"
+				decoding="async"
 			>
-				<img
-					src="<?php echo esc_url( $badge['url'] ); ?>"
-					alt=""
-					width="126"
-					height="126"
-					class="plgc-gs__badge"
-					loading="lazy"
-					decoding="async"
-				>
-			</a>
+		</a>
 <?php endif; ?>
-			</div><?php /* .plgc-gs__btn-row */ ?>
-			<?php endif; ?>
-		</div><?php /* .plgc-gs__collapsible */ ?>
+		</div><?php /* .plgc-gs__btn-row */ ?>
+		<?php endif; ?>
 
 	</div><?php /* .plgc-gs__card */ ?>
 
