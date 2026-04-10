@@ -2,10 +2,10 @@
  * PLGC Featured Events Slider — event-slider.css
  *
  * Figma "hero slider" node (34039:628) — right column of Section 2
- *   Container:  708 × 567 px
- *   Photo:      full-bleed cover
- *   Panel:      bottom 30.5% (173/567px), full width
- *               gradient black → #454041, 1px black border, border-radius 10px 10px 0 0
+ *   Container:  708 × 567 px  →  aspect-ratio: 5/4 (scales with column width)
+ *   Photo:      full-bleed cover  (recommended graphic: 1400×1120px, 5:4 ratio)
+ *   Panel:      bottom ~23%, full width, auto-height from content
+ *               gradient black → #454041, border-radius 10px 0 0 10px
  *   Title:      Open Sans Regular 24px / 36px, white, centered
  *   CTA:        Open Sans Regular 24px, white, underlined — OR yellow pill for tickets
  *   Dots:       top-right, 27px from top (4.76% × 567), 41px from right (5.83% × 708)
@@ -15,32 +15,26 @@
  * @since   1.5.5
  */
 
-/* ── Elementor parent height inheritance ────────────────────────────────── */
-/* The slider's height:100% only works if every parent passes height down.
-   Elementor's widget wrappers don't do this by default, so the slider
-   falls back to min-height:567px even when the column is taller.
-   :has() tells the widget + its inner container to stretch.              */
+/* ── Elementor parent — let the slider size itself via aspect-ratio ───── */
+/* The widget wrapper just needs to not collapse. The slider's own
+   aspect-ratio (5/4 on desktop) sets its height from the column width,
+   so we no longer need to chain height:100% down from the section.      */
 .elementor-widget:has(.plgc-es) {
-    height: 100%;
     align-self: stretch;
-}
-
-.elementor-widget:has(.plgc-es) > .elementor-widget-container {
-    height: 100%;
 }
 
 /* ── Wrapper ─────────────────────────────────────────────────────────────── */
 .plgc-es {
     position: relative;
     width: 100%;
-    height: 100%;
-    min-height: 567px;
+    aspect-ratio: 5 / 4;
     overflow: hidden;
     background: #1a2e1d;
 }
 
 /* Admin notice — only admins see this when TEC not active */
 .plgc-es--admin-notice {
+    aspect-ratio: auto;
     min-height: 0;
     background: transparent;
 }
@@ -105,7 +99,6 @@
 .plgc-es__swiper {
     width: 100%;
     height: 100%;
-    min-height: 567px;
 }
 
 /* ── Individual slide ────────────────────────────────────────────────────── */
@@ -113,7 +106,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    min-height: 567px;
     overflow: hidden;
 }
 
@@ -431,14 +423,9 @@
 
 
 /* ── Responsive — Tablet (768px–1024px) ──────────────────────────────────── */
-/* Same horizontal layout as desktop; smaller sizes to fit the 50/50 column   */
+/* Same horizontal layout as desktop; smaller sizes to fit the 50/50 column.
+   aspect-ratio: 5/4 from the base rule still applies — no min-height needed. */
 @media (max-width: 1024px) {
-    .plgc-es,
-    .plgc-es__swiper,
-    .plgc-es__slide {
-        min-height: 420px;
-    }
-
     .plgc-es__content {
         display: flex;
         flex-direction: row;
@@ -481,9 +468,11 @@
 
 /* ── Responsive — Mobile (≤ 767px) ──────────────────────────────────────── */
 @media (max-width: 767px) {
-    .plgc-es,
-    .plgc-es__swiper,
-    .plgc-es__slide {
+    /* On mobile the slider stacks image-above / content-below, so we need a
+       pixel floor instead of aspect-ratio. The 58/42 split gives the image
+       ~244px at 420px total — enough to read a graphic clearly.              */
+    .plgc-es {
+        aspect-ratio: auto;
         min-height: 420px;
     }
 
