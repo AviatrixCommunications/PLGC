@@ -380,6 +380,139 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   GALLERY TOGGLE — "View Full Image" / "Show Details"
+   Desktop-only: on tablet/mobile the layout is stacked (image on top, card
+   below) so the user already sees the full image — no toggle needed.
+
+   WCAG compliance:
+     SC 4.1.2 — <button> with aria-expanded + aria-controls
+     SC 2.1.1 — Native <button> is keyboard operable (Enter/Space)
+     SC 2.4.7 — Visible focus ring (3px solid #233C26)
+     SC 2.5.5 — 44×44px minimum touch target
+     SC 1.4.3 — Text contrast verified (#567915 on #FFFFFF = 5.07:1)
+   ───────────────────────────────────────────────────────────────────────────── */
+.plgc-gs__toggle {
+    display: none;  /* Hidden by default — shown only on desktop via media query */
+}
+
+/* Desktop only — show the toggle */
+@media (min-width: 1025px) {
+    .plgc-gs__toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        position: absolute;
+        z-index: 5;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid #E7E4E4;
+        border-radius: 100px;
+        padding: 6px 14px;
+        min-height: 44px;           /* WCAG 2.5.5 touch target */
+        min-width: 44px;
+        cursor: pointer;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 0.8125rem;       /* 13px */
+        font-weight: 600;
+        color: #567915;
+        line-height: 1;
+        white-space: nowrap;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* ── Position varies by layout ─────────────────────────────────────── */
+    /* Image-left (Golf Outings, McChesney's): toggle on the top-left of the card,
+       which is the edge facing the image. */
+    .plgc-gs--image-left .plgc-gs__toggle {
+        top: 16px;
+        left: 16px;
+    }
+
+    /* Image-right (Weddings): toggle on the top-right of the card */
+    .plgc-gs--image-right .plgc-gs__toggle {
+        top: 16px;
+        right: 16px;
+    }
+
+    .plgc-gs__toggle:hover {
+        background: #FFFFFF;
+        color: #233C26;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+    }
+
+    .plgc-gs__toggle:focus-visible {
+        outline: 3px solid #233C26;
+        outline-offset: 2px;
+    }
+
+    /* Chevron icon */
+    .plgc-gs__toggle-icon {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+    }
+
+    /* When collapsed, rotate chevron upward */
+    .plgc-gs__toggle[aria-expanded="false"] .plgc-gs__toggle-icon {
+        transform: rotate(180deg);
+    }
+}
+
+/* ── Collapsible container ────────────────────────────────────────────────
+   Wraps body text + CTA. On desktop, transitions max-height + opacity
+   for a smooth collapse. On tablet/mobile, always visible (no toggle).  */
+.plgc-gs__collapsible {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* tablet/mobile: always visible, no transition needed */
+}
+
+@media (min-width: 1025px) {
+    .plgc-gs__collapsible {
+        overflow: hidden;
+        transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.35s ease;
+        max-height: 600px;       /* large enough to never clip expanded content */
+        opacity: 1;
+        margin-top: 0;
+    }
+
+    /* Collapsed state */
+    .plgc-gs__card--collapsed .plgc-gs__collapsible {
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+        /* Hide from assistive tech when collapsed so tab order skips hidden links */
+        visibility: hidden;
+    }
+
+    /* Card padding shrinks when collapsed — heading only needs modest padding */
+    .plgc-gs__card--collapsed {
+        padding-top: 54px;
+        padding-bottom: 32px;
+    }
+
+    /* Weddings (image-right) keeps its right-aligned text alignment when collapsed */
+    .plgc-gs--image-right .plgc-gs__card--collapsed {
+        padding-top: 54px;
+        padding-bottom: 32px;
+    }
+}
+
+/* ── Reduced motion — instant toggle, no animation ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .plgc-gs__collapsible {
+        transition: none !important;
+    }
+    .plgc-gs__toggle-icon {
+        transition: none !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    McCHESNEY'S SPECIFIC OVERRIDES
    The badge sits next to the button in normal flex flow, vertically centred.
 

@@ -597,11 +597,15 @@
     const mobileClose = document.querySelector('.plgc-mobile-nav__close');
     const overlay     = document.querySelector('.plgc-mobile-nav__overlay');
     let lastFocus;
+	
+	    // Ensure mobile nav is inert on load (prevents hidden focusable elements  WCAG 4.1.2)
+	    //     if (mobileNav) mobileNav.setAttribute('inert', '');
 
     function openDrawer() {
         if (!mobileNav) return;
         lastFocus = document.activeElement;
         mobileNav.classList.add('is-open');
+		        mobileNav.removeAttribute('inert');
         mobileNav.setAttribute('aria-hidden', 'false');
         overlay && overlay.classList.add('is-visible');
         hamburger && hamburger.setAttribute('aria-expanded', 'true');
@@ -612,6 +616,7 @@
     function closeDrawer() {
         if (!mobileNav) return;
         mobileNav.classList.remove('is-open');
+		        mobileNav.setAttribute('inert', '');
         mobileNav.setAttribute('aria-hidden', 'true');
         overlay && overlay.classList.remove('is-visible');
         hamburger && hamburger.setAttribute('aria-expanded', 'false');

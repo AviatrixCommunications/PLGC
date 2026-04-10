@@ -80,7 +80,7 @@ function plgc_register_acf_options_fields() {
                            . '<ul style="margin:0.5em 0 0 1.25em;list-style:disc">'
                            . '<li><strong>Homepage Gallery Sections</strong> — Golf Outings, Weddings &amp; Events, and McChesney\'s sliders (images, headings, body text, CTAs)</li>'
                            . '<li><strong>"Grass Is Greener" Section</strong> — Section title, intro, background image, four image tiles (with links), and testimonials</li>'
-                           . '<li><strong>Events Carousel</strong> — Fallback image and messaging shown when no events are currently featured.</li>'
+                           . '<li><strong>Events Carousel</strong> — Scheduled announcements, fallback image, and messaging for the homepage events slider.</li>'
                            . '</ul>',
                 'new_lines' => 'wpautop',
                 'esc_html'  => 0,
@@ -146,6 +146,145 @@ function plgc_register_acf_options_fields() {
                 'instructions' => 'Where the CTA link points. Only used when a CTA Label is set.',
                 'placeholder'  => 'https://prairielanding.com/events/',
                 'wrapper'      => [ 'width' => '40' ],
+            ],
+
+            // ================================================================
+            // EVENTS CAROUSEL — ANNOUNCEMENTS
+            // ================================================================
+            [
+                'key'     => 'field_plgc_announcements_label',
+                'label'   => '',
+                'name'    => 'plgc_announcements_label',
+                'type'    => 'message',
+                'message' => '<h3 style="margin:0 0 0.25em">Events Carousel — Announcements</h3>'
+                           . '<p style="margin:0">Add announcements that appear in the Events Carousel alongside featured events. '
+                           . 'Each announcement has a start and expiration date so it appears and disappears automatically. '
+                           . 'Use the Sort Order field to control the position of each announcement relative to events.</p>',
+                'new_lines' => 'wpautop',
+                'esc_html'  => 0,
+                'wrapper'   => [ 'width' => '100' ],
+            ],
+            [
+                'key'          => 'field_plgc_announcements',
+                'label'        => 'Announcements',
+                'name'         => 'plgc_announcements',
+                'type'         => 'repeater',
+                'instructions' => '',
+                'layout'       => 'block',
+                'button_label' => 'Add Announcement',
+                'min'          => 0,
+                'max'          => 0, // unlimited
+                'sub_fields'   => [
+                    [
+                        'key'          => 'field_plgc_ann_sort_order',
+                        'label'        => 'Sort Order',
+                        'name'         => 'sort_order',
+                        'type'         => 'number',
+                        'instructions' => 'Lower numbers appear first. Events without a sort order use their start date. Tip: use 10, 20, 30… to leave room for future inserts.',
+                        'default_value'=> 10,
+                        'min'          => 0,
+                        'wrapper'      => [ 'width' => '15' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_media_type',
+                        'label'        => 'Media Type',
+                        'name'         => 'media_type',
+                        'type'         => 'select',
+                        'instructions' => '',
+                        'choices'      => [
+                            'image' => 'Image',
+                            'video' => 'Video',
+                        ],
+                        'default_value' => 'image',
+                        'wrapper'       => [ 'width' => '15' ],
+                    ],
+                    [
+                        'key'           => 'field_plgc_ann_image',
+                        'label'         => 'Image',
+                        'name'          => 'image',
+                        'type'          => 'image',
+                        'instructions'  => 'Landscape image, recommended: 1600×900px (16:9). Also used as the video poster frame.',
+                        'return_format' => 'array',
+                        'preview_size'  => 'medium',
+                        'wrapper'       => [ 'width' => '35' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_video_url',
+                        'label'        => 'Video URL',
+                        'name'         => 'video_url',
+                        'type'         => 'url',
+                        'instructions' => 'Direct MP4 URL, or YouTube/Vimeo URL. The image above is used as the poster frame.',
+                        'placeholder'  => 'https://example.com/video.mp4',
+                        'wrapper'      => [ 'width' => '35' ],
+                        'conditional_logic' => [
+                            [
+                                [
+                                    'field'    => 'field_plgc_ann_media_type',
+                                    'operator' => '==',
+                                    'value'    => 'video',
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_headline',
+                        'label'        => 'Headline',
+                        'name'         => 'headline',
+                        'type'         => 'text',
+                        'instructions' => 'Main text shown on the dark overlay panel.',
+                        'placeholder'  => '2026 Memberships Now Available!',
+                        'wrapper'      => [ 'width' => '50' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_body_text',
+                        'label'        => 'Body Text',
+                        'name'         => 'body_text',
+                        'type'         => 'text',
+                        'instructions' => 'Optional secondary line below the headline.',
+                        'placeholder'  => '',
+                        'wrapper'      => [ 'width' => '50' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_cta_label',
+                        'label'        => 'CTA Label',
+                        'name'         => 'cta_label',
+                        'type'         => 'text',
+                        'instructions' => 'Button text. Leave blank to hide.',
+                        'placeholder'  => 'Learn More',
+                        'wrapper'      => [ 'width' => '25' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_cta_url',
+                        'label'        => 'CTA URL',
+                        'name'         => 'cta_url',
+                        'type'         => 'url',
+                        'instructions' => '',
+                        'placeholder'  => 'https://prairielanding.com/',
+                        'wrapper'      => [ 'width' => '25' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_start_date',
+                        'label'        => 'Start Date',
+                        'name'         => 'start_date',
+                        'type'         => 'date_picker',
+                        'instructions' => 'Announcement appears starting at midnight on this date.',
+                        'display_format' => 'F j, Y',
+                        'return_format'  => 'Ymd',
+                        'first_day'      => 0,
+                        'wrapper'        => [ 'width' => '25' ],
+                    ],
+                    [
+                        'key'          => 'field_plgc_ann_end_date',
+                        'label'        => 'Expiration Date',
+                        'name'         => 'end_date',
+                        'type'         => 'date_picker',
+                        'instructions' => 'Announcement stops showing after this date.',
+                        'display_format' => 'F j, Y',
+                        'return_format'  => 'Ymd',
+                        'first_day'      => 0,
+                        'wrapper'        => [ 'width' => '25' ],
+                    ],
+                ],
             ],
 
             // ================================================================

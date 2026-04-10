@@ -180,4 +180,58 @@
         }, 50 );
     }
 
+
+    /* ─────────────────────────────────────────────────────────────────────
+       GALLERY TOGGLE — "View Full Image" / "Show Details"
+
+       Desktop only. Collapses the card body+CTA so more of the gallery
+       image is visible. On tablet/mobile the toggle button is display:none
+       and the collapsible region has no max-height constraint, so this JS
+       is harmless if the button doesn't exist.
+
+       WCAG 2.1 AA:
+         SC 4.1.2 — aria-expanded toggles between "true" and "false"
+         SC 2.1.1 — Native <button> fires on Enter/Space automatically
+         SC 4.1.3 — Status change announced via aria-expanded state
+         SC 2.4.7 — Focus ring defined in CSS
+       ─────────────────────────────────────────────────────────────────── */
+    function initGalleryToggles() {
+        document.querySelectorAll( '.plgc-gs__toggle' ).forEach( function ( btn ) {
+            btn.addEventListener( 'click', function () {
+                var card        = btn.closest( '.plgc-gs__card' );
+                var expanded    = btn.getAttribute( 'aria-expanded' ) === 'true';
+                var labelEl     = btn.querySelector( '.plgc-gs__toggle-label' );
+                var collapsible = card ? card.querySelector( '.plgc-gs__collapsible' ) : null;
+
+                // Toggle state
+                var newExpanded = ! expanded;
+                btn.setAttribute( 'aria-expanded', newExpanded ? 'true' : 'false' );
+
+                // Toggle card class
+                if ( card ) {
+                    card.classList.toggle( 'plgc-gs__card--collapsed', ! newExpanded );
+                }
+
+                // Swap button label text
+                if ( labelEl ) {
+                    labelEl.textContent = newExpanded
+                        ? ( labelEl.dataset.expanded || 'View Full Image' )
+                        : ( labelEl.dataset.collapsed || 'Show Details' );
+                }
+
+                // When expanding, restore visibility after the CSS transition starts
+                if ( newExpanded && collapsible ) {
+                    collapsible.style.visibility = 'visible';
+                }
+            } );
+        } );
+    }
+
+    // Run toggle init alongside the slider init
+    if ( document.readyState === 'loading' ) {
+        document.addEventListener( 'DOMContentLoaded', initGalleryToggles );
+    } else {
+        initGalleryToggles();
+    }
+
 }() );

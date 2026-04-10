@@ -72,6 +72,27 @@ function plgc_es_register_acf_fields(): void {
 				'ui_off_text'  => 'Not featured',
 			],
 			[
+				'key'          => 'field_plgc_event_sort_order',
+				'label'        => 'Carousel Sort Order',
+				'name'         => 'plgc_event_sort_order',
+				'type'         => 'number',
+				'instructions' => 'Controls this event\'s position in the homepage carousel. Lower numbers appear first. Leave blank to sort by event start date (default behavior). Tip: use 10, 20, 30… to leave room for announcements.',
+				'required'     => 0,
+				'default_value'=> '',
+				'min'          => 0,
+				'placeholder'  => 'Auto (by date)',
+				'wrapper'      => [ 'width' => '50' ],
+				'conditional_logic' => [
+					[
+						[
+							'field'    => 'field_plgc_event_featured',
+							'operator' => '==',
+							'value'    => '1',
+						],
+					],
+				],
+			],
+			[
 				'key'          => 'field_plgc_event_banner',
 				'label'        => 'Homepage Banner Image',
 				'name'         => 'plgc_event_banner',
@@ -356,8 +377,195 @@ function plgc_es_format_price( int $event_id ): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6. FALLBACK SLIDE — shown when no events are featured
+// 6. ANNOUNCEMENTS — QUERY & MERGE
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Returns active announcements from the ACF repeater on the options page.
+ *
+ * Each returned item is a stdClass with properties matching the ACF sub-field
+ * names: sort_order, media_type, image, video_url, headline, body_text,
+ * cta_label, cta_url, start_date, end_date.
+ *
+ * "Active" means: today >= start_date AND today <= end_date.
+ *
+ * @return stdClass[]
+ */
+function plgc_es_get_announcements(): array {
+	if ( ! function_exists( 'get_field' ) ) {
+		return [];
+	}
+
+	$rows = get_field( 'plgc_announcements', 'option' );
+	if ( ! is_array( $rows ) || empty( $rows ) ) {
+		return [];
+	}
+
+	$today  = (int) current_time( 'Ymd' );
+	$active = [];
+
+	foreach ( $rows as $row ) {
+		$start = isset( $row['start_date'] ) ? (int) $row['start_date'] : 0;
+		$end   = isset( $row['end_date'] )   ? (int) $row['end_date']   : 0;
+
+		// Skip if scheduling data is incomplete
+		if ( ! $start || ! $end ) {
+			continue;
+		}
+
+		// Check date window
+		if ( $today < $start || $today > $end ) {
+			continue;
+		}
+
+		// Must have at least an image or headline
+		$has_image = is_array( $row['image'] ?? null ) && ! empty( $row['image']['url'] );
+		$has_headline = ! empty( $row['headline'] );
+		if ( ! $has_image && ! $has_headline ) {
+			continue;
+		}
+
+		$ann = (object) $row;
+		$ann->_slide_type = 'announcement';
+		$active[] = $ann;
+	}
+
+	return $active;
+}
+
+
+/**
+ * Merges featured events and active announcements into a single sorted array.
+ *
+ * Sort logic:
+ *   - Items with an explicit sort_order number sort by that number (ascending).
+ *   - Events without a sort_order derive one from their start date as a Unix
+ *     timestamp shifted to a high range (999000000+), so they naturally fall
+ *     after explicitly-ordered items but remain in chronological order among
+ *     themselves.
+ *   - Stable sort: items with the same sort_key preserve their original order.
+ *
+ * Each item in the returned array is a stdClass with at minimum:
+ *   ->_slide_type   'event' | 'announcement'
+ *   ->_sort_key     numeric value used for ordering
+ *
+ * Event items additionally carry: ->_event_id, ->_event_post (WP_Post)
+ * Announcement items carry the ACF sub-field values directly.
+ *
+ * @param  WP_Post[]   $events
+ * @param  stdClass[]  $announcements
+ * @return stdClass[]
+ */
+function plgc_es_merge_slides( array $events, array $announcements ): array {
+	$merged = [];
+
+	// ── Wrap events ──────────────────────────────────────────────────────────
+	foreach ( $events as $event ) {
+		$item = new stdClass();
+		$item->_slide_type = 'event';
+		$item->_event_id   = $event->ID;
+		$item->_event_post = $event;
+
+		// Custom sort order from ACF
+		$custom_order = function_exists( 'get_field' )
+			? get_field( 'plgc_event_sort_order', $event->ID )
+			: '';
+
+		if ( $custom_order !== '' && $custom_order !== null && $custom_order !== false ) {
+			$item->_sort_key = (float) $custom_order;
+		} else {
+			// Derive from start date — high range so un-ordered events sort last
+			$start_ts = (int) strtotime(
+				get_post_meta( $event->ID, '_EventStartDate', true ) ?: 'now'
+			);
+			// Normalize to a range that sorts after explicit orders (0–999)
+			// but still preserves chronological order among events.
+			$item->_sort_key = 999000000 + $start_ts;
+		}
+
+		$merged[] = $item;
+	}
+
+	// ── Wrap announcements ───────────────────────────────────────────────────
+	foreach ( $announcements as $ann ) {
+		$ann->_sort_key = (float) ( $ann->sort_order ?? 10 );
+		$merged[] = $ann;
+	}
+
+	// ── Stable sort by _sort_key ─────────────────────────────────────────────
+	// PHP's usort is not stable, so we use a secondary index to preserve
+	// insertion order for items with equal sort keys.
+	$i = 0;
+	foreach ( $merged as $item ) {
+		$item->_stable_idx = $i++;
+	}
+
+	usort( $merged, function ( $a, $b ) {
+		$diff = $a->_sort_key - $b->_sort_key;
+		if ( abs( $diff ) < 0.0001 ) {
+			return $a->_stable_idx - $b->_stable_idx;
+		}
+		return $diff < 0 ? -1 : 1;
+	} );
+
+	return $merged;
+}
+
+
+/**
+ * Detect video type from a URL.
+ *
+ * @param  string  $url
+ * @return string  'youtube' | 'vimeo' | 'mp4' | 'unknown'
+ */
+function plgc_es_video_type( string $url ): string {
+	if ( preg_match( '/youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\//i', $url ) ) {
+		return 'youtube';
+	}
+	if ( preg_match( '/vimeo\.com\//i', $url ) ) {
+		return 'vimeo';
+	}
+	if ( preg_match( '/\.mp4(\?|$)/i', $url ) ) {
+		return 'mp4';
+	}
+	return 'unknown';
+}
+
+
+/**
+ * Extract a YouTube embed URL from various YouTube URL formats.
+ *
+ * @param  string  $url
+ * @return string  Embed URL or empty string
+ */
+function plgc_es_youtube_embed_url( string $url ): string {
+	$id = '';
+	if ( preg_match( '/[?&]v=([a-zA-Z0-9_-]{11})/', $url, $m ) ) {
+		$id = $m[1];
+	} elseif ( preg_match( '/youtu\.be\/([a-zA-Z0-9_-]{11})/', $url, $m ) ) {
+		$id = $m[1];
+	} elseif ( preg_match( '/embed\/([a-zA-Z0-9_-]{11})/', $url, $m ) ) {
+		$id = $m[1];
+	}
+	return $id ? 'https://www.youtube-nocookie.com/embed/' . $id . '?autoplay=1&rel=0' : '';
+}
+
+
+/**
+ * Extract a Vimeo embed URL.
+ *
+ * @param  string  $url
+ * @return string  Embed URL or empty string
+ */
+function plgc_es_vimeo_embed_url( string $url ): string {
+	if ( preg_match( '/vimeo\.com\/(\d+)/', $url, $m ) ) {
+		return 'https://player.vimeo.com/video/' . $m[1] . '?autoplay=1';
+	}
+	return '';
+}
+
+
+
 
 /**
  * Renders a static "fallback" version of the event slider panel when no
@@ -455,34 +663,73 @@ function plgc_es_fallback_slide(): string {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 7. SHORTCODE
+// 8. SHORTCODE
 // ─────────────────────────────────────────────────────────────────────────────
 
 add_shortcode( 'plgc_event_slider', 'plgc_es_shortcode' );
 
+/**
+ * Renders the Events Carousel.
+ *
+ * Three-tier priority:
+ *   1. Featured events (TEC posts with ACF toggle on)
+ *   2. Active announcements (ACF repeater, date-gated)
+ *   3. Fallback slide (single static image/text from ACF options)
+ *
+ * Events and announcements are merged and sorted by their sort_order field.
+ * Video announcements render a poster image with a play button overlay;
+ * clicking loads the video (MP4 inline, YouTube/Vimeo via iframe facade).
+ *
+ * WCAG 2.1 AA:
+ *   SC 1.1.1 — All images have alt text; decorative elements aria-hidden
+ *   SC 1.4.1 — Status (sold out) conveyed by text + colour, not colour alone
+ *   SC 2.1.1 — All controls are keyboard operable (native buttons)
+ *   SC 2.2.2 — No autoplay on carousel or video; user initiates playback
+ *   SC 2.4.4 — All CTA aria-labels include descriptive context
+ *   SC 2.4.7 — Visible focus rings on all interactive elements
+ *   SC 2.5.5 — 44×44px minimum touch targets
+ *   SC 4.1.2 — Proper role/aria on carousel, slides, and controls
+ */
 function plgc_es_shortcode( array $atts = [] ): string {
-	// Silent on frontend if TEC not yet installed; admin sees an install prompt
-	if ( ! class_exists( 'Tribe__Events__Main' ) ) {
+	// TEC not required for announcements — only check for events query
+	$has_tec = class_exists( 'Tribe__Events__Main' );
+
+	// If no TEC AND no ACF (can't even check announcements), bail
+	if ( ! $has_tec && ! function_exists( 'get_field' ) ) {
 		if ( current_user_can( 'manage_options' ) ) {
 			return '<div role="note" style="padding:16px 20px;background:#fff3cd;border-left:4px solid #ffc107;font-family:sans-serif;font-size:14px;">'
-			     . '<strong>PLGC Event Slider:</strong> Install and activate The Events Calendar to enable this slider.</div>';
+			     . '<strong>PLGC Events Carousel:</strong> Install The Events Calendar and/or configure announcements in PL Settings.</div>';
 		}
 		return '';
 	}
 
-	$atts   = shortcode_atts( [ 'limit' => 0 ], $atts, 'plgc_event_slider' );
-	$events = plgc_es_get_events( (int) $atts['limit'] );
+	$atts = shortcode_atts( [ 'limit' => 0 ], $atts, 'plgc_event_slider' );
 
-	if ( empty( $events ) ) {
+	// ── Tier 1: Featured events ──────────────────────────────────────────────
+	$events = $has_tec ? plgc_es_get_events( (int) $atts['limit'] ) : [];
+
+	// ── Tier 2: Active announcements ─────────────────────────────────────────
+	$announcements = plgc_es_get_announcements();
+
+	// ── Tier 3: Fallback if both empty ───────────────────────────────────────
+	if ( empty( $events ) && empty( $announcements ) ) {
 		return plgc_es_fallback_slide();
 	}
 
+	// ── Merge & sort ─────────────────────────────────────────────────────────
+	$slides = plgc_es_merge_slides( $events, $announcements );
+	$total  = count( $slides );
+
+	if ( $total === 0 ) {
+		return plgc_es_fallback_slide();
+	}
+
+	// ── Enqueue assets ───────────────────────────────────────────────────────
 	wp_enqueue_style( 'swiper' );
 	wp_enqueue_script( 'swiper' );
 	wp_enqueue_style( 'plgc-event-slider' );
 	wp_enqueue_script( 'plgc-event-slider' );
 
-	$total     = count( $events );
 	$is_single = ( $total === 1 );
 	$slider_id = 'plgc-es-' . wp_unique_id();
 
@@ -492,7 +739,7 @@ function plgc_es_shortcode( array $atts = [] ): string {
 	id="<?php echo esc_attr( $slider_id ); ?>"
 	class="plgc-es<?php echo $is_single ? ' plgc-es--single' : ''; ?>"
 	role="region"
-	aria-label="<?php esc_attr_e( 'Featured Events', 'plgc' ); ?>"
+	aria-label="<?php esc_attr_e( 'Events and Announcements', 'plgc' ); ?>"
 	<?php if ( ! $is_single ) echo 'aria-roledescription="carousel"'; ?>
 >
 	<div class="plgc-es__sr-live" aria-live="polite" aria-atomic="true" role="status"></div>
@@ -500,52 +747,57 @@ function plgc_es_shortcode( array $atts = [] ): string {
 	<div class="swiper plgc-es__swiper">
 		<div class="swiper-wrapper">
 <?php
-	foreach ( $events as $i => $event ) :
-		$event_id = $event->ID;
-		$title    = get_the_title( $event_id );
-		$url      = get_permalink( $event_id );
-		$img_url  = '';
-		// Priority: ACF banner image → Featured Image → empty (placeholder)
-		if ( function_exists( 'get_field' ) ) {
-			$banner = get_field( 'plgc_event_banner', $event_id );
-			if ( $banner ) {
-				$img_url = is_array( $banner ) ? ( $banner['url'] ?? '' ) : (string) $banner;
+	foreach ( $slides as $i => $slide ) :
+
+		if ( $slide->_slide_type === 'event' ) :
+			// ── EVENT SLIDE ──────────────────────────────────────────────────
+			$event_id = $slide->_event_id;
+			$title    = get_the_title( $event_id );
+			$url      = get_permalink( $event_id );
+			$img_url  = '';
+
+			// Priority: ACF banner image → Featured Image → empty
+			if ( function_exists( 'get_field' ) ) {
+				$banner = get_field( 'plgc_event_banner', $event_id );
+				if ( $banner ) {
+					$img_url = is_array( $banner ) ? ( $banner['url'] ?? '' ) : (string) $banner;
+				}
 			}
-		}
-		if ( ! $img_url ) {
-			$img_url = get_the_post_thumbnail_url( $event_id, 'large' ) ?: '';
-		}
-		$date_str = plgc_es_format_date( $event_id );
-		$price    = plgc_es_format_price( $event_id );
-		$state    = plgc_es_ticket_state( $event_id );
+			if ( ! $img_url ) {
+				$img_url = get_the_post_thumbnail_url( $event_id, 'large' ) ?: '';
+			}
 
-		// ── CTA — aria-labels include event title (WCAG 2.4.4) ──────────────
-		switch ( $state ) {
-			case 'available':
-				$cta_text = __( 'Get Tickets', 'plgc' );
-				$cta_aria = sprintf( __( 'Get tickets for %s', 'plgc' ), $title );
-				$cta_url  = esc_url( $url . '#tribe-tickets' );
-				$cta_mod  = 'tickets';
-				break;
-			case 'sold_out':
-				$cta_text = __( 'View Details', 'plgc' );
-				$cta_aria = sprintf( __( 'View details for %s', 'plgc' ), $title );
-				$cta_url  = esc_url( $url );
-				$cta_mod  = 'details';
-				break;
-			default:
-				$cta_text = __( 'Learn More', 'plgc' );
-				$cta_aria = sprintf( __( 'Learn more about %s', 'plgc' ), $title );
-				$cta_url  = esc_url( $url );
-				$cta_mod  = 'learn';
-		}
+			$date_str = plgc_es_format_date( $event_id );
+			$price    = plgc_es_format_price( $event_id );
+			$state    = plgc_es_ticket_state( $event_id );
 
-		$slide_aria = $is_single
-			? $title
-			: sprintf( __( 'Slide %1$d of %2$d: %3$s', 'plgc' ), $i + 1, $total, $title );
+			// CTA — aria-labels include event title (WCAG 2.4.4)
+			switch ( $state ) {
+				case 'available':
+					$cta_text = __( 'Get Tickets', 'plgc' );
+					$cta_aria = sprintf( __( 'Get tickets for %s', 'plgc' ), $title );
+					$cta_url  = esc_url( $url . '#tribe-tickets' );
+					$cta_mod  = 'tickets';
+					break;
+				case 'sold_out':
+					$cta_text = __( 'View Details', 'plgc' );
+					$cta_aria = sprintf( __( 'View details for %s', 'plgc' ), $title );
+					$cta_url  = esc_url( $url );
+					$cta_mod  = 'details';
+					break;
+				default:
+					$cta_text = __( 'Learn More', 'plgc' );
+					$cta_aria = sprintf( __( 'Learn more about %s', 'plgc' ), $title );
+					$cta_url  = esc_url( $url );
+					$cta_mod  = 'learn';
+			}
+
+			$slide_aria = $is_single
+				? $title
+				: sprintf( __( 'Slide %1$d of %2$d: %3$s', 'plgc' ), $i + 1, $total, $title );
 ?>
 			<div
-				class="swiper-slide plgc-es__slide"
+				class="swiper-slide plgc-es__slide plgc-es__slide--event"
 				<?php if ( ! $is_single ) : ?>
 				role="group" aria-roledescription="slide"
 				aria-label="<?php echo esc_attr( $slide_aria ); ?>"
@@ -582,7 +834,7 @@ function plgc_es_shortcode( array $atts = [] ): string {
 					<?php if ( $price ) : ?>
 					<p class="plgc-es__price"><?php echo esc_html( $price ); ?></p>
 					<?php endif; ?>
-					</div><!-- /.plgc-es__text -->
+					</div>
 
 					<div class="plgc-es__divider" aria-hidden="true"></div>
 
@@ -593,14 +845,121 @@ function plgc_es_shortcode( array $atts = [] ): string {
 					><?php echo esc_html( $cta_text ); ?></a>
 				</div>
 			</div>
-<?php endforeach; ?>
+
+<?php
+		else :
+			// ── ANNOUNCEMENT SLIDE ───────────────────────────────────────────
+			$ann_headline  = $slide->headline ?? '';
+			$ann_body      = $slide->body_text ?? '';
+			$ann_cta_label = $slide->cta_label ?? '';
+			$ann_cta_url   = $slide->cta_url ?? '';
+			$ann_media     = $slide->media_type ?? 'image';
+			$ann_image     = $slide->image ?? null;
+			$ann_video_url = $slide->video_url ?? '';
+
+			$ann_img_url = ( is_array( $ann_image ) && ! empty( $ann_image['url'] ) )
+				? $ann_image['url'] : '';
+			$ann_img_alt = ( is_array( $ann_image ) && ! empty( $ann_image['alt'] ) )
+				? $ann_image['alt']
+				: ( $ann_headline ?: __( 'Announcement', 'plgc' ) );
+
+			$is_video     = ( $ann_media === 'video' && ! empty( $ann_video_url ) );
+			$video_type   = $is_video ? plgc_es_video_type( $ann_video_url ) : '';
+
+			$slide_label  = $ann_headline ?: __( 'Announcement', 'plgc' );
+			$slide_aria   = $is_single
+				? $slide_label
+				: sprintf( __( 'Slide %1$d of %2$d: %3$s', 'plgc' ), $i + 1, $total, $slide_label );
+
+			// Video embed URLs for facade pattern
+			$embed_url = '';
+			if ( $is_video ) {
+				if ( $video_type === 'youtube' ) {
+					$embed_url = plgc_es_youtube_embed_url( $ann_video_url );
+				} elseif ( $video_type === 'vimeo' ) {
+					$embed_url = plgc_es_vimeo_embed_url( $ann_video_url );
+				}
+			}
+?>
+			<div
+				class="swiper-slide plgc-es__slide plgc-es__slide--announcement<?php echo $is_video ? ' plgc-es__slide--video' : ''; ?>"
+				<?php if ( ! $is_single ) : ?>
+				role="group" aria-roledescription="slide"
+				aria-label="<?php echo esc_attr( $slide_aria ); ?>"
+				<?php endif; ?>
+				<?php if ( $is_video ) : ?>
+				data-video-type="<?php echo esc_attr( $video_type ); ?>"
+				data-video-src="<?php echo esc_attr( $video_type === 'mp4' ? $ann_video_url : $embed_url ); ?>"
+				<?php endif; ?>
+			>
+				<?php /* Poster image — always rendered (doubles as video poster frame) */ ?>
+				<?php if ( $ann_img_url ) : ?>
+				<img
+					class="plgc-es__bg-img"
+					src="<?php echo esc_url( $ann_img_url ); ?>"
+					alt="<?php echo esc_attr( $ann_img_alt ); ?>"
+					loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>"
+					decoding="async"
+				>
+				<?php else : ?>
+				<div class="plgc-es__bg-placeholder" aria-hidden="true"></div>
+				<?php endif; ?>
+
+				<?php /* Video play button — WCAG 2.2.2: no autoplay, user initiates.
+				   SC 2.1.1: native <button>, keyboard accessible.
+				   SC 2.5.5: 56×56px meets 44px minimum.
+				   SC 4.1.2: aria-label describes the action. */ ?>
+				<?php if ( $is_video ) : ?>
+				<button
+					class="plgc-es__play-btn"
+					type="button"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Play video: %s', 'plgc' ), $slide_label ) ); ?>"
+				>
+					<svg class="plgc-es__play-icon" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v13.72a1 1 0 001.5.86l11.04-6.86a1 1 0 000-1.72L9.5 4.28a1 1 0 00-1.5.86z"/></svg>
+				</button>
+
+				<?php /* Container where JS injects <video> or <iframe> on play */ ?>
+				<div class="plgc-es__video-container" aria-hidden="true"></div>
+				<?php endif; ?>
+
+				<?php $has_overlay = $ann_headline || $ann_body || ( $ann_cta_label && $ann_cta_url ); ?>
+				<?php if ( $has_overlay ) : ?>
+				<div class="plgc-es__panel" aria-hidden="true"></div>
+
+				<div class="plgc-es__content">
+					<div class="plgc-es__text">
+						<?php if ( $ann_headline ) : ?>
+						<p class="plgc-es__title"><?php echo esc_html( $ann_headline ); ?></p>
+						<?php endif; ?>
+
+						<?php if ( $ann_body ) : ?>
+						<p class="plgc-es__date"><?php echo esc_html( $ann_body ); ?></p>
+						<?php endif; ?>
+					</div>
+
+					<?php if ( $ann_cta_label && $ann_cta_url ) : ?>
+					<div class="plgc-es__divider" aria-hidden="true"></div>
+					<a
+						href="<?php echo esc_url( $ann_cta_url ); ?>"
+						class="plgc-es__cta plgc-es__cta--learn"
+						aria-label="<?php echo esc_attr( $ann_cta_label ); ?>"
+					><?php echo esc_html( $ann_cta_label ); ?></a>
+					<?php endif; ?>
+				</div>
+				<?php endif; ?>
+			</div>
+
+<?php
+		endif;
+	endforeach;
+?>
 		</div><?php /* .swiper-wrapper */ ?>
 
 		<?php if ( ! $is_single ) : ?>
 		<div
 			class="swiper-pagination plgc-es__dots"
 			role="tablist"
-			aria-label="<?php esc_attr_e( 'Event slides', 'plgc' ); ?>"
+			aria-label="<?php esc_attr_e( 'Carousel slides', 'plgc' ); ?>"
 		></div>
 		<?php endif; ?>
 

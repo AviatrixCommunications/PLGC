@@ -886,14 +886,38 @@ add_action( 'admin_menu', function () {
 } );
 
 /**
+ * Intercept CSV export requests on admin_init — BEFORE any HTML output.
+ *
+ * WordPress renders the full admin shell (head, admin bar, sidebar) before
+ * firing the page callback. If we send Content-Disposition headers inside
+ * the callback, the browser has already received HTML and the download
+ * fails. Hooking admin_init runs before any output starts.
+ */
+add_action( 'admin_init', function () {
+    if (
+        ! isset( $_GET['plgc_export_menu'] ) ||
+        ! isset( $_GET['page'] ) ||
+        $_GET['page'] !== 'plgc-menu-csv'
+    ) {
+        return;
+    }
+
+    // Verify nonce
+    if ( ! wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'plgc_export_menu' ) ) {
+        wp_die( 'Invalid or expired security token. Please go back and try again.', 'Export Error', [ 'back_link' => true ] );
+    }
+
+    plgc_menu_csv_export();
+    // plgc_menu_csv_export() calls exit — execution stops here.
+} );
+
+/**
  * Render the CSV Import/Export admin page.
  */
 function plgc_menu_csv_page() {
-    // Handle export
-    if ( isset( $_GET['plgc_export_menu'] ) && wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'plgc_export_menu' ) ) {
-        plgc_menu_csv_export();
-        return;
-    }
+    // NOTE: Export is handled by the admin_init hook above — it must run
+    // before WordPress outputs any HTML, so the browser receives proper
+    // Content-Disposition headers for the file download.
 
     // Handle import
     $import_result = null;

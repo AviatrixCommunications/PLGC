@@ -335,8 +335,9 @@ function plgc_gs_shortcode( array $atts ): string {
 	// ── Build HTML ───────────────────────────────────────────────────────────
 	$image_side   = $config['image_side'];   // 'left' or 'right'
 	$dot_position = $config['dot_position']; // 'left' or 'right'
-	$section_id   = 'plgc-gs-' . $section_key;
-	$heading_id   = $section_id . '-heading';
+	$section_id      = 'plgc-gs-' . $section_key;
+	$heading_id      = $section_id . '-heading';
+	$collapsible_id  = $section_id . '-details';
 
 	ob_start();
 	?>
@@ -431,45 +432,69 @@ function plgc_gs_shortcode( array $atts ): string {
 
 	<?php /* ── Content card ────────────────────────────────────────────── */ ?>
 	<div class="plgc-gs__card">
+		<?php /* Toggle button — desktop only (hidden on tablet/mobile via CSS).
+		   Collapses the body text + CTA so the user can see more of the gallery image.
+		   WCAG: <button> with aria-expanded, aria-controls pointing to collapsible region.
+		   SC 4.1.2 — name/role/value; SC 2.1.1 — keyboard operable (native button). */ ?>
+		<button
+			class="plgc-gs__toggle"
+			type="button"
+			aria-expanded="true"
+			aria-controls="<?php echo esc_attr( $collapsible_id ); ?>"
+		>
+			<span class="plgc-gs__toggle-label" data-expanded="<?php esc_attr_e( 'View Full Image', 'plgc' ); ?>" data-collapsed="<?php esc_attr_e( 'Show Details', 'plgc' ); ?>"><?php esc_html_e( 'View Full Image', 'plgc' ); ?></span>
+			<svg class="plgc-gs__toggle-icon" aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4.5L6 8.5L10 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+		</button>
+
 		<h2
 			id="<?php echo esc_attr( $heading_id ); ?>"
 			class="plgc-gs__heading"
 		><?php echo wp_kses_post( $heading ); ?></h2>
 
-		<div class="plgc-gs__body">
-			<?php echo wp_kses_post( $body ); ?>
-		</div>
-
-		<?php if ( $btn_label && $btn_url ) : ?>
-		<div class="plgc-gs__btn-row">
-		<a
-			href="<?php echo esc_url( $btn_url ); ?>"
-			class="plgc-gs__btn plgc-btn"
-		><?php echo esc_html( $btn_label ); ?></a>
-
-		<?php /* Badge — linked to same URL as CTA (tabindex=-1/aria-hidden so the
-		   link isn't a duplicate keyboard stop; the CTA button is the real stop) */ ?>
-		<?php if ( ! empty( $badge ) && ! empty( $badge['url'] ) ) : ?>
-		<a
-			href="<?php echo esc_url( $btn_url ); ?>"
-			class="plgc-gs__badge-link"
-			aria-label="<?php echo esc_attr( wp_strip_all_tags( html_entity_decode( $heading, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) ); ?>"
-			tabindex="-1"
-			aria-hidden="true"
+		<?php /* Collapsible region — body text, CTA, badge.
+		   Wraps everything below the heading so the toggle can show/hide it.
+		   role="region" omitted intentionally — this is supplementary content,
+		   not a landmark. aria-labelledby ties it to the section heading. */ ?>
+		<div
+			class="plgc-gs__collapsible"
+			id="<?php echo esc_attr( $collapsible_id ); ?>"
+			aria-labelledby="<?php echo esc_attr( $heading_id ); ?>"
 		>
-			<img
-				src="<?php echo esc_url( $badge['url'] ); ?>"
-				alt=""
-				width="126"
-				height="126"
-				class="plgc-gs__badge"
-				loading="lazy"
-				decoding="async"
+			<div class="plgc-gs__body">
+				<?php echo wp_kses_post( $body ); ?>
+			</div>
+
+			<?php if ( $btn_label && $btn_url ) : ?>
+			<div class="plgc-gs__btn-row">
+			<a
+				href="<?php echo esc_url( $btn_url ); ?>"
+				class="plgc-gs__btn plgc-btn"
+			><?php echo esc_html( $btn_label ); ?></a>
+
+			<?php /* Badge — linked to same URL as CTA (tabindex=-1/aria-hidden so the
+			   link isn't a duplicate keyboard stop; the CTA button is the real stop) */ ?>
+			<?php if ( ! empty( $badge ) && ! empty( $badge['url'] ) ) : ?>
+			<a
+				href="<?php echo esc_url( $btn_url ); ?>"
+				class="plgc-gs__badge-link"
+				aria-label="<?php echo esc_attr( wp_strip_all_tags( html_entity_decode( $heading, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) ); ?>"
+				tabindex="-1"
+				aria-hidden="true"
 			>
-		</a>
+				<img
+					src="<?php echo esc_url( $badge['url'] ); ?>"
+					alt=""
+					width="126"
+					height="126"
+					class="plgc-gs__badge"
+					loading="lazy"
+					decoding="async"
+				>
+			</a>
 <?php endif; ?>
-		</div><?php /* .plgc-gs__btn-row */ ?>
-		<?php endif; ?>
+			</div><?php /* .plgc-gs__btn-row */ ?>
+			<?php endif; ?>
+		</div><?php /* .plgc-gs__collapsible */ ?>
 
 	</div><?php /* .plgc-gs__card */ ?>
 
