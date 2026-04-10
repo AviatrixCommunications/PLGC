@@ -203,7 +203,7 @@ function plgc_register_acf_options_fields() {
                         'label'         => 'Image',
                         'name'          => 'image',
                         'type'          => 'image',
-                        'instructions'  => 'Landscape image, recommended: 1600×900px (16:9). Also used as the video poster frame.',
+                        'instructions'  => 'Recommended: 1400×1120px (5:4 ratio). Also used as the video poster frame.',
                         'return_format' => 'array',
                         'preview_size'  => 'medium',
                         'wrapper'       => [ 'width' => '35' ],

@@ -97,7 +97,7 @@ function plgc_es_register_acf_fields(): void {
 				'label'        => 'Homepage Banner Image',
 				'name'         => 'plgc_event_banner',
 				'type'         => 'image',
-				'instructions' => 'Optional landscape image for the homepage slider (recommended: 1600×900px, 16:9 ratio). If left empty, the Featured Image will be used instead. Only needed when this event is featured in the carousel.',
+				'instructions' => 'Optional image for the homepage slider (recommended: 1400×1120px, 5:4 ratio). If left empty, the Featured Image will be used instead. Only needed when this event is featured in the carousel.',
 				'required'     => 0,
 				'return_format'=> 'url',
 				'preview_size' => 'medium',
