@@ -186,7 +186,7 @@ function plgc_render_primary_nav() {
             $panel_id  = 'plgc-mega-' . $item->ID;
             $is_hash   = (empty($item->url) || $item->url === '#');
 
-            $chevron = '<svg class="plgc-nav__chevron" aria-hidden="true" focusable="false"'
+            $chevron = '<svg class="plgc-nav__chevron" aria-hidden="true" focusable="false" role="presentation"'
                 . ' width="12" height="12" viewBox="0 0 12 12" fill="none">'
                 . '<path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8"'
                 . ' stroke-linecap="round" stroke-linejoin="round"/>'
@@ -392,7 +392,7 @@ class PLGC_Mobile_Walker extends Walker_Nav_Menu {
                     . ' aria-expanded="false"'
                     . ' aria-controls="' . esc_attr($panel_id) . '">'
                     . '<span class="plgc-mobile-nav__row-label">' . esc_html($item->title) . '</span>'
-                    . '<svg class="plgc-mobile-nav__chevron" aria-hidden="true" focusable="false"'
+                    . '<svg class="plgc-mobile-nav__chevron" aria-hidden="true" focusable="false" role="presentation"'
                     . ' width="14" height="14" viewBox="0 0 12 12" fill="none">'
                     . '<path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8"'
                     . ' stroke-linecap="round" stroke-linejoin="round"/>'
@@ -408,7 +408,7 @@ class PLGC_Mobile_Walker extends Walker_Nav_Menu {
                     . ' aria-expanded="false"'
                     . ' aria-controls="' . esc_attr($panel_id) . '"'
                     . ' aria-label="Expand ' . esc_attr($item->title) . ' submenu">'
-                    . '<svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 12 12" fill="none">'
+                    . '<svg aria-hidden="true" focusable="false" role="presentation" width="14" height="14" viewBox="0 0 12 12" fill="none">'
                     . '<path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8"'
                     . ' stroke-linecap="round" stroke-linejoin="round"/>'
                     . '</svg>'

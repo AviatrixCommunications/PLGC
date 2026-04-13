@@ -362,9 +362,8 @@
 }
 
 .plgc-es__dots .swiper-pagination-bullet:focus-visible {
-    outline: 3px solid #FFAE40;
-    outline-offset: 2px;
-    border-radius: 50%;
+    outline: none;
+    box-shadow: 0 0 0 3px #FFAE40, 0 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Text group wrapper — date + title + price stacked ───────────────────── */

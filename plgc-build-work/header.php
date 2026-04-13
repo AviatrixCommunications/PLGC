@@ -160,7 +160,8 @@ $cta = plgc_get_nav_cta();
 <div id="plgc-mobile-nav"
      class="plgc-mobile-nav"
      aria-label="Mobile navigation"
-     aria-hidden="true">
+     aria-hidden="true"
+     inert>
 
     <!-- Scrollable menu area -->
     <div class="plgc-mobile-nav__inner">

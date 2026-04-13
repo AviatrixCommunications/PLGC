@@ -197,10 +197,13 @@
     box-shadow: 0 0 0 2px #FFFFFF, 0 1px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Focus ring — WCAG 2.4.7 Focus Visible */
+/* Focus ring — WCAG 2.4.7 Focus Visible.
+   Uses box-shadow instead of outline because outline on a zero-sized
+   padded element renders as an elongated rectangle in some browsers.
+   box-shadow always follows border-radius for a clean circular ring.  */
 .plgc-gs__dots .swiper-pagination-bullet:focus-visible {
-    outline: 3px solid #FFAE40;
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 3px #FFAE40, 0 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 /* Hover state — slightly dim inactive dot */
@@ -407,8 +410,11 @@
     -webkit-backdrop-filter: blur(2px);
 }
 
-.plgc-gs--image-left .plgc-gs__expand-btn { right: 16px; }
-.plgc-gs--image-right .plgc-gs__expand-btn { left: 16px; }
+/* Image-left (Golf Outings, McChesney's): button in bottom-LEFT (free corner) */
+.plgc-gs--image-left .plgc-gs__expand-btn { left: 16px; }
+
+/* Image-right (Weddings): button in bottom-RIGHT (free corner) */
+.plgc-gs--image-right .plgc-gs__expand-btn { right: 16px; }
 
 .plgc-gs__expand-btn:hover {
     background: rgba(0, 0, 0, 0.7);

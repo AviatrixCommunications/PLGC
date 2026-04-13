@@ -599,7 +599,7 @@
     let lastFocus;
 	
 	    // Ensure mobile nav is inert on load (prevents hidden focusable elements  WCAG 4.1.2)
-	    //     if (mobileNav) mobileNav.setAttribute('inert', '');
+	        if (mobileNav) mobileNav.setAttribute('inert', '');
 
     function openDrawer() {
         if (!mobileNav) return;
