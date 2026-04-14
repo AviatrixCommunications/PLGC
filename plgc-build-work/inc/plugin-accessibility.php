@@ -348,7 +348,7 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 			}
 
 			// Fix on DOMContentLoaded
-			document.addEventListener('DOMContentLoaded', fixAriaDescription);
+			document.addEventListener('DOMContentLoaded', function() { fixAriaDescription(); });
 
 			// Fix on window load (catches late-loading TEC content)
 			window.addEventListener('load', function() {

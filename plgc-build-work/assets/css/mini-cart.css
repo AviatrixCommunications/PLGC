@@ -1,9 +1,12 @@
 /**
  * Floating Mini-Cart
  *
- * Fixed-position cart icon in the lower-left corner.
+ * Fixed-position cart icon — top-right, below the sticky header.
  * Brand colors: dark green tone (#233C26) background, yellow (#FFAE40) badge.
- * Touch target: 56×56 px (exceeds 44×44 minimum).
+ *
+ * Desktop: 64×64 px circle, 28 px icon.
+ * Mobile:  56×56 px circle, 24 px icon.
+ * Both exceed the 44×44 minimum touch target (SC 2.5.5).
  *
  * WCAG 2.1 AA:
  *   - White icon on #233C26 = 12.02:1 contrast ratio ✅
@@ -17,10 +20,16 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .plgc-mini-cart {
     position: fixed;
-    bottom: 24px;
-    left: 24px;
+    /* 103px header + 65px clear gap below nav */
+    top: 168px;
+    right: 24px;
     z-index: 9999;
     transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+}
+
+/* WP admin bar shifts the sticky header down 32px */
+body.admin-bar .plgc-mini-cart {
+    top: 200px;
 }
 
 .plgc-mini-cart--hidden {
@@ -36,8 +45,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background-color: #233C26;
     color: #FFFFFF;
@@ -67,8 +76,8 @@
    ICON
    ───────────────────────────────────────────────────────────────────────────── */
 .plgc-mini-cart__icon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
 }
 
@@ -79,16 +88,16 @@
     position: absolute;
     top: -4px;
     right: -4px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 5px;
-    border-radius: 11px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 12px;
     background-color: #FFAE40;
     color: #000000;
     font-family: 'Open Sans', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 700;
-    line-height: 22px;
+    line-height: 24px;
     text-align: center;
     pointer-events: none;
 }
@@ -107,12 +116,49 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   RESPONSIVE
+   RESPONSIVE — Tablet
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .plgc-mini-cart {
+        top: 140px;
+        right: 20px;
+    }
+    body.admin-bar .plgc-mini-cart {
+        top: 172px;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE — Mobile
    ───────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
     .plgc-mini-cart {
-        bottom: 16px;
-        left: 16px;
+        top: 110px;
+        right: 16px;
+    }
+    body.admin-bar .plgc-mini-cart {
+        /* WP mobile admin bar is 46px */
+        top: 156px;
+    }
+
+    /* Slightly smaller on mobile — still well above 44px minimum */
+    .plgc-mini-cart__link {
+        width: 56px;
+        height: 56px;
+    }
+
+    .plgc-mini-cart__icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .plgc-mini-cart__count {
+        min-width: 22px;
+        height: 22px;
+        padding: 0 5px;
+        border-radius: 11px;
+        font-size: 0.75rem;
+        line-height: 22px;
     }
 }
 

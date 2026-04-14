@@ -2,7 +2,7 @@
 /**
  * PLGC Floating Mini-Cart
  *
- * Renders a fixed-position cart icon in the lower-left corner when
+ * Renders a fixed-position cart icon in the upper-right corner when
  * the WooCommerce cart has items. Updates dynamically via AJAX
  * fragments so it reflects add/remove actions without a page reload.
  *
