@@ -9,7 +9,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'ALERT_BANNER_VERSION', '1.0.0' );
+define( 'ALERT_BANNER_VERSION', '1.1.0' );
 define( 'ALERT_BANNER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ALERT_BANNER_URL', plugin_dir_url( __FILE__ ) );
 
