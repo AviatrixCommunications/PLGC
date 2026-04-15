@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Constants
  */
-define('PLGC_VERSION', '1.7.54');
+define('PLGC_VERSION', '1.7.55');
 define('PLGC_DIR', get_stylesheet_directory());
 define('PLGC_URI', get_stylesheet_directory_uri());
 
@@ -613,6 +613,9 @@ require_once PLGC_DIR . '/inc/menu-cpt.php';
 
 // Floating Mini-Cart — sticky cart icon when WooCommerce cart has items
 require_once PLGC_DIR . '/inc/woocommerce-mini-cart.php';
+
+// Search enhancements — punctuation-insensitive matching (apostrophes, curly quotes)
+require_once PLGC_DIR . '/inc/search-config.php';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CUSTOM ELEMENTOR GALLERY WIDGETS

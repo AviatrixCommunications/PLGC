@@ -472,6 +472,10 @@
        ~244px at 420px total — enough to read a graphic clearly.              */
     .plgc-es {
         aspect-ratio: auto;
+        height: 420px;         /* explicit height — children need this to resolve height:100%.
+                                  min-height alone does NOT propagate to height:100% children
+                                  in standard CSS block layout. Without this, the swiper/slide
+                                  chain collapses to 0px and overflow:hidden clips all content. */
         min-height: 420px;
     }
 

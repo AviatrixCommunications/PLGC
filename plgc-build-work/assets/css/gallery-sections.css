@@ -386,7 +386,14 @@
    EXPAND BUTTON — opens lightbox with full-size image
    Sits in the bottom corner of the image column.
 
+   Hidden by default, revealed on hover/focus-within so it doesn't clutter
+   the gallery at rest but remains available for keyboard and mouse users.
+   Can't be removed entirely — it's the keyboard-accessible trigger for the
+   lightbox (the image click handler blocks keyboard-generated clicks via
+   e.detail === 0, so this button is the only SC 2.1.1 compliant path).
+
    WCAG 2.1 AA:
+     SC 2.1.1 — Native <button>, keyboard operable
      SC 2.5.5 — 44×44px touch target
      SC 2.4.7 — Visible focus ring
      SC 1.4.11 — White icon on dark translucent bg > 3:1 against any image
@@ -405,9 +412,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s ease, transform 0.15s ease;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.15s ease;
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+    /* Hidden at rest — revealed on hover/focus */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Reveal when the image column is hovered or contains a focused element */
+.plgc-gs__image-col:hover .plgc-gs__expand-btn,
+.plgc-gs__image-col:focus-within .plgc-gs__expand-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Always show when the button itself has keyboard focus */
+.plgc-gs__expand-btn:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+    outline: 3px solid #FFAE40;
+    outline-offset: 2px;
 }
 
 /* Image-left (Golf Outings, McChesney's): button in bottom-LEFT (free corner) */
@@ -419,11 +444,6 @@
 .plgc-gs__expand-btn:hover {
     background: rgba(0, 0, 0, 0.7);
     transform: scale(1.06);
-}
-
-.plgc-gs__expand-btn:focus-visible {
-    outline: 3px solid #FFAE40;
-    outline-offset: 2px;
 }
 
 .plgc-gs__expand-icon {
